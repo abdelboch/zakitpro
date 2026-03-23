@@ -1,0 +1,23 @@
+SCCM boundary group work looks boring until it quietly wrecks content location, WAN traffic, or site assignment behavior.
+
+That is exactly why AI is useful here.
+Not because it "knows SCCM better" than an experienced engineer. It doesn’t.
+It’s useful because boundary validation is repetitive, messy, and full of ugly query work that most of us do not want to write from scratch.
+
+The catch: if you let AI guess table names, joins, or ConfigMgr logic, you get a polished lie.
+
+I published a practical guide on using AI to build read-only SCCM boundary group validation queries safely:
+
+- define the exact validation job before prompting
+- feed AI trusted schema or a known-good query skeleton
+- force it to label assumptions instead of bluffing
+- keep the first pass read-only
+- validate against a location you already understand before trusting the report
+
+AI is a good drafting assistant.
+It is a terrible source of authority.
+
+Full guide:
+https://zakitpro.com/articles/ai-sccm-boundary-group-query-validation
+
+#SCCM #ConfigMgr #DesktopEngineering #EndpointManagement #PowerShell #AIforIT

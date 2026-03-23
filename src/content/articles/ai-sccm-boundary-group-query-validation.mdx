@@ -1,0 +1,316 @@
+---
+title: "How Desktop Engineers Can Use AI to Build Safer SCCM Boundary Group Validation Queries"
+description: "A practical workflow for using AI to draft SCCM boundary group validation queries and reports without trusting hallucinated logic or making reckless production changes."
+publishedAt: "2026-03-23"
+updatedAt: "2026-03-23"
+pillar: ai
+difficulty: senior
+type: how-to
+tags: ["SCCM", "Configuration Manager", "Boundary Groups", "WQL", "SQL", "AI", "Desktop Engineering"]
+draft: false
+---
+
+SCCM boundary group work has a nasty habit of looking simple right up until it breaks something important.
+
+On paper, it is just site assignment, content location, and a few tidy relationships. In the real world, it is where slow deployments, wrong management point behavior, remote office pain, and "why is this client pulling content over the WAN" arguments go to breed.
+
+That is why AI can be genuinely useful here. Not because it is smarter than an experienced ConfigMgr engineer. It is not. It is useful because boundary group validation is repetitive, easy to mess up, and full of ugly query glue work that nobody enjoys writing from scratch.
+
+The catch is obvious: if you let AI invent classes, fields, joins, or assumptions about your hierarchy, you will get a polished-looking lie. That is worse than no query at all.
+
+This guide shows how to use AI the right way: to draft safer SCCM boundary group validation queries, sanity-check your logic, and produce readable reports without handing a chatbot the keys to production.
+
+## The real problem is not writing the query
+
+Most engineers do not struggle because they cannot type SQL or WQL. They struggle because the question itself is muddy.
+
+Are you trying to validate site assignment?
+Check which boundary group a subnet maps to?
+Find clients in a remote office that are falling back to the wrong content source?
+Compare AD site boundaries with IP range boundaries after a network change?
+
+Those are different questions. AI falls apart when you ask one vague question and expect one perfect answer.
+
+So start here: define the exact validation job.
+
+Examples of good validation jobs:
+
+- list boundary groups that have no distribution points assigned
+- identify overlapping IP range boundaries before a change window
+- compare a known subnet list against existing boundaries
+- report devices in a location that are resolving to an unexpected boundary group
+- generate a review report before changing content location relationships
+
+That is the first place AI helps. It forces you to clean up your own thinking.
+
+## Where AI actually earns its keep
+
+AI is strong at four things in boundary group work.
+
+### Turning messy intent into a first draft
+
+If you describe the report you want, the inputs you have, and the tables or classes you trust, AI can give you a usable first pass much faster than starting from an empty file.
+
+That matters when the work is mostly plumbing.
+
+### Translating between SCCM concepts and query structure
+
+A lot of desktop engineers understand what they want to validate but do not keep SCCM's schema details in their head every day. AI is useful for mapping the human request into a draft query skeleton.
+
+### Building reporting wrappers around a known-good query
+
+Once the core logic is right, AI is great at adding the boring parts:
+
+- CSV export
+- grouped output
+- parameter handling
+- readable PowerShell wrappers
+- basic error handling
+- markdown summaries for change reviews
+
+### Critiquing fragile logic
+
+If you paste your draft query and ask, "What assumptions here could burn me in production?" you often get decent warnings about hard-coded values, missing filters, duplicate joins, or ambiguous location logic.
+
+That review step is underrated.
+
+## Where AI will absolutely make a fool of you
+
+Here is the part people skip.
+
+### It will invent SCCM schema details
+
+If the model is unsure, it may confidently produce classes, properties, or SQL joins that look plausible and do not exist in your environment.
+
+Never trust a ConfigMgr query just because the field names look Microsoft-ish.
+
+### It will collapse different goals into one mushy query
+
+Site assignment, content location, and client health are related. They are not the same thing. AI loves blending them together into an overstuffed query that answers nothing cleanly.
+
+### It will ignore your environment's weirdness
+
+Your hierarchy may have legacy boundaries, acquisitions, VPN ranges, stale AD site definitions, or "temporary" exceptions that have been around since the Obama administration. AI does not know any of that unless you tell it.
+
+### It will tempt you to skip validation
+
+This is the dangerous part. The output looks finished. It reads like it came from someone who knows SCCM. That aesthetic confidence tricks people into running the query, trusting the report, and making changes off bad data.
+
+Do not do that.
+
+## The safe workflow for AI-assisted boundary group validation
+
+This is the workflow I would actually trust in a real desktop engineering team.
+
+### 1. State the question like an operator, not a marketer
+
+Bad prompt:
+
+```text
+Write a query to check SCCM boundary groups.
+```
+
+That prompt deserves a bad result.
+
+Better prompt:
+
+```text
+I need a read-only validation report for SCCM boundary groups.
+Goal: find boundary groups that have boundaries assigned but no distribution points.
+Environment: ConfigMgr current branch, on-prem SQL reporting allowed, no production changes.
+Output: SQL query first, then a PowerShell wrapper that exports CSV.
+Rules: do not invent table names, call out any assumptions, and keep the query read-only.
+```
+
+That is boring. Good. Boring prompts produce safer output.
+
+### 2. Feed AI the schema you actually trust
+
+Do not ask the model to guess your world.
+
+Give it one of these:
+
+- known-good table names from your reporting environment
+- a working query you want adapted
+- class/property output from WBEMTest or PowerShell
+- a sample CSV with the columns you want to join against
+
+If you make the model work from trusted structure, you cut down the hallucination rate a lot.
+
+### 3. Force the model to label assumptions
+
+This one is non-negotiable.
+
+Ask for a section called "Assumptions and unknowns" every time. If the model assumes a table, relationship, or identifier, you want that stated plainly instead of buried inside a query.
+
+A good prompt line is:
+
+```text
+If you are unsure about a class, view, or column, stop and label it as an assumption instead of pretending it is correct.
+```
+
+### 4. Keep the first pass read-only
+
+Boundary group mistakes can become network mistakes very quickly. So the AI's first job is reporting, not remediation.
+
+Start with:
+
+- SELECT only
+- no update logic
+- no automatic boundary changes
+- no content location edits
+- no site assignment changes
+
+If the report is wrong, the blast radius stays small.
+
+### 5. Validate against a case you already understand
+
+Before you trust the output broadly, test it against something you already know is true.
+
+For example:
+
+- a branch office with a known subnet and known DP
+- a VPN range with known fallback behavior
+- a pilot boundary group you reviewed manually last week
+
+If the query cannot accurately describe known reality, it has no business informing a change window.
+
+## A practical AI prompt template
+
+Use something like this:
+
+```text
+You are helping with SCCM boundary group validation.
+
+Goal:
+Create a read-only query and optional PowerShell wrapper for a validation report.
+
+Validation task:
+Find boundary groups that have boundaries assigned but no distribution points mapped.
+
+Environment:
+- Microsoft Configuration Manager current branch
+- On-prem SQL reporting is allowed
+- No production changes
+- Read-only output only
+
+Known trusted inputs:
+- I will provide the table names or an existing query skeleton
+- Do not invent missing schema
+
+Rules:
+- If a table, column, or relationship is uncertain, label it as an assumption
+- Keep the first output read-only
+- Separate the query from the explanation
+- Explain what the query does in plain English
+- List edge cases that could make the results misleading
+
+Output format:
+1. Assumptions and unknowns
+2. SQL query
+3. Plain-English explanation
+4. Edge cases
+5. Optional PowerShell wrapper to export CSV
+```
+
+That prompt will not win any creativity awards. It will save you from dumb mistakes.
+
+## Example use cases worth automating
+
+Here are the boundary group validation jobs where AI is genuinely helpful.
+
+### Report boundary groups with thin or broken content relationships
+
+This is one of the best use cases because the goal is clear and the output is reviewable.
+
+You want to know:
+
+- which boundary groups have no DP mapping
+- which ones rely on fallback when they should not
+- which ones look incomplete after a site expansion
+
+That is perfect AI grunt work.
+
+### Compare network inventory against SCCM boundaries
+
+If your network team hands you an updated subnet list, AI can help turn that into a comparison workflow.
+
+Not the final truth. A workflow.
+
+For example, AI can help you draft a script that:
+
+1. imports a CSV of expected subnets
+2. normalizes formatting
+3. compares against exported SCCM boundary data
+4. flags missing or overlapping ranges
+5. generates a review report for human approval
+
+That is useful because the hard part is usually the boring comparison logic.
+
+### Build operator-friendly review reports
+
+Most SCCM query output is technically correct and socially useless.
+
+AI is good at taking a dense result set and producing:
+
+- an exception summary
+- a location-by-location breakdown
+- a short change review note
+- a list of records that need manual review
+
+That is how you make the work easier for the next engineer instead of just dumping raw rows into a ticket.
+
+## A sample operator checklist
+
+Before you trust any AI-assisted boundary group query, check this:
+
+- [ ] The validation question is specific and read-only.
+- [ ] The model worked from known schema, not guesses.
+- [ ] Assumptions are listed explicitly.
+- [ ] I tested the output against a location or boundary group I already know.
+- [ ] The report separates site assignment questions from content location questions.
+- [ ] Overlap, fallback, and legacy exceptions are called out.
+- [ ] No production changes were made from AI output alone.
+
+If you skip this checklist, you are not using AI. You are gambling with nicer formatting.
+
+## A PowerShell wrapper pattern that works well
+
+Once the SQL or WQL logic is verified, AI can help build a wrapper like this:
+
+```powershell
+param(
+    [Parameter(Mandatory)]
+    [string]$SqlServer,
+
+    [Parameter(Mandatory)]
+    [string]$Database,
+
+    [Parameter(Mandatory)]
+    [string]$OutputPath
+)
+
+$query = @"
+-- Known-good read-only query goes here
+"@
+
+$result = Invoke-Sqlcmd -ServerInstance $SqlServer -Database $Database -Query $query -ErrorAction Stop
+$result | Export-Csv -Path $OutputPath -NoTypeInformation
+$result | Format-Table -AutoSize
+```
+
+There is nothing glamorous about this. That is the point. You want the cleverness in the thinking, not in the operational path.
+
+## My blunt take
+
+AI is a strong assistant for SCCM boundary group validation work. It is a terrible source of authority.
+
+Use it to draft. Use it to refactor. Use it to wrap ugly query logic in something readable. Use it to pressure-test your assumptions.
+
+Do not use it as your schema oracle.
+Do not use it as your final reviewer.
+And definitely do not let it talk you into production changes because the output looked polished.
+
+Boundary groups are one of those areas where enterprise pain is usually self-inflicted. AI can reduce the grunt work, but only if the engineer keeps a hand on the wheel.
+
+That is the real job now: not typing faster, but filtering machine output before it turns into a weekend outage.
