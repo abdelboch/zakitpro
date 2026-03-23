@@ -1,0 +1,12 @@
+AI + Intune Supersedence Review
+Use AI to review Intune supersedence safely by validating uninstall behavior, detection truth, dependencies, scope, and rollback before pilot.
+OLD APP FACTS: Capture uninstall command, detection logic, requirements, dependencies, and assignment scope for the current package.
+NEW APP FACTS: Capture install command, replacement intent, reboot behavior, prerequisites, and expected coexistence rules for the new package.
+VERIFY UNINSTALL: Show a test step proving the legacy app uninstalls silently and cleanly in the same context Intune will use.
+CHECK DETECTION: Flag file-exists-only or overlapping detection rules that could create false positives after replacement.
+DEPENDENCIES + REBOOT: Review runtimes, prerequisite apps, service changes, and reboot behavior before enabling supersedence.
+LIMIT BLAST RADIUS: Isolate pilot targeting, filters, and exclusions before production groups ever see the change.
+ROLLBACK READY: Define rollback owner, stop condition, and steps to disable the chain and restore the prior package fast.
+Safer Upgrades
+Pilot Risk Control
+Rollback Ready

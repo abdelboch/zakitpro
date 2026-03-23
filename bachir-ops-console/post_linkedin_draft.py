@@ -7,6 +7,7 @@ verification when possible so the caller gets a more trustworthy result than a
 blindly constructed feed URL.
 """
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -19,6 +20,7 @@ import requests
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE_ROOT = Path('/home/zak/.openclaw/workspace')
 TOKEN_FILE = WORKSPACE_ROOT / 'memory' / 'linkedin_auth.json'
+PUBLISH_HISTORY_FILE = WORKSPACE_ROOT / 'memory' / 'linkedin_publish_history.json'
 DEFAULT_POST_FILE = REPO_ROOT / 'Writers' / 'Social_Media' / 'ai-autopilot-esp-failure-triage-linkedin.txt'
 DEFAULT_MEMBER_ID = 'WjEDGn4RZK'
 LINKEDIN_API_TIMEOUT = 30
@@ -93,6 +95,51 @@ def build_permalink_details(urn: str | None) -> dict[str, str | bool | None]:
         'displayable': False,
         'reason': 'Unknown URN type; returning best-effort feed URL only.',
     }
+
+
+def normalize_optional_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip()
+    return normalized or None
+
+
+def content_fingerprint(post_text: str) -> str:
+    normalized = '\n'.join(line.rstrip() for line in post_text.strip().splitlines())
+    return hashlib.sha256(normalized.encode('utf-8')).hexdigest()
+
+
+def load_publish_history() -> list[dict]:
+    if not PUBLISH_HISTORY_FILE.exists():
+        return []
+
+    try:
+        payload = json.loads(PUBLISH_HISTORY_FILE.read_text())
+    except json.JSONDecodeError:
+        return []
+
+    if isinstance(payload, list):
+        return payload
+    return []
+
+
+def save_publish_history(entries: list[dict]) -> None:
+    PUBLISH_HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    PUBLISH_HISTORY_FILE.write_text(json.dumps(entries, indent=2, sort_keys=True))
+
+
+def ensure_not_duplicate_publish(post_text: str, slug: str | None = None, article_url: str | None = None) -> None:
+    slug = normalize_optional_text(slug)
+    article_url = normalize_optional_text(article_url)
+    fingerprint = content_fingerprint(post_text)
+
+    for entry in load_publish_history():
+        if slug and entry.get('slug') == slug:
+            raise RuntimeError(f'Duplicate LinkedIn publish blocked: slug already published ({slug}).')
+        if article_url and entry.get('article_url') == article_url:
+            raise RuntimeError(f'Duplicate LinkedIn publish blocked: article URL already published ({article_url}).')
+        if entry.get('content_fingerprint') == fingerprint:
+            raise RuntimeError('Duplicate LinkedIn publish blocked: identical post body already published.')
 
 
 def upload_image_to_linkedin(token: str, author: str, image_source: str) -> str:
@@ -260,7 +307,27 @@ def verify_created_post(token: str, created_urn: str | None) -> dict:
     return result
 
 
-def publish_post(post_text: str, image_source: str | None = None, title: str = 'ZakitPro Update', verify: bool = True) -> dict:
+def record_publish_result(*, slug: str | None, article_url: str | None, post_text: str, image_source: str | None, result: dict) -> None:
+    entries = load_publish_history()
+    now = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+    entries.append({
+        'published_at': now,
+        'slug': normalize_optional_text(slug),
+        'article_url': normalize_optional_text(article_url),
+        'content_fingerprint': content_fingerprint(post_text),
+        'image_source': normalize_optional_text(image_source),
+        'urn': result.get('urn'),
+        'canonical_urn': result.get('canonical_urn'),
+        'url': result.get('url'),
+        'verification_ok': bool(result.get('verification', {}).get('ok')),
+    })
+    save_publish_history(entries)
+
+
+def publish_post(post_text: str, image_source: str | None = None, title: str = 'ZakitPro Update', verify: bool = True, slug: str | None = None, article_url: str | None = None, allow_duplicate: bool = False) -> dict:
+    if not allow_duplicate:
+        ensure_not_duplicate_publish(post_text, slug=slug, article_url=article_url)
+
     token, member_id = get_auth()
     author = f'urn:li:person:{member_id}'
     headers = linkedin_headers(token)
@@ -319,7 +386,7 @@ def publish_post(post_text: str, image_source: str | None = None, title: str = '
 
     permalink = build_permalink_details(canonical_urn)
 
-    return {
+    result = {
         'ok': True,
         'author': author,
         'urn': created_urn,
@@ -332,7 +399,13 @@ def publish_post(post_text: str, image_source: str | None = None, title: str = '
         'permalink': permalink,
         'verification': verification,
         'trustworthy_result': bool(verification.get('ok')),
+        'source': {
+            'slug': normalize_optional_text(slug),
+            'article_url': normalize_optional_text(article_url),
+        },
     }
+    record_publish_result(slug=slug, article_url=article_url, post_text=post_text, image_source=image_source, result=result)
+    return result
 
 
 def main() -> int:
@@ -341,6 +414,9 @@ def main() -> int:
     parser.add_argument('--text', '-t', help='Inline post text')
     parser.add_argument('--image', '-i', help='Image path or URL')
     parser.add_argument('--title', default='AI + Autopilot ESP Triage', help='Image title')
+    parser.add_argument('--slug', help='Source article slug for duplicate-publish protection')
+    parser.add_argument('--article-url', help='Canonical article URL for duplicate-publish protection')
+    parser.add_argument('--allow-duplicate', action='store_true', help='Bypass duplicate-publish protection')
     parser.add_argument('--no-verify', action='store_true', help='Skip post-publish verification lookup')
     args = parser.parse_args()
 
@@ -349,7 +425,15 @@ def main() -> int:
     else:
         post_text = Path(args.file).read_text().strip()
 
-    result = publish_post(post_text, image_source=args.image, title=args.title, verify=not args.no_verify)
+    result = publish_post(
+        post_text,
+        image_source=args.image,
+        title=args.title,
+        verify=not args.no_verify,
+        slug=args.slug,
+        article_url=args.article_url,
+        allow_duplicate=args.allow_duplicate,
+    )
     print(json.dumps(result))
     return 0
 
