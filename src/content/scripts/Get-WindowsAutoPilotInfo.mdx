@@ -1,0 +1,71 @@
+---
+title: "Streamline Device Registration with Get-WindowsAutoPilotInfo"
+description: "Learn how to use Get-WindowsAutoPilotInfo to quickly retrieve hardware hashes and register devices with Windows Autopilot for seamless deployment."
+language: "powershell"
+pillar: "scripting"
+publishedAt: "2026-03-09"
+draft: false
+---
+
+# Streamline Device Registration with Get-WindowsAutoPilotInfo
+
+For IT Desktop Engineers managing modern workplace environments, Windows Autopilot is a game-changer. It eliminates the need for traditional imaging by allowing devices to be provisioned over the air. However, to leverage Autopilot, devices must first be registered in your tenant. This is where the **Get-WindowsAutoPilotInfo** PowerShell script becomes indispensable.
+
+## What is Get-WindowsAutoPilotInfo?
+
+`Get-WindowsAutoPilotInfo` is a widely used PowerShell script available on the PowerShell Gallery. It uses WMI (Windows Management Instrumentation) to extract the critical properties required for Windows Autopilot registration—specifically, the device's Serial Number and Hardware Hash. 
+
+## Why Desktop Engineers Need It
+
+Before a device can go through the Autopilot provisioning process, Intune needs to know it exists and belongs to your organization. While OEMs and resellers can automatically upload this information for new devices, desktop engineers frequently need to manually gather hardware hashes for:
+
+*   **Existing Fleets:** Transitioning legacy domain-joined machines to cloud-native Autopilot management.
+*   **Repurposed Devices:** Wiping and re-provisioning devices for new users.
+*   **Virtual Machines:** Testing Autopilot deployments using Hyper-V or other hypervisors.
+*   **Break/Fix Scenarios:** Re-registering devices after major hardware replacements (like motherboards).
+
+Without this script, extracting the 4000-character hardware hash manually is virtually impossible.
+
+## How to Use It
+
+Using the script is straightforward. Here’s a basic workflow to get you started:
+
+### 1. Install the Script
+
+Open an elevated PowerShell prompt and install the script from the PowerShell Gallery:
+
+```powershell
+Install-Script -Name Get-WindowsAutoPilotInfo -Force
+```
+
+### 2. Set Execution Policy
+
+Ensure your PowerShell execution policy allows running downloaded scripts:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
+
+### 3. Generate the CSV
+
+Run the script and output the results to a CSV file. This CSV is perfectly formatted for importing directly into the Intune portal.
+
+```powershell
+Get-WindowsAutoPilotInfo.ps1 -OutputFile C:\AutopilotHWID.csv
+```
+
+*Note: It is normal for the resulting CSV file to not collect a Windows Product ID (PKID) value, as only the serial number and hardware hash are strictly required to register a device.*
+
+### 4. Direct Online Registration (Advanced)
+
+The script also supports directly uploading the hash to Intune using the `-Online` parameter (requires the `Microsoft.Graph.Intune` module and appropriate permissions):
+
+```powershell
+Get-WindowsAutoPilotInfo.ps1 -Online
+```
+
+This bypasses the CSV step entirely, saving valuable time during bulk enrollments.
+
+## Conclusion
+
+The `Get-WindowsAutoPilotInfo` script is an essential utility in any modern desktop engineer's toolkit. By automating the extraction of hardware hashes, it bridges the gap between physical hardware and cloud-based Autopilot provisioning, making device deployments faster and more efficient.

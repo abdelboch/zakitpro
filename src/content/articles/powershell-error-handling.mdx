@@ -1,0 +1,198 @@
+---
+title: "PowerShell Error Handling Best Practices"
+slug: "powershell-error-handling"
+description: "Write robust PowerShell scripts with proper error handling. Try/Catch, -ErrorAction, and logging strategies."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: junior
+type: how-to
+tags: ["powershell", "error-handling", "scripting", "best-practices"]
+draft: false
+---
+
+# PowerShell Error Handling Best Practices
+
+Bad error handling makes scripts fragile. Good error handling makes them professional. Here's how to write PowerShell that fails gracefully.
+
+## The Basics
+
+### -ErrorAction Parameter
+
+```powershell
+# Different levels
+Stop      # Throw exception (use with Try/Catch)
+Continue  # Write to $error and continue (default)
+SilentlyContinue # Suppress error message
+Inquire   # Ask user what to do
+
+# Examples
+Get-Item C:\Missing -ErrorAction Stop
+Get-Item C:\Missing -ErrorAction SilentlyContinue
+```
+
+### Try/Catch/Finally
+
+```powershell
+try {
+    # Risky operation
+    Get-Content "C:\important.txt" -ErrorAction Stop
+    
+    # Success path
+    Write-Host "File found!"
+}
+catch {
+    # What to do on failure
+    Write-Host "Error: $($_.Exception.Message)"
+    
+    # Log the error
+    $Error | Out-File "C:\Logs\errors.log" -Append
+}
+finally {
+    # Always runs - cleanup
+    Remove-Item $tempFile -ErrorAction SilentlyContinue
+}
+```
+
+## Types of Errors
+
+### Terminating vs Non-Terminating
+
+```powershell
+# Terminating - stops execution
+# Use -ErrorAction Stop to convert
+
+# Non-terminating - continues
+Get-ChildItem C:\ -Recurse -ErrorAction SilentlyContinue
+
+# Make terminating
+$ErrorActionPreference = "Stop"
+```
+
+### Catch Specific Errors
+
+```powershell
+try {
+    Get-ADUser "doesntexist"
+}
+catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+    Write-Host "User not found"
+}
+catch [System.UnauthorizedAccessException] {
+    Write-Host "Access denied"
+}
+catch {
+    Write-Host "Unexpected error: $_"
+}
+```
+
+## Logging Errors
+
+```powershell
+function Write-ErrorLog {
+    param([string]$Message)
+    
+    $LogPath = "$env:TEMP\ScriptErrors.log"
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    
+    "$Timestamp - $Message" | Out-File $LogPath -Append
+}
+
+# Usage
+try {
+    Invoke-RestMethod "https://api.example.com/data" -ErrorAction Stop
+}
+catch {
+    Write-ErrorLog "API call failed: $($_.Exception.Message)"
+    throw
+}
+```
+
+## Validation Patterns
+
+```powershell
+# Pre-flight checks
+function Install-App {
+    param([string]$InstallerPath)
+    
+    # Validate input
+    if (-not (Test-Path $InstallerPath)) {
+        throw "Installer not found: $InstallerPath"
+    }
+    
+    # Validate disk space
+    $FreeSpace = (Get-PSDrive C).Free
+    if ($FreeSpace -lt 1GB) {
+        throw "Insufficient disk space"
+    }
+    
+    # Proceed with install
+}
+```
+
+## Retry Logic
+
+```powershell
+function Invoke-WithRetry {
+    param(
+        [scriptblock]$ScriptBlock,
+        [int]$MaxAttempts = 3,
+        [int]$DelaySeconds = 5
+    )
+    
+    for ($i = 1; $i -le $MaxAttempts; $i++) {
+        try {
+            & $ScriptBlock -ErrorAction Stop
+            return
+        }
+        catch {
+            if ($i -eq $MaxAttempts) {
+                throw "Failed after $MaxAttempts attempts: $_"
+            }
+            Write-Host "Attempt $i failed, retrying..."
+            Start-Sleep -Seconds $DelaySeconds
+        }
+    }
+}
+
+# Usage
+Invoke-WithRetry -ScriptBlock {
+    Test-NetConnection -ComputerName "api.example.com" -Port 443
+} -MaxAttempts 3 -DelaySeconds 5
+```
+
+## $PSItem vs $_
+
+```powershell
+# Both work the same
+catch {
+    $_.Exception.Message      # The error message
+    $_.Exception.GetType()    # Exception type
+    $_.ScriptStackTrace      # Where it happened
+    $_.TargetObject           # What failed
+}
+```
+
+## Common Mistakes
+
+❌ **Bad:**
+```powershell
+Get-Item C:\file.txt
+if ($?) { Write-Host "Success" }
+```
+
+✅ **Good:**
+```powershell
+try {
+    Get-Item C:\file.txt -ErrorAction Stop
+    Write-Host "Success"
+}
+catch {
+    Write-Host "Failed"
+}
+```
+
+## Wrap-Up
+
+Always assume things can fail. Use Try/Catch, log errors, and validate inputs. Your future self will thank you.
+
+Questions? Drop them below!

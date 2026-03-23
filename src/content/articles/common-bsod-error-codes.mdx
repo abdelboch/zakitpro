@@ -1,0 +1,185 @@
+---
+title: "Common BSOD Error Codes and Fixes"
+slug: "common-bsod-error-codes"
+description: "The most common Windows Blue Screen of Death (BSOD) error codes, what they mean, and how to fix them."
+publishedAt: "2026-02-27"
+pillar: troubleshooting
+difficulty: mid
+type: error-reference
+tags: ["bsod", "blue-screen", "crash", "stop-error", "windows"]
+draft: false
+---
+
+# Common BSOD Error Codes and Fixes
+
+The Blue Screen of Death (BSOD) — every IT pro has seen it. Here's how to diagnose and fix the most common errors.
+
+## CRITICAL_PROCESS_DIED
+
+### Meaning
+A critical system process crashed.
+
+### Fix
+```powershell
+# Check for recent crashes
+Get-WinEvent -FilterHashtable @{LogName="System";ID=1001} -MaxEvents 10
+
+# Run system file checker
+sfc /scannow
+
+# Check disk
+chkdsk C: /f /r
+
+# Update drivers, especially chipset and storage
+```
+
+## DRIVER_IRQL_NOT_LESS_OR_EQUAL (D1)
+
+### Meaning
+A driver tried to access memory it shouldn't.
+
+### Fix
+```powershell
+# Boot to safe mode
+# Uninstall recent driver updates
+# Roll back to previous version
+
+# Check for problematic drivers
+driverquery /v | findstr /i "error"
+
+# Update BIOS and chipset drivers
+```
+
+## PAGE_FAULT_IN_NONPAGED_AREA
+
+### Meaning
+System tried to access invalid memory.
+
+### Fix
+```powershell
+# Check RAM
+mdsched.exe
+
+# Update drivers
+# Check for malware
+# Update Windows
+```
+
+## KERNEL_DATA_INPAGE_ERROR (7A)
+
+### Meaning
+Couldn't read/write data to disk.
+
+### Fix
+```powershell
+# Check disk health
+Get-PhysicalDisk | Get-StorageReliabilityCounter
+
+# Run chkdsk
+chkdsk C: /f /r /x
+
+# Check cable connections
+# Test with different SATA port
+```
+
+## SYSTEM_THREAD_EXCEPTION_NOT_HANDLED
+
+### Meaning
+A driver didn't handle an exception properly.
+
+### Fix
+```powershell
+# Update graphics drivers
+# Disable overclocking
+# Check for Windows updates
+# Run verifier to find driver:
+ verifier /standard /driver mydriver.sys
+```
+
+## VIDEO_TDR_FAILURE / VIDEO_TDR_TIMEOUT_DETECTED
+
+### Meaning
+Graphics driver timed out.
+
+### Fix
+```powershell
+# Roll back graphics driver
+# Update to latest driver
+# Disable overclocking
+# Check GPU temperature
+
+# Disable TDR in registry (temporary):
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" -Name "TdrLevel" -Value 0 -Type DWord
+```
+
+## IRQL_NOT_LESS_OR_EQUAL
+
+### Meaning
+Driver accessed memory at wrong IRQL.
+
+### Fix
+- Update all drivers
+- Check for conflicting software
+- Run SFC and DISM
+- Test with clean boot
+
+## BAD_POOL_HEADER
+
+### Meaning
+Memory pool corruption, usually driver-related.
+
+### Fix
+```powershell
+# Update network drivers especially
+# Run Memory Diagnostics
+mdsched.exe
+
+# Check for malware
+```
+
+## ACPI_BIOS_ERROR
+
+### Meaning
+BIOS/ACPI issue.
+
+### Fix
+```powershell
+# Update BIOS
+# Reset BIOS to defaults
+# Disable C-States in BIOS
+```
+
+## MACHINE_CHECK_EXCEPTION
+
+### Meaning
+Hardware failure — CPU, RAM, or power.
+
+### Fix
+```powershell
+# Check CPU temperature
+# Test RAM with MemTest86
+# Check power supply
+# Update BIOS
+```
+
+## Quick BSOD Checklist
+
+1. Write down the error code
+2. Check Windows Event Viewer → System log
+3. Run `sfc /scannow`
+4. Update drivers
+5. Check RAM and disk health
+6. Check temps
+
+## Tools to Have
+
+- **WhoCrashed** — Analyzes crash dumps
+- **BlueScreenView** — View crash info
+- **WinDbg** — Advanced dump analysis
+- **MemTest86** — RAM testing
+
+## Wrap-Up
+
+BSODs are scary but usually fixable. The error code tells you where to look. Start with drivers, then hardware.
+
+Questions? Drop them below!

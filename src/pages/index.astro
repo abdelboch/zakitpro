@@ -1,0 +1,58 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const pillars = [
+  { icon: "🔧", name: "Windows Troubleshooting", href: "/troubleshooting/", desc: "Boot failures, BSOD, event log forensics, profile corruption, error codes" },
+  { icon: "⚡", name: "Scripting & Automation", href: "/scripting/", desc: "PowerShell, Graph API, task automation, scheduled jobs" },
+  { icon: "📦", name: "Deployment & Imaging", href: "/deployment/", desc: "Autopilot, WinPE, MDT, driver injection, provisioning" },
+  { icon: "🔒", name: "Endpoint Security", href: "/security/", desc: "CIS benchmarks, LAPS, Defender for Endpoint, BitLocker, Conditional Access" },
+  { icon: "📱", name: "App Packaging", href: "/packaging/", desc: "Win32/Intune packaging, PSADT, silent installs, detection rules" },
+  { icon: "🚀", name: "Career & Craft", href: "/career/", desc: "Career progression, lab setup, cert roadmaps, documentation, tooling" },
+  { icon: "🤖", name: "AI-Augmented Engineering", href: "/ai/", desc: "Practical AI workflows for Intune, SCCM, PowerShell, and enterprise troubleshooting" },
+  { icon: "🎓", name: "Trainings & Certificates", href: "/trainings/", desc: "Professional certifications and training records in AI, cloud, and IT infrastructure" },
+];
+---
+
+<Layout title="Home">
+
+  <!-- Hero -->
+  <section class="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <h1 class="text-4xl md:text-5xl font-heading font-bold mb-4 text-gray-900 dark:text-white">
+        Modern Desktop Engineering in the AI Era
+      </h1>
+      <h2 class="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+        Advanced Microsoft Intune, SCCM, PowerShell, and AI-driven automation strategies for real-world enterprise environments.
+      </h2>
+      <p class="text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-4xl mx-auto">
+        Learn practical endpoint management, automation, and security techniques used by professional desktop engineers.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-3">
+        <a href="/deployment/" class="px-6 py-3 rounded-lg bg-accent text-white font-semibold hover:opacity-90 transition">Explore Guides</a>
+        <a href="/ai/" class="px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition">Get the AI Toolkit</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pillars Grid -->
+  <section class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {pillars.map((pillar) => (
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-accent dark:hover:border-accent transition-colors group">
+            <div class="flex items-start gap-4 mb-4">
+              <span class="text-3xl">{pillar.icon}</span>
+              <div>
+                <h3 class="text-lg font-bold group-hover:text-accent transition-colors">
+                  <a href={pillar.href}>{pillar.name}</a>
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{pillar.desc}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Layout>

@@ -1,0 +1,80 @@
+---
+title: "Top 20 Essential PowerShell Gallery Scripts for Desktop Engineers in 2026"
+slug: "top-20-essential-powershell-gallery-scripts-desktop-engineers"
+description: "The definitive list of the top 20 most useful PowerShell scripts and modules every modern Desktop Engineer needs to have installed from the PowerShell Gallery."
+publishedAt: "2026-03-09"
+pillar: scripting
+difficulty: mid
+type: script-drop
+tags: ["powershell", "scripting", "intune", "sccm", "automation"]
+draft: false
+---
+
+# Top 20 Essential PowerShell Gallery Scripts for Desktop Engineers in 2026
+
+If you are managing endpoints in 2026, you know that the GUI is just a suggestion. True desktop engineering—whether you're working in Microsoft Intune, SCCM, or managing security compliance—requires automation. The PowerShell Gallery is the ultimate repository for tools that save time, fix broken deployments, and secure devices at scale.
+
+Here is the definitive list of the top 20 most useful PowerShell scripts and modules every modern Desktop Engineer needs to have installed.
+
+## 1. IntuneWin32App
+Packaging Win32 apps for Intune used to be a tedious manual process. This module automates the creation of `.intunewin` files directly from your CI/CD pipeline or local scripts, making bulk app packaging a breeze.
+
+## 2. Microsoft.Graph.Intune
+While the newer Graph modules are taking over, this legacy wrapper is still heavily downloaded for managing Intune device compliance, configuration policies, and pulling quick device inventory reports without writing raw JSON requests.
+
+## 3. PSWindowsUpdate
+The holy grail of endpoint patching. When SCCM or Windows Update for Business (WUfB) fails to push a critical patch, `PSWindowsUpdate` allows you to force-scan, download, and install updates remotely via PowerShell.
+
+## 4. ConfigMgr (ConfigurationManager)
+If you still have one foot in on-prem infrastructure, the official ConfigMgr module is non-negotiable. It is the engine behind automating Task Sequences, creating device collections, and pushing out client settings.
+
+## 5. AutopilotDiagnostics
+When a Windows Autopilot deployment fails, digging through the event viewer is a nightmare. This script extracts the Autopilot event logs, diagnoses exactly which policy or app failed during the ESP (Enrollment Status Page), and outputs it in a readable format.
+
+## 6. ImportExcel
+Desktop engineers deal with a lot of hardware hashes and inventory lists. `ImportExcel` lets you read, write, and format Excel files in PowerShell without needing Microsoft Office installed on the machine.
+
+## 7. HardeningKitty
+Endpoint security is a major pillar for any admin. HardeningKitty audits a Windows system against industry-standard baselines (like CIS or DoD) and outputs a detailed report of what registry keys and policies need tightening.
+
+## 8. Pester
+If you are writing scripts to deploy across 10,000 machines, you need to test them. Pester is the testing framework for PowerShell, allowing you to validate that your endpoint configurations actually applied successfully.
+
+## 9. PSAppDeployToolkit (PSADT)
+Though often downloaded from GitHub, PSADT is the industry standard for wrapping complex application installations. It handles user deferrals, checking for running processes, and deep registry cleanups before installing a new app version.
+
+## 10. Win32-OpenSSH
+Managing remote endpoints requires secure connections. Automating the installation and configuration of the OpenSSH server on Windows endpoints allows for secure, cross-platform remote management.
+
+## 11. OSDBuilder
+For the SCCM admins, OSDBuilder is a lifesaver. It automates the process of performing Offline Servicing to Windows image (WIM) files, allowing you to inject the latest cumulative updates before deploying the OS.
+
+## 12. NTFSSecurity
+Managing file and folder permissions via the standard `Get-Acl` is notoriously difficult. `NTFSSecurity` provides a much simpler, human-readable way to audit and set NTFS permissions across shared drives and local endpoints.
+
+## 13. AzureAD (and AzureADPreview)
+While Microsoft is transitioning everything to Graph, these modules are still heavily used to pull user device registrations, check BitLocker recovery keys, and manage device object states in Entra ID.
+
+## 14. PSExec
+Not the Sysinternals tool, but the PowerShell wrapper. For immediate, raw execution of commands on remote systems where WinRM might be blocked but SMB is open, this is a classic fallback for troubleshooting.
+
+## 15. BurntToast
+User communication is key during deployments. `BurntToast` allows you to generate native Windows 10/11 Action Center notifications to warn users about impending reboots or software updates.
+
+## 16. Get-AutopilotDiagnostics
+A lighter, faster script specifically designed to be run via Shift+F10 during the OOBE phase to see exactly why a device isn't grabbing its Autopilot profile.
+
+## 17. Uninstall-Windows10Bloatware
+Every desktop engineer has a script to strip out Xbox, Candy Crush, and TikTok from the base OS. This community-driven script is constantly updated to remove the latest consumer bloatware from Enterprise environments.
+
+## 18. PSGetSID
+A great utility for deep endpoint troubleshooting, allowing you to quickly translate user and group SIDs when diagnosing strange profile corruption or SCCM client cache issues.
+
+## 19. Defender-Config
+A streamlined module for managing Microsoft Defender Antivirus settings locally, forcing signature updates, and initiating deep scans when managed policies fail to apply.
+
+## 20. WinGet (Microsoft.WinGet.Client)
+The future of package management. While technically a native tool now, the PowerShell wrappers for WinGet allow you to script the installation of common utilities (like Notepad++, 7-Zip, or Chrome) directly during device provisioning.
+
+### Final Thoughts
+As AI continues to change how we write scripts, having these core modules in your arsenal ensures you can actually execute the code. Stop doing things manually in the GUI—grab these modules from the PowerShell Gallery and start automating your environment.

@@ -1,0 +1,166 @@
+---
+title: "Windows Event Log Essentials for IT"
+slug: "windows-event-log-essentials"
+description: "The essential Windows Event Logs every IT pro should monitor. Learn to read, filter, and act on Windows logs effectively."
+publishedAt: "2026-02-27"
+pillar: troubleshooting
+difficulty: junior
+type: how-to
+tags: ["windows", "event-logs", "troubleshooting", "event-viewer", "monitoring"]
+draft: false
+---
+
+# Windows Event Log Essentials for IT
+
+When something breaks, the Event Logs are your first stop. But there's a lot of noise in there. This guide covers the essential logs you need to monitor and how to read them effectively.
+
+## The Big Five Logs
+
+### 1. System Log
+**Location:** `Application and Services Logs\Microsoft\Windows\EventID\...`
+
+What you'll find:
+- Driver failures
+- Service starts/stops
+- Hardware issues
+- Blue Screen events (BugCheck)
+
+```powershell
+# Quick System log check
+Get-WinEvent -LogName System -MaxEvents 50 | 
+    Where-Object { $_.LevelDisplayName -eq 'Error' } | 
+    Select-Object TimeCreated, Id, Message
+```
+
+### 2. Application Log
+
+What you'll find:
+- Application crashes
+- .NET errors
+- Software installation issues
+
+```powershell
+# Recent application errors
+Get-WinEvent -LogName Application -MaxEvents 20 |
+    Where-Object { $_.Level -eq 2 } |
+    Select-Object TimeCreated, ProviderName, Message
+```
+
+### 3. Security Log
+
+What you'll find:
+- Logon events (4624, 4625)
+- Account changes (4728, 4729)
+- Privilege use (4672)
+- Failed password attempts
+
+```powershell
+# Recent successful logons
+Get-WinEvent -LogName Security -FilterHashtable @{
+    ID = 4624
+    TimeCreated = (Get-Date).AddHours(-24)
+} -MaxEvents 10 | Select-Object TimeCreated, @{N='User';E={$_.Properties[5].Value}}
+
+# Failed logon attempts
+Get-WinEvent -LogName Security -FilterHashtable @{
+    ID = 4625
+    TimeCreated = (Get-Date).AddHours(-24)
+} -MaxEvents 10
+```
+
+### 4. Setup Log
+
+What you'll find:
+- Windows Update issues
+- Installation failures
+- Component store corruption
+
+```powershell
+# Setup log location
+$SetupLog = "$env:SystemRoot\Panther\setupact.log"
+Get-Content $SetupLog -Tail 50
+```
+
+### 5. Microsoft-Windows-DeviceManagement-Enterprise-Diagnostics-Provider/Admin
+
+What you'll find:
+- Intune enrollment issues
+- MDM sync problems
+- Policy deployment failures
+
+```powershell
+# Intune/MDM logs
+Get-WinEvent -LogName "Microsoft-Windows-DeviceManagement-Enterprise-Diagnostics-Provider/Admin" -MaxEvents 20
+```
+
+## Essential Event IDs to Know
+
+### Security
+| Event ID | Meaning |
+|----------|---------|
+| 4624 | Successful logon |
+| 4625 | Failed logon |
+| 4634 | Logoff |
+| 4672 | Special privileges assigned |
+| 4720 | User account created |
+| 4726 | User account deleted |
+
+### System
+| Event ID | Meaning |
+|----------|---------|
+| 6005 | Event Log service started |
+| 6006 | Event Log service stopped |
+| 6008 | Unexpected shutdown |
+| 7036 | Service state changed |
+| 7045 | New service installed |
+
+## PowerShell Log Queries
+
+### The "Something Broke" Starter Pack
+
+```powershell
+# Everything error-level from last 24 hours
+Get-WinEvent -FilterHashtable @{
+    LogName = 'System', 'Application'
+    Level = 2
+    StartTime = (Get-Date).AddDays(-1)
+} -MaxEvents 100
+
+# Find crashes
+Get-WinEvent -FilterHashtable @{LogName='Application'; StartTime=(Get-Date).AddDays(-7)} |
+    Where-Object { $_.Message -match "faulting|exception|error" } |
+    Select-Object TimeCreated, ProviderName, Message
+```
+
+### Monitor a Specific Service
+
+```powershell
+# Track a service
+$ServiceName = "W32Time"
+Get-WinEvent -FilterHashtable @{
+    LogName = 'System'
+    ProviderName = 'Microsoft-Windows-Time-Service'
+} -MaxEvents 50
+```
+
+## Remote Log Collection
+
+```powershell
+# Collect from remote computer
+Invoke-Command -ComputerName "TARGET-PC" -ScriptBlock {
+    Get-WinEvent -LogName System -MaxEvents 20 -ErrorAction SilentlyContinue
+} | Select-Object TimeCreated, MachineName, Message
+```
+
+## Pro Tips
+
+1. **Create custom views** — Filter once, save the view
+2. **Use XML queries** — More powerful filtering
+3. **Export to CSV** — For analysis
+4. **Set up subscriptions** — Central collection with Windows Event Forwarding
+
+## Wrap-Up
+
+The Event Logs are your friend. Know your Event IDs, build good queries, and you'll diagnose issues faster.
+
+Questions? Drop them below!

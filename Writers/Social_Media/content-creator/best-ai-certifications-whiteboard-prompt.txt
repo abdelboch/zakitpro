@@ -1,0 +1,15 @@
+A photograph of a glossy whiteboard with an aluminum frame, showing a structured business infographic drawn in professional dry-erase marker. The style is business doodling or graphic recording, featuring clean line art, simple icons, and handwritten-style lettering. The bottom tray of the whiteboard must hold realistic markers and an eraser.
+
+The main title at the top is: "BEST AI CERTIFICATIONS FOR IT PROS" in bold blue marker. Directly below it, add a section labeled "Objective: Guide IT and desktop engineers to the most valuable AI certifications for enterprise careers."
+
+Divide the main board space into exactly seven structured, numbered panels (1 through 7) in a grid layout (two columns of three, and a single wide panel at the bottom). Fill each panel according to this specific list of requirements:
+
+1. CERTIFICATION LANDSCAPE: visual of a bird's-eye view showing badges from Microsoft, CompTIA, AWS, Google, NVIDIA arranged like a map of the IT certification world.
+2. TIER 1 PICKS: visual of a gold trophy with Microsoft AI-900 and AI-102 badges, plus CompTIA AI Essentials, with a green checkmark.
+3. TIER 2 SPECIALISTS: visual of a silver medal with AWS ML Specialty, Google ML Engineer, and NVIDIA GenAI badges alongside cloud icons.
+4. CERTIFICATION ROADMAP: visual of a staircase roadmap with three phases labeled Foundation, Specialization, Leadership, each with 2-3 milestone badges.
+5. COST AND TIME: visual of a simple comparison table doodle showing exam costs ($99-$300) and study hours (15-120) with bar charts.
+6. REAL-WORLD APPLICATION: visual of a desktop engineer at a laptop with AI-powered Intune dashboards, automated remediation scripts, and intelligent ticket routing icons.
+7. WHY IT MATTERS: visual of a career path arrow going from "Endpoint Engineer" through "AI-Literate Engineer" to "AI Infrastructure Leader" with skill icons along the way.
+
+Use a high-contrast palette of red, blue, green, and yellow markers with thick black outlines for all elements. The composition must include subtle whiteboard surface texture, slight reflections, and visible erase marks. The overall look is structured, professional, yet analog.

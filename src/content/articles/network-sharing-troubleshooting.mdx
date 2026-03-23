@@ -1,0 +1,117 @@
+---
+title: "Network Sharing Troubleshooting Guide"
+slug: "network-sharing-troubleshooting"
+description: "Fix Windows network sharing issues. File sharing, printer sharing, and network discovery problems solved."
+publishedAt: "2026-02-27"
+pillar: troubleshooting
+difficulty: junior
+type: how-to
+tags: ["network", "sharing", "samba", "smb", "troubleshooting"]
+draft: false
+---
+
+# Network Sharing Troubleshooting Guide
+
+Network shares not working? Can't see other computers? Here's how to fix common Windows sharing issues.
+
+## Quick Checklist
+
+- [ ] Network set to Private
+- [ ] File and Printer Sharing enabled
+- [ ] Same workgroup (for legacy)
+- [ ] Same subnet
+- [ ] Firewall allows SMB
+
+## Enable File Sharing
+
+```powershell
+# Enable via PowerShell (Admin)
+Enable-NetFirewallRule -Name "FileAndPrinterSharing-SMB-In"
+Enable-NetFirewallRule -Name "FileAndPrinterSharing-In"
+Enable-NetFirewallRule -Name "FileAndPrinterSharing-llmnr-In"
+
+# Enable sharing
+Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force
+Set-SmbServerConfiguration -RequireSecuritySignature $false -Force
+```
+
+## Create a Share
+
+```powershell
+# Create folder
+New-Item -ItemType Directory -Path "C:\Shared"
+
+# Share it
+New-SmbShare -Name "Shared" -Path "C:\Shared" -FullAccess "Everyone"
+
+# Or use NTFS permissions
+$ACL = Get-Acl "C:\Shared"
+$AccessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("DOMAIN\Users","FullControl","ContainerInherit,ObjectInherit","None","Allow")
+$ACL.SetAccessRule($AccessRule)
+Set-Acl "C:\Shared" $ACL
+```
+
+## Access a Share
+
+```powershell
+# Map drive
+New-PSDrive -Name "S" -PSProvider FileSystem - "\\ServerName\ShareName"
+
+# Test connection
+Test-Path "\\ServerName\ShareName"
+
+# View shares on server
+Get-SmbShare -CimSession ServerName
+```
+
+## Fix "Access Denied"
+
+```powershell
+# Check share permissions
+Get-SmbShareAccess -Name "ShareName"
+
+# Reset permissions
+Grant-SmbShareAccess -Name "ShareName" -AccountName "Everyone" -AccessRight Full -Force
+```
+
+## SMB Version Issues
+
+```powershell
+# Check SMB versions enabled
+Get-SmbServerConfiguration
+
+# Enable SMBv2 (if needed)
+Set-SmbServerConfiguration -EnableSMB2Protocol $true
+
+# Disable SMBv1 (security!)
+Set-SmbServerConfiguration -EnableSMB1Protocol $false
+```
+
+## Network Discovery Not Working
+
+```powershell
+# Enable network discovery
+Set-NetFirewallProfile -Profile Private -Enabled True
+Get-BrowserManager | Enable 2>/dev/null # or
+
+# Enable these services:
+Start-Service -Name "fdPHost"
+Start-Service -Name "Browser"
+Start-Service -Name "LanmanServer"
+Start-Service -Name "LanmanWorkstation"
+```
+
+## Common Error Codes
+
+| Error | Meaning |
+|-------|---------|
+| 0x80070035 | Network path not found |
+| 0x80070043 | Network name cannot be found |
+| 0x800704cf | Network is offline |
+| 0x80004005 | Unspecified error |
+
+## Wrap-Up
+
+Most sharing issues are firewall or permission-related. Check those first, then SMB versions.
+
+Questions? Drop them below!

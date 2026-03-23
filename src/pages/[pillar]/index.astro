@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import ArticleCard from '../../components/ArticleCard.astro';
+import DifficultyBadge from '../../components/DifficultyBadge.astro';
+
+export async function getStaticPaths() {
+  const pillars = ['troubleshooting', 'scripting', 'deployment', 'security', 'packaging', 'career', 'ai'];
+  return pillars.map(pillar => ({
+    params: { pillar }
+  }));
+}
+
+const { pillar } = Astro.params;
+
+const pillarNames = {
+  troubleshooting: 'Windows Troubleshooting',
+  scripting: 'Scripting & Automation',
+  deployment: 'Deployment & Imaging',
+  security: 'Endpoint Security',
+  packaging: 'App Packaging',
+  career: 'Career & Craft',
+  ai: 'AI-Augmented Engineering'
+};
+
+
+
+const aiStartHere = [
+  {
+    title: 'AI for Desktop Engineers: Practical Enterprise Guide',
+    href: '/ai/ai-for-desktop-engineers-practical-enterprise-guide/',
+    note: 'Foundational strategy and safe AI adoption model for endpoint teams.'
+  },
+  {
+    title: 'Using AI to Generate Intune Detection Rules',
+    href: '/ai/using-ai-to-generate-intune-detection-rules/',
+    note: 'Prompt templates and validation workflow for production-safe detection logic.'
+  },
+  {
+    title: 'How to Prompt AI to Write Secure PowerShell',
+    href: '/ai/how-to-prompt-ai-to-write-secure-powershell/',
+    note: 'A practical checklist to turn AI output into enterprise-ready scripts.'
+  }
+];
+
+const aiClusters = [
+  {
+    name: 'Intune + AI',
+    points: ['AI-generated detection rules', 'AI-assisted remediation scripts', 'Policy design and review prompts']
+  },
+  {
+    name: 'SCCM + AI',
+    points: ['AI log triage for client/install failures', 'Task sequence troubleshooting prompts', 'Patch rollout risk checks']
+  },
+  {
+    name: 'PowerShell + AI',
+    points: ['Prompt-to-script workflow', 'Security/code-review checklist', 'Automation refactoring patterns']
+  },
+  {
+    name: 'Troubleshooting + AI',
+    points: ['CMTrace/ProcMon pattern extraction', 'Root-cause hypotheses', 'Safe log redaction before analysis']
+  },
+  {
+    name: 'Governance + Security',
+    points: ['AI usage policy for endpoint teams', 'Data handling boundaries', 'Auditability and change control']
+  }
+];
+
+const pillarDescriptions = {
+  troubleshooting: 'Boot failures, BSOD, event log forensics, profile corruption, error codes',
+  scripting: 'PowerShell, Graph API, task automation, scheduled jobs',
+  deployment: 'Autopilot, WinPE, MDT, driver injection, provisioning',
+  security: 'CIS benchmarks, LAPS, Defender for Endpoint, BitLocker, Conditional Access',
+  packaging: 'Win32/Intune packaging, PSADT, silent installs, detection rules',
+  career: 'Career progression, lab setup, cert roadmaps, documentation, tooling',
+  ai: 'AI workflows for endpoint engineering, prompt ops, AI-assisted troubleshooting, and governance'
+};
+
+// Get all articles for this pillar
+const allArticles = await getCollection('articles', ({ data }) => !data.draft);
+const pillarArticles = allArticles
+  .filter(a => a.data.pillar === pillar)
+  .sort((a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime());
+
+const difficulties = ['junior', 'mid', 'senior'];
+const types = ['war-story', 'deep-dive', 'how-to', 'script-drop', 'error-reference', 'opinion', 'career-guide'];
+---
+
+<BaseLayout title={pillarNames[pillar]} description={pillarDescriptions[pillar]}>
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">{pillarNames[pillar]}</h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400">{pillarDescriptions[pillar]}</p>
+    </div>
+    
+
+    {pillar === 'ai' && (
+      <>
+        <section class="mb-10 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50/70 dark:bg-purple-950/30 p-6">
+          <h2 class="text-2xl font-heading font-bold mb-3">AI for Desktop Engineers: Practical Enterprise Guide</h2>
+          <p class="text-gray-700 dark:text-gray-300 mb-4">
+            This pillar helps endpoint teams apply AI safely and usefully in production: faster troubleshooting, better scripting,
+            stronger governance, and repeatable workflows.
+          </p>
+          <div class="grid md:grid-cols-3 gap-4">
+            {aiStartHere.map(item => (
+              <a href={item.href} class="block rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 hover:border-accent">
+                <h3 class="font-semibold mb-1">{item.title}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{item.note}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section class="mb-10">
+          <h2 class="text-xl font-heading font-bold mb-4">Cluster Map</h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            {aiClusters.map(cluster => (
+              <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                <h3 class="font-semibold mb-2">{cluster.name}</h3>
+                <ul class="list-disc pl-5 text-sm text-gray-700 dark:text-gray-300">
+                  {cluster.points.map(point => <li>{point}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      </>
+    )}
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-8">
+      <select id="difficulty-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+        <option value="">All Levels</option>
+        {difficulties.map(d => (
+          <option value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
+        ))}
+      </select>
+      
+      <select id="type-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+        <option value="">All Types</option>
+        {types.map(t => (
+          <option value={t}>{t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>
+        ))}
+      </select>
+    </div>
+    
+    <!-- Articles Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="articles-grid">
+      {pillarArticles.length > 0 ? (
+        pillarArticles.map(article => (
+          <div class="article-item" data-difficulty={article.data.difficulty} data-type={article.data.type}>
+            <ArticleCard article={{ ...article.data, slug: article.slug }} />
+          </div>
+        ))
+      ) : (
+        <p class="text-gray-500 col-span-full">No articles yet. Coming soon!</p>
+      )}
+    </div>
+    
+    <!-- Pagination placeholder -->
+    {pillarArticles.length > 15 && (
+      <div class="mt-8 flex justify-center gap-2">
+        <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Previous</button>
+        <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Next</button>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  const difficultyFilter = document.getElementById('difficulty-filter');
+  const typeFilter = document.getElementById('type-filter');
+  const articles = document.querySelectorAll('.article-item');
+  
+  function filterArticles() {
+    const difficulty = difficultyFilter?.value || '';
+    const type = typeFilter?.value || '';
+    
+    articles.forEach(article => {
+      const articleDifficulty = article.getAttribute('data-difficulty');
+      const articleType = article.getAttribute('data-type');
+      
+      const matchesDifficulty = !difficulty || articleDifficulty === difficulty;
+      const matchesType = !type || articleType === type;
+      
+      (article as HTMLElement).style.display = matchesDifficulty && matchesType ? 'block' : 'none';
+    });
+  }
+  
+  difficultyFilter?.addEventListener('change', filterArticles);
+  typeFilter?.addEventListener('change', filterArticles);
+</script>

@@ -1,0 +1,145 @@
+---
+title: "Fix Intune Access Denied Errors"
+slug: "intune-access-denied-fix"
+description: "Resolving Access Denied errors when managing Intune devices. Step-by-step troubleshooting for the most common permission issues."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["intune", "microsoft-endpoint-manager", "access-denied", "permissions", "troubleshooting"]
+draft: false
+---
+
+# Fix Intune Access Denied Errors
+
+You're trying to deploy an app, create a policy, or sync a device in Microsoft Intune, and suddenly you hit **"Access Denied."** It's one of the most frustrating errors because it usually means something is broken in your permission chain — and the error message rarely tells you *what*.
+
+In this guide, I'll walk you through the most common causes of Access Denied in Intune and how to fix them.
+
+## The Problem
+
+You log into the Microsoft Endpoint Manager admin center, try to create a configuration profile, assign a policy, or even just view device details, and you get:
+
+> **Access Denied. You don't have permission to access this resource.**
+
+Sometimes it affects everything, sometimes just specific actions. Let's dig in.
+
+## Cause #1: Missing Role Assignments
+
+The most common cause. Intune uses Role-Based Access Control (RBAC), and if your account isn't assigned the right role, you're locked out.
+
+### How to Check
+
+1. Go to **Microsoft Endpoint Manager** → **Admin centers** → **Microsoft Endpoint Manager admin center**
+2. Navigate to **Tenant administration** → **Roles** → **All roles**
+3. Find your role or check what roles you have assigned
+
+### The Fix
+
+1. Go to **Tenant administration** → **Users** → Select your user
+2. Check **Intune role** assignments
+3. Add a built-in role like **Intune Administrator** or **Policy and Profile Manager**
+
+> **Screenshot placeholder:** *Show Intune role assignment blade*
+
+## Cause #2: Scope Tags Misconfiguration
+
+Scope tags restrict what resources you can manage. Even with the right role, if you don't have the right scope tag, Access Denied.
+
+### How to Check
+
+1. Go to **Tenant administration** → **Roles** → **All roles**
+2. Open your assigned role
+3. Look at the **Scope (Tags)** section
+
+### The Fix
+
+- Either assign the scope tag that contains your target devices/profiles
+- Or create a custom role without scope tag restrictions
+
+```powershell
+# Quick check: What scope tags do I have?
+Get-MgDeviceManagementRoleAssignment -Filter "principalId eq '$((Get-MgUser -UserId $env:USERNAME).id)'" | 
+    Select-Object RoleDefinitionName, ScopeTags
+```
+
+> **Screenshot placeholder:** *Show scope tag configuration*
+
+## Cause #3: Incorrect License Assignment
+
+You need an Intune license to manage devices. Without it, you can't access the admin center properly.
+
+### The Fix
+
+1. Go to **Microsoft 365 admin center** → **Users** → **Active users**
+2. Select your account
+3. Verify **Intune (Plan 1)** or **Microsoft Intune Plan 2** is assigned
+
+```powershell
+# Check license via Graph
+Get-MgUserLicenseDetail -UserId $env:USERNAME | 
+    Where-Object { $_.ServicePlans | Where-Object { $_.ServicePlanName -like "*Intune*" }}
+```
+
+## Cause #4: Conditional Access Policies Blocking Access
+
+Conditional Access policies can lock you out of the Endpoint Manager portal if they exclude the admin accounts incorrectly.
+
+### The Fix
+
+1. Go to **Microsoft Entra ID** → **Security** → **Conditional Access**
+2. Look for policies targeting "Microsoft Intune" or "Endpoint Manager"
+3. Check the **Exclude** list — make sure your admin account isn't excluded inappropriately
+
+> **Warning:** Be careful not to lock yourself out completely!
+
+## Cause #5: Graph API Permissions (For Automation)
+
+If you're using PowerShell scripts or automation (like the examples in this blog), you need the right API permissions.
+
+### The Fix
+
+If using Azure AD App registrations:
+- **DeviceManagementManagedDevices.Read.All**
+- **DeviceManagementConfiguration.ReadWrite.All**
+- **DeviceManagementServiceConfiguration.ReadWrite.All**
+
+```powershell
+# Test Graph access
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All"
+Get-MgDeviceManagementManagedDevice -Top 1
+```
+
+## Cause #6: Device-Specific Block Issues
+
+Sometimes Access Denied appears when trying to:
+- Wipe a device
+- Retire a device  
+- Push apps to a specific device
+
+### The Fix
+
+1. Check if the device is **blocked** in Intune
+2. Verify the device record exists and isn't orphaned
+3. Check if the user has been removed from Azure AD (orphaned device)
+
+```powershell
+# Find the device and check its status
+Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'TARGETDEVICE'" |
+    Select-Object DeviceName, UserId, EnrollmentState, DeviceRegistrationPolicy
+```
+
+## Quick Troubleshooting Checklist
+
+1. ✅ Do you have an Intune license?
+2. ✅ Are you assigned an Intune role?
+3. ✅ Does that role have the right permissions?
+4. ✅ Does the role include the right scope tags?
+5. ✅ Any Conditional Access policies blocking portal access?
+6. ✅ Is this a Graph API permission issue?
+
+## Wrap-Up
+
+Access Denied in Intune is almost always a permission problem. Start with role assignments, check scope tags, verify licenses, and work your way through the list above.
+
+Need help? Drop a comment below with what you're seeing.

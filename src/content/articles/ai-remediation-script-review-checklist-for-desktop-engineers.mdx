@@ -1,0 +1,271 @@
+---
+title: "AI Remediation Script Review Checklist for Desktop Engineers"
+slug: "ai-remediation-script-review-checklist-for-desktop-engineers"
+description: "A practical checklist for reviewing AI-generated remediation scripts in endpoint environments, with safety gates, testing flow, and change-control discipline."
+publishedAt: "2026-03-08"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["ai", "desktop-engineering", "powershell", "intune", "change-control"]
+draft: false
+---
+
+# AI remediation script review checklist for desktop engineers
+
+AI can write a remediation script in 30 seconds. Cleaning up the damage from a bad script can take days.
+
+If you manage Intune or SCCM endpoints, the risk is familiar: a script looks clean, it passes a quick glance, then it restarts the wrong service, deletes the wrong key, or hits machines outside scope. The script is not the hard part anymore. Review discipline is.
+
+This guide gives you a practical review checklist for AI-generated remediation scripts before they touch production endpoints. It's designed for desktop engineers who need speed without gambling with fleet stability.
+
+## Table of contents
+
+- [Where AI scripts usually fail in endpoint environments](#where-ai-scripts-usually-fail-in-endpoint-environments)
+- [The 10-point review checklist before pilot deployment](#the-10-point-review-checklist-before-pilot-deployment)
+- [A safe test flow: lab, pilot, phased rollout](#a-safe-test-flow-lab-pilot-phased-rollout)
+- [How to integrate the checklist into Intune and SCCM change control](#how-to-integrate-the-checklist-into-intune-and-sccm-change-control)
+- [Example: fixing a stuck Windows Update agent with AI-assisted scripting](#example-fixing-a-stuck-windows-update-agent-with-ai-assisted-scripting)
+- [Common review mistakes that cause avoidable incidents](#common-review-mistakes-that-cause-avoidable-incidents)
+- [FAQ](#faq)
+
+## Where AI scripts usually fail in endpoint environments
+
+Most bad outcomes are not because the script was malicious. They happen because the script was context-blind.
+
+Common failure modes:
+
+- Assumes a service exists with the same name on every OS build.
+- Uses broad wildcards in registry or file operations.
+- Ignores device state (battery, VPN, user session, encryption).
+- Treats error handling as an afterthought.
+- Lacks rollback logic when partial changes succeed.
+
+AI is strong at producing plausible code. Endpoint engineering demands code that is predictable under edge cases. That's the gap your review process has to close.
+
+If your team is still building prompt hygiene, pair this with [How to Prompt AI to Write Secure PowerShell](/ai/how-to-prompt-ai-to-write-secure-powershell). If you're troubleshooting policy behavior, also keep [AI Intune policy troubleshooting](/ai/ai-intune-policy-troubleshooting) nearby.
+
+## The 10-point review checklist before pilot deployment
+
+Use this checklist every time. Do not skip steps because "it's a simple fix."
+
+### 1) Confirm the exact problem statement
+
+Your script must answer one specific incident pattern, not a loose category.
+
+Bad: "Fix Windows Update issues."
+Good: "Reset WU components for devices stuck at 0% download with error 0x8024401c after proxy change."
+
+If the target condition is fuzzy, AI output will be fuzzy too.
+
+### 2) Verify scope control
+
+Check how target devices are selected:
+
+- Intune assignment filters or dynamic groups
+- SCCM collections
+- Exclusion rules for servers, kiosks, VIP devices
+
+Scope errors are the fastest path to a broad outage.
+
+### 3) Inspect destructive actions line by line
+
+Flag any command that can remove, disable, or overwrite:
+
+- `Remove-Item`
+- `Set-ItemProperty`
+- `Stop-Service` / `Set-Service -StartupType Disabled`
+- `schtasks /delete`
+- WMI method calls that force state changes
+
+Every destructive line needs a reason and a guard condition.
+
+### 4) Enforce idempotency
+
+The script should be safe to run more than once.
+
+Look for:
+
+- Existence checks before create/delete
+- "Already compliant" exit paths
+- Deterministic outcomes on rerun
+
+If second run behavior is unknown, production behavior is unknown.
+
+### 5) Validate error handling and exit codes
+
+A remediation script that always exits `0` is a liar.
+
+Require:
+
+- Structured `try/catch` blocks
+- Explicit failure exit codes
+- Clear log messages for each failure branch
+
+This is essential for Intune remediation reporting and SCCM status interpretation.
+
+### 6) Confirm telemetry and audit output
+
+Before rollout, decide where proof lands:
+
+- Local log file path
+- Event log entries
+- Detection output consumed by management platform
+
+No telemetry means no confidence during incident review.
+
+### 7) Check for environment assumptions
+
+Read for hidden assumptions:
+
+- Requires admin context
+- Requires internet or specific proxy
+- Depends on domain reachability
+- Assumes BitLocker suspended/not suspended
+
+Call these out in script comments and change record.
+
+### 8) Add a dry-run or what-if mode where possible
+
+For high-risk actions, support simulation first.
+
+Even a simple switch (`-WhatIfMode`) that logs intended changes can prevent painful mistakes during pilot.
+
+### 9) Require peer review with checklist sign-off
+
+No self-approval for AI-generated remediation.
+
+Reviewer should verify:
+
+- Logic correctness
+- Platform compatibility
+- Rollback feasibility
+- Operational readability at 2 a.m.
+
+### 10) Define rollback before approval
+
+Rollback is not "we'll figure it out if needed."
+
+Document:
+
+- Trigger condition for rollback
+- Exact rollback script/steps
+- Decision owner
+- Communication path
+
+If rollback is vague, approval should be blocked.
+
+## A safe test flow: lab, pilot, phased rollout
+
+The flow below keeps speed while containing blast radius.
+
+### Phase 1: Lab validation
+
+- Test on representative OS versions.
+- Include one intentionally broken device and one healthy device.
+- Capture baseline and post-run state.
+
+Goal: prove script does not harm healthy machines.
+
+### Phase 2: Pilot ring
+
+- 1-3% of target population.
+- Include devices from different network paths (LAN, VPN, remote).
+- Monitor 24-48 hours before expansion.
+
+Goal: catch real-world edge cases without wide impact.
+
+### Phase 3: Controlled expansion
+
+- Expand in increments (10% > 25% > 50% > 100%).
+- Gate each increment on success metrics.
+- Pause automatically if failure threshold breached.
+
+Goal: make "stop" easy and fast.
+
+For rollout risk framing, this complements [AI change risk review for Intune baselines](/ai/ai-change-risk-review-intune-baselines).
+
+## How to integrate the checklist into Intune and SCCM change control
+
+The checklist only works if it becomes part of process, not tribal memory.
+
+### Intune pattern
+
+- Keep a template change record for remediation scripts.
+- Require checklist answers in the PR or ticket.
+- Attach pilot evidence (success/fail counts, logs, rollback readiness).
+- Block broad assignment until peer sign-off is complete.
+
+### SCCM pattern
+
+- Tie script package/version to CAB ticket ID.
+- Require collection scope and exclusion proof.
+- Store execution logs with incident timeline.
+- Record post-deployment verification in closure notes.
+
+In both platforms, make checklist completion auditable. Governance improves when evidence is easy to inspect.
+
+## Example: fixing a stuck Windows Update agent with AI-assisted scripting
+
+Incident: a subset of laptops fails monthly cumulative update scan after proxy changes.
+
+AI-generated draft includes:
+
+- Stop `wuauserv` and `bits`
+- Clear `SoftwareDistribution`
+- Re-register update components
+- Restart services
+
+Without review, this is risky. With checklist review:
+
+- Scope narrowed to devices returning specific scan error pattern.
+- Health pre-check added (disk free space, battery, VPN state).
+- Idempotency added for folder reset logic.
+- Event log writes added for each step.
+- Non-zero exit codes added for partial failure.
+- Rollback documented: restore services and abort if re-registration fails.
+
+Result: pilot resolved target issue without collateral failures, and failures were diagnosable from logs instead of guesswork.
+
+## Common review mistakes that cause avoidable incidents
+
+- Trusting script readability more than script behavior.
+- Skipping pilot because "it worked in a VM."
+- Mixing remediation logic and cleanup logic in one untested block.
+- Approving without rollback owner.
+- Expanding scope before telemetry confirms success.
+
+If your team keeps repeating these mistakes, don't add more tooling first. Tighten review gates.
+
+## Start this week with a lightweight enforcement rule
+
+If you want immediate improvement, enforce one policy now:
+
+"No AI-generated remediation script reaches production without completed checklist, peer review, and rollback plan."
+
+That single rule prevents most self-inflicted endpoint incidents.
+
+## FAQ
+
+### Should we ban AI-generated remediation scripts in enterprise endpoint teams?
+
+No. Banning usually drives shadow usage. A better approach is governed usage with review gates, scope controls, and audit trails.
+
+### How many reviewers should approve a remediation script?
+
+At least one peer reviewer besides the author. For high-risk scripts that touch security controls, require a second approver from platform/security.
+
+### What is the minimum safe pilot size?
+
+There is no universal number, but 1-3% is a practical starting point if the sample includes diverse device/network profiles.
+
+### Can AI help with rollback generation too?
+
+Yes, but rollback should be reviewed with the same rigor as remediation. A bad rollback can make an incident worse.
+
+### Which KPI should we track to prove this process works?
+
+Track remediation-related incident rate and mean time to recover after script deployment. If governance is working, both should improve.
+
+## CTA: copy this checklist into your change template
+
+Do not keep the review checklist in someone's notes app. Put it in your actual change template, require sign-off fields, and make it the default path for every AI-generated remediation script.

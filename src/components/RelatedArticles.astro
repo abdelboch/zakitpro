@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleCard from './ArticleCard.astro';
+
+interface Props {
+  currentSlug: string;
+  pillar: string;
+  tags?: string[];
+}
+
+const { currentSlug, pillar, tags } = Astro.props;
+
+// Get all published articles
+const allArticles = await getCollection('articles', ({ data }) => !data.draft);
+
+// Filter and score related articles
+const relatedArticles = allArticles
+  .filter(a => a.slug !== currentSlug && a.data.pillar === pillar)
+  .map(article => {
+    const tagOverlap = article.data.tags?.filter(tag => tags?.includes(tag)).length || 0;
+    return { ...article, score: tagOverlap };
+  })
+  .sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime();
+  })
+  .slice(0, 3);
+---
+
+{relatedArticles.length > 0 && (
+  <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-bold mb-4">Related Articles</h3>
+    <div class="grid gap-4 md:grid-cols-3">
+      {relatedArticles.map(article => (
+        <ArticleCard article={{ ...article.data, slug: article.slug }} />
+      ))}
+    </div>
+  </div>
+)}

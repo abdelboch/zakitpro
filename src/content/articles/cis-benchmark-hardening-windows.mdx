@@ -1,0 +1,137 @@
+---
+title: "CIS Benchmark Hardening for Windows"
+slug: "cis-benchmark-hardening-windows"
+description: "Apply CIS Microsoft Windows 10/11 Enterprise Benchmark. Secure your Windows devices with proven security settings."
+publishedAt: "2026-02-27"
+pillar: security
+difficulty: senior
+type: how-to
+tags: ["cis", "hardening", "security", "benchmark", "endpoint-security"]
+draft: false
+---
+
+# CIS Benchmark Hardening for Windows
+
+CIS Benchmarks are industry-recognized security baselines. Here's how to apply them to Windows 10/11.
+
+## What is CIS?
+
+Center for Internet Security (CIS) Benchmarks are:
+- Vendor-agnostic
+- Community-developed
+- Prioritized controls
+- Free to use
+
+## Getting the Benchmarks
+
+1. Download from: https://www.cisecurity.org/cis-benchmarks/
+2. Look for "CIS Microsoft Windows 10 Enterprise Benchmark"
+3. Get the Excel or PDF version
+
+## Key Controls to Implement
+
+### Control 1: Account Policies
+
+```powershell
+# Password Policy (via GPO or local)
+# Computer Configuration → Windows Settings → Security Settings → Account Policies
+
+# Recommended:
+# - Minimum password length: 14
+# - Password complexity: Enabled
+# - Maximum password age: 60
+# - Lockout threshold: 5
+```
+
+### Control 2: Local Policies
+
+```powershell
+# Audit Policy
+# - Logon events: Success, Failure
+# - Object access: Failure
+# - Policy change: Success
+
+# User Rights Assignment:
+# - Deny log on through Remote Desktop Services: Guests
+# - Allow log on locally: Users, Administrators
+```
+
+### Control 3: Windows Firewall
+
+```powershell
+# Enable Windows Firewall
+# Domain/Private/Public: Enabled
+
+# Default inbound: Block
+# Default outbound: Allow
+```
+
+### Control 4: Windows Defender
+
+```powershell
+# Enable Defender settings:
+# - Real-time protection: Enabled
+# - Behavior monitoring: Enabled
+# - Script scanning: Enabled
+# - Cloud-delivered protection: Enabled
+```
+
+### Control 5: Network Security
+
+```powershell
+# Disable SMBv1
+Set-SmbServerConfiguration -RequireSecuritySignature 0 -EnableSMB1Protocol 0 -Force
+
+# Disable NetBIOS over TCP/IP
+# In network adapter settings
+```
+
+## Using CIS-CAT Pro
+
+CIS provides a free scanner:
+
+```powershell
+# Download CIS-CAT Pro
+# Run assessment:
+# .\CIS-CAT-Pro-Assessor-CLI.bat -assess -profile "CIS Windows 10 Enterprise Benchmark"
+```
+
+## Intune Integration
+
+```powershell
+# Import cis-cbl (CIS Configuration Baseline)
+# Or use security baselines in Intune:
+# Endpoint security → Security baselines → CIS Microsoft Windows
+```
+
+## Quick Hardening Script
+
+```powershell
+<#
+.SYNOPSIS
+    Quick CIS-style hardening
+#>
+
+# Disable SMBv1
+Set-SmbServerConfiguration -RequireSecuritySignature 0 -EnableSMB1Protocol 0 -Force
+
+# Enable Windows Firewall
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
+
+# Disable auto-play
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoDriveTypeAutoRun" -Value 255
+
+# Disable remote registry
+Set-Service -Name "RemoteRegistry" -StartupType Disabled
+
+# Disable Windows Script Host (if not needed)
+# Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows Script Host\Settings" -Name "Enabled" -Value 0
+
+Write-Host "Basic hardening complete"
+```
+
+## Wrap-Up
+
+CIS benchmarks give you a proven security baseline. Start with the basics and work through the controls methodically.
+
+Questions? Drop them below!

@@ -1,0 +1,144 @@
+---
+title: "Deploy Printers with Intune"
+slug: "deploy-printers-intune"
+description: "Deploy network printers to Windows devices via Intune. Printer provisioning scripts and group policy alternatives."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: junior
+type: how-to
+tags: ["intune", "printers", "deployment", "gpo", "scripting"]
+draft: false
+---
+
+# Deploy Printers with Intune
+
+Printer deployment has moved from GPO to modern management. Here's how to deploy network printers with Intune.
+
+## The Old Way: GPO
+
+```powershell
+# Traditional GPO printer connection
+# Still works but not "modern management"
+Add-Printer -ConnectionName "\\PrintServer\PrinterName"
+```
+
+## Modern Way: Intune Scripts
+
+### PowerShell Script: Install Printer
+
+```powershell
+<#
+.SYNOPSIS
+    Deploy network printer
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$PrinterPath,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$DriverName
+)
+
+$ErrorActionPreference = "Stop"
+
+try {
+    # Check if printer already exists
+    $Existing = Get-Printer -Name $PrinterPath -ErrorAction SilentlyContinue
+    
+    if ($Existing) {
+        Write-Host "Printer already installed: $PrinterPath"
+        exit 0
+    }
+    
+    # Add printer
+    if ($DriverName) {
+        Add-Printer -ConnectionName $PrinterPath -DriverName $DriverName
+    } else {
+        Add-Printer -ConnectionName $PrinterPath
+    }
+    
+    Write-Host "Printer installed: $PrinterPath"
+    exit 0
+}
+catch {
+    Write-Host "Error: $($_.Exception.Message)"
+    exit 1
+}
+```
+
+### Make Printer Default
+
+```powershell
+<#
+.SYNOPSIS
+    Set default printer
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$PrinterName
+)
+
+# Set as default
+$Printer = Get-Printer -Name $PrinterName
+Set-PrintConfiguration -PrinterName $PrinterName -Datatype "RAW"
+
+# Make default via Windows settings
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Windows" -Name "Device" -Value "$PrinterName,winspool,ne00:"
+```
+
+## Deploy via Intune
+
+### Step 1: Create Script
+
+1. Go to **Devices** → **Scripts**
+2. **Add** → **Windows 10 and later**
+3. Upload script
+
+### Step 2: Assign to Groups
+
+- Target user or device groups
+- Run as logged-on user
+
+## Printer Driver Management
+
+```powershell
+# List installed drivers
+Get-PrinterDriver | Select-Object Name, DriverVersion
+
+# Install driver from inf
+pnputil /add-driver printer.inf /install
+```
+
+## Troubleshooting
+
+```powershell
+# Check printer service
+Get-Service Spooler
+
+# Restart print spooler
+Restart-Service Spooler
+
+# Clear print queue
+Get-Process | Where-Object { $_.Name -eq "spoolsv" } | Stop-Process -Force
+
+# Clear temp files
+Remove-Item "$env:SystemRoot\System32\Spool\Printers\*" -Recurse -Force
+```
+
+## Universal Print (Cloud)
+
+For Microsoft 365:
+
+```powershell
+# Connect to Universal Print
+# In Microsoft Endpoint Manager:
+# 1. Enable Universal Print connector
+# 2. Deploy via Intune
+# 3. Users get printer in Windows settings
+```
+
+## Wrap-Up
+
+Printers are simple with modern management. Use PowerShell scripts in Intune, or move to Universal Print for cloud.
+
+Questions? Drop them below!

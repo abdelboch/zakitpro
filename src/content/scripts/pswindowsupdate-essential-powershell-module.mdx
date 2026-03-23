@@ -1,0 +1,94 @@
+---
+title: "PSWindowsUpdate: The Essential PowerShell Module for Desktop Engineers"
+description: "Learn how to use PSWindowsUpdate to manage, force, and script Windows Updates on remote endpoints without relying solely on SCCM or Intune."
+language: "powershell"
+pillar: "scripting"
+publishedAt: "2026-03-09"
+draft: false
+---
+
+# Master Windows Updates with PSWindowsUpdate
+
+For Desktop Engineers, managing Windows Updates across hundreds or thousands of endpoints is a core responsibility. While tools like Microsoft Intune (Windows Update for Business) and SCCM (Software Center) handle the bulk of update rings and patch deployments, they sometimes fail. A device might get stuck in a "Pending Install" state, WSUS caches might corrupt, or an emergency out-of-band (OOB) patch might need immediate deployment before the next SCCM sync cycle.
+
+This is where **[PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate)** comes in. With over 1.9 billion downloads from the PowerShell Gallery, it is arguably the most critical module for managing the Windows Update Client directly via PowerShell.
+
+## Why Desktop Engineers Need PSWindowsUpdate
+
+1. **Remote Execution:** You can force a remote machine to check for, download, and install updates without interrupting the end user or waiting for a management agent to check in.
+2. **Granular Control:** You can specifically exclude certain KB articles (like a known bad driver update) or only install updates from a specific category.
+3. **WSUS Bypass:** If an endpoint's local WSUS configuration is broken, you can temporarily instruct the module to bypass the local update server and pull directly from Microsoft Update.
+4. **Reporting and Logging:** It provides clean, object-oriented output of update history, which is perfect for generating compliance reports.
+
+## How to Install the Module
+
+Installing the module is straightforward. Because it requires administrative privileges to interact with the Windows Update agent, ensure you are running an elevated PowerShell session.
+
+```powershell
+# Install from the PowerShell Gallery
+Install-Module -Name PSWindowsUpdate -Force -AcceptLicense
+
+# Import the module into your current session
+Import-Module -Name PSWindowsUpdate
+```
+
+*Note: You may need to set your execution policy to allow remote scripts (`Set-ExecutionPolicy RemoteSigned`).*
+
+## Core Commands Every Admin Should Know
+
+Here are the most common scenarios and the exact commands you need to execute them.
+
+### 1. Check for Pending Updates
+To simply scan the endpoint and see what updates are available (without downloading or installing them):
+
+```powershell
+Get-WUList
+```
+
+This will output a clean table showing the KB Article ID, the size, and the title of the update.
+
+### 2. Download and Install All Updates
+If you want to force a machine to download and install all available updates and automatically reboot if necessary:
+
+```powershell
+Install-WindowsUpdate -AcceptAll -AutoReboot
+```
+
+### 3. Install a Specific KB Article
+When an emergency patch is released (e.g., a critical zero-day vulnerability), you don't want to wait for Intune. You can push a specific update by its KB number:
+
+```powershell
+Install-WindowsUpdate -KBArticleID KB5034441 -AcceptAll
+```
+
+### 4. Hide a Problematic Update
+Sometimes a specific driver or cumulative update causes blue screens (BSODs) on a specific hardware model. You can hide the update so the Windows Update client ignores it:
+
+```powershell
+Hide-WindowsUpdate -KBArticleID KB1234567
+```
+
+### 5. Check Update History
+To verify if a specific patch was installed successfully, or to generate a report of the last 10 installed updates:
+
+```powershell
+Get-WUHistory -MaxDate (Get-Date).AddDays(-30) | Select-Object Date, Title, Result
+```
+
+## Running Updates on Remote Computers
+
+The real power of `PSWindowsUpdate` lies in PowerShell Remoting (`Invoke-Command`). You can orchestrate updates across an entire fleet.
+
+```powershell
+# Define your target computers
+$Computers = @("WKSTN-01", "WKSTN-02", "WKSTN-03")
+
+# Remotely trigger the update process
+Invoke-WUJob -ComputerName $Computers -Script { Install-WindowsUpdate -AcceptAll -AutoReboot } -RunNow -Confirm:$false
+```
+
+*Note: `Invoke-WUJob` actually creates a scheduled task on the remote machine to run the update process as the SYSTEM account, which bypasses the "double-hop" authentication issue common in PowerShell remoting when dealing with Windows Updates.*
+
+## Summary
+
+Relying solely on MDM/MAM platforms for patch compliance is risky. Having `PSWindowsUpdate` in your toolbelt ensures that when the GUI fails, or when agents break, you still have direct, programmatic control over the endpoint's update lifecycle. Add it to your golden image provisioning scripts or your proactive remediation toolset today.

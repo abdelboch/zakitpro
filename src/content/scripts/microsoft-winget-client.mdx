@@ -1,0 +1,297 @@
+---
+title: "Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers"
+description: "Learn how to use Microsoft.WinGet.Client to find, install, update, export, and standardize Windows apps with PowerShell at enterprise scale."
+language: "powershell"
+pillar: "scripting"
+publishedAt: "2026-03-09"
+draft: false
+---
+
+# Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers
+
+If you manage Windows endpoints long enough, software sprawl turns into a full-time nuisance. One machine has 7-Zip 23.x, another has 24.x, a third has a mystery vendor installer from 2022, and somehow everybody swears they are on the “latest version.” That is where **[Microsoft.WinGet.Client](https://www.powershellgallery.com/packages/Microsoft.WinGet.Client)** earns its keep.
+
+This PowerShell Gallery module gives desktop engineers a supported way to control the **Windows Package Manager** from PowerShell. Instead of relying on manual clicks or fragile one-off install scripts, you can discover packages, install apps, update software, export package lists, and standardize endpoint application state with repeatable automation.
+
+With more than 149 million downloads on the PowerShell Gallery, `Microsoft.WinGet.Client` has become one of the most practical modules for modern Windows endpoint management.
+
+## What Microsoft.WinGet.Client Does
+
+`Microsoft.WinGet.Client` is the PowerShell module for the Windows Package Manager client. In plain English: it lets you manage WinGet from scripts and remediation workflows instead of treating application installs like a help desk scavenger hunt.
+
+The module exposes cmdlets such as:
+
+- `Find-WinGetPackage`
+- `Get-WinGetPackage`
+- `Install-WinGetPackage`
+- `Update-WinGetPackage`
+- `Uninstall-WinGetPackage`
+- `Export-WinGetPackage`
+- `Get-WinGetSource`
+- `Add-WinGetSource`
+- `Repair-WinGetPackageManager`
+
+That makes it useful for several desktop engineering jobs:
+
+- building standard app baselines for new endpoints
+- automating common software installs during provisioning
+- updating approved apps outside heavyweight packaging workflows
+- auditing what is actually installed on a device
+- repairing broken package manager components before they waste your afternoon
+
+## Why Desktop Engineers Need It
+
+There is a reason this module matters in real enterprise environments.
+
+### 1. It reduces packaging friction
+
+Not every deployment needs a custom Win32 wrapper, custom detection logic, and a three-stage pilot. Sometimes you just need a reliable, scriptable way to put **PowerToys, 7-Zip, VS Code, Notepad++, Git, or Company Portal dependencies** on a workstation and move on with your life.
+
+### 2. It fits modern endpoint workflows
+
+If your team uses **Intune, PowerShell remediations, proactive remediations, remote support tools, or Autopilot-driven provisioning**, a PowerShell-native package management layer is useful immediately. You can script installs and updates without bolting together a random mix of vendor EXEs and hope.
+
+### 3. It helps with standardization
+
+Desktop engineering is not just about getting apps installed. It is about getting the **same apps**, in the **same state**, on the **right devices**. `Microsoft.WinGet.Client` helps you define and repeat that baseline.
+
+### 4. It improves troubleshooting
+
+When an endpoint has a broken WinGet registration, missing sources, or stale client components, the module gives you commands to inspect and repair the package management stack directly.
+
+## Install Microsoft.WinGet.Client
+
+Run PowerShell as an administrator and install the module from the PowerShell Gallery:
+
+```powershell
+Install-Module -Name Microsoft.WinGet.Client -Force
+Import-Module Microsoft.WinGet.Client
+```
+
+If your environment uses the newer PSResourceGet tooling, you can also install it with:
+
+```powershell
+Install-PSResource -Name Microsoft.WinGet.Client
+```
+
+After importing the module, verify that the client is available:
+
+```powershell
+Get-WinGetVersion
+```
+
+That is the first sanity check I would run before building anything bigger around it.
+
+## Core Commands Every Desktop Engineer Should Know
+
+Here are the commands that do the real work.
+
+### Find an application in the WinGet sources
+
+Need to confirm a package ID before you automate deployment? Search the repository first.
+
+```powershell
+Find-WinGetPackage -Query "7zip"
+```
+
+You can also search for a more exact package:
+
+```powershell
+Find-WinGetPackage -Id "7zip.7zip"
+```
+
+This is useful when you are validating package naming before wrapping the logic into Intune, a task sequence, or a provisioning script.
+
+### Install an approved app
+
+Once you know the package ID, installation is straightforward:
+
+```powershell
+Install-WinGetPackage -Id "7zip.7zip"
+```
+
+For a more realistic desktop engineering example, you might install multiple baseline tools during endpoint setup:
+
+```powershell
+$apps = @(
+    "7zip.7zip",
+    "Microsoft.PowerToys",
+    "Git.Git",
+    "Microsoft.VisualStudioCode"
+)
+
+foreach ($app in $apps) {
+    Install-WinGetPackage -Id $app
+}
+```
+
+That kind of loop is not glamorous, but it is exactly the sort of boring, repeatable work you want automated.
+
+### Inventory what is already installed
+
+If a machine is behaving like a junk drawer, check what WinGet sees:
+
+```powershell
+Get-WinGetPackage
+```
+
+You can narrow the results to a specific product:
+
+```powershell
+Get-WinGetPackage -Id "Microsoft.PowerToys"
+```
+
+This is handy for audit scripts, compliance checks, and remediation reporting.
+
+### Update installed applications
+
+One of the best uses for `Microsoft.WinGet.Client` is software hygiene. Instead of waiting for users to click “Update later” for six months straight, you can script updates:
+
+```powershell
+Update-WinGetPackage -Id "Microsoft.PowerToys"
+```
+
+If you want to work through a set of approved packages:
+
+```powershell
+$approvedApps = @(
+    "7zip.7zip",
+    "Git.Git",
+    "Microsoft.PowerToys",
+    "Microsoft.VisualStudioCode"
+)
+
+foreach ($app in $approvedApps) {
+    Update-WinGetPackage -Id $app
+}
+```
+
+That is especially useful for IT-managed utility apps that do not justify a full packaging project every single time a minor release drops.
+
+### Remove unwanted software
+
+If you are cleaning up lab machines, kiosk endpoints, or stale support tools, uninstalling through the module is simple:
+
+```powershell
+Uninstall-WinGetPackage -Id "Microsoft.PowerToys"
+```
+
+This helps when you want to standardize a support image or strip non-approved tooling from shared devices.
+
+### Export package state for rebuilds or standardization
+
+`Export-WinGetPackage` is underrated. It gives you a way to capture package state so you can reuse it during rebuilds or migration planning.
+
+```powershell
+Export-WinGetPackage -OutputPath "C:\Temp\winget-apps.json"
+```
+
+That exported list can become a reference point for:
+
+- new build standards
+- pilot groups
+- break/fix rebuilds
+- replacement device preparation
+
+Yes, there are fancier ways to manage app portfolios. This one is fast, practical, and usually good enough to get work done.
+
+## Where It Fits in an Enterprise Desktop Engineering Stack
+
+`Microsoft.WinGet.Client` does not replace everything.
+
+It will not magically solve:
+
+- complex packaging with custom transforms
+- apps that require licensing workflows
+- brittle legacy installers with ugly silent switches
+- every detection/reporting need in Intune or Configuration Manager
+
+What it **does** do is fill a really useful gap between fully manual installs and heavyweight app packaging.
+
+A smart way to use it is:
+
+1. **Use WinGet + PowerShell** for approved mainstream applications.
+2. **Use Intune or SCCM** to distribute the script or remediation logic.
+3. **Reserve full custom packaging** for ugly enterprise apps that deserve the extra ceremony.
+
+That division of labor keeps your engineering effort pointed at the messy stuff, instead of wasting time rebuilding what WinGet already handles well.
+
+## Example: Build a Simple Baseline Script
+
+Here is a starter example for a baseline app install script that desktop engineers can adapt:
+
+```powershell
+Import-Module Microsoft.WinGet.Client
+
+$baselineApps = @(
+    "7zip.7zip",
+    "Google.Chrome",
+    "Git.Git",
+    "Microsoft.PowerToys",
+    "Microsoft.VisualStudioCode"
+)
+
+foreach ($app in $baselineApps) {
+    try {
+        $existing = Get-WinGetPackage -Id $app -ErrorAction SilentlyContinue
+        if (-not $existing) {
+            Install-WinGetPackage -Id $app
+            Write-Host "Installed $app"
+        }
+        else {
+            Update-WinGetPackage -Id $app -ErrorAction SilentlyContinue
+            Write-Host "Checked/updated $app"
+        }
+    }
+    catch {
+        Write-Warning "Failed to process $app : $($_.Exception.Message)"
+    }
+}
+```
+
+This is the kind of script that works well in:
+
+- Intune remediation scripts
+- technician-led build workflows
+- post-imaging clean-up steps
+- lab refresh projects
+- endpoint rebuild playbooks
+
+## Troubleshooting Tips
+
+If the module or package manager behaves badly, start with the obvious checks.
+
+### Verify the WinGet client health
+
+```powershell
+Get-WinGetVersion
+Assert-WinGetPackageManager
+```
+
+### Check package sources
+
+```powershell
+Get-WinGetSource
+```
+
+If a source is broken or missing, repair it:
+
+```powershell
+Reset-WinGetSource
+```
+
+### Repair the package manager
+
+```powershell
+Repair-WinGetPackageManager
+```
+
+That is a solid first move when WinGet is installed but clearly acting possessed.
+
+## Final Take
+
+If you support Windows endpoints in 2026, you should know `Microsoft.WinGet.Client` cold. It gives desktop engineers a practical way to **discover, install, update, export, and repair application state with PowerShell**, which makes it perfect for provisioning, remediation, standardization, and day-two endpoint support.
+
+It is not a silver bullet. Nothing in endpoint management ever is. But it is one of the most useful PowerShell Gallery modules for reducing software chaos on Windows devices.
+
+If your current app deployment method is “someone downloads it from a browser and hopes for the best,” this module is a much better plan.

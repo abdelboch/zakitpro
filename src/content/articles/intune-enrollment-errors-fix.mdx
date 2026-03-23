@@ -1,0 +1,146 @@
+---
+title: "Fix Intune Enrollment Errors"
+slug: "intune-enrollment-errors-fix"
+description: "Troubleshoot common Intune enrollment errors. Get your Windows devices enrolled and managed quickly."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["intune", "enrollment", "mdm", "autopilot", "errors"]
+draft: false
+---
+
+# Fix Intune Enrollment Errors
+
+Windows device enrollment in Intune should be seamless. When it fails, the error messages aren't always helpful. Here's how to fix the most common enrollment errors.
+
+## Error: "0x80180014 - MDM Enrolled Failed"
+
+This usually means the device already has an enrollment.
+
+### Fix
+
+```powershell
+# Run on client
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MDM*" | Select-Object *
+
+# Delete existing enrollment
+Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MDM*" -Recurse -Force
+
+# Re-enroll
+"C:\Program Files\Microsoft OnlineManagement\ProvTool\ProvTool.exe" /Oobe /Q
+```
+
+## Error: "Device enrollment could not be completed"
+
+Generic error — check these things:
+
+### Fix
+
+1. **Check Intune license**
+```powershell
+Get-MgUserLicenseDetail -UserId $env:USERNAME | Select-Object -ExpandProperty ServicePlans
+```
+
+2. **Check auto-enroll settings**
+- Go to Microsoft Entra ID → Mobility (MDM and MAM)
+- Enable "MDM user scope" for All or Some users
+
+3. **Clear old enrollment**
+```powershell
+Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Enrollments\*" -Recurse -Force
+```
+
+## Error: "0x801c0003 - The device is already enrolled"
+
+The device has a stale enrollment record.
+
+### Fix
+
+```powershell
+# In Intune, manually retire the device first
+# Then on client:
+dsregcmd /leave /debug
+
+# Re-enroll
+dsregcmd /join
+```
+
+## Error: "Certificate enrollment server not available"
+
+Usually a network or DNS issue.
+
+### Fix
+
+```powershell
+# Test connectivity
+Test-NetConnection -ComputerName enterpriseregistration.windows.net -Port 443
+
+# Check DNS
+Resolve-DnsName enterpriseregistration.windows.net
+
+# Check proxy
+netsh winhttp show proxy
+```
+
+## Error: "Enrollment timed out"
+
+### Fix
+
+```powershell
+# Increase timeout in registry
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MDM" -Name "EnrollmentTimeout" -Value 300 -Type DWord
+
+# Check for third-party software blocking
+Get-Process | Where-Object { $_.Company -notlike "Microsoft*" } | Select-Object Name, Company
+```
+
+## Error: Autopilot Profile Not Found
+
+### Fix
+
+1. **Assign profile to device group**
+   - Intune → Devices → Windows → Autopilot deployment profiles
+   - Assign to device group containing the hardware ID
+
+2. **Upload hardware ID if missing**
+   - Intune → Devices → Windows → Upload hardware IDs
+   - Get hardware ID: `Get-WindowsAutoPilotInfo -Computer .`
+
+## Error: 0x80180005 - Unknown Error
+
+Usually permission-related.
+
+### Fix
+
+```powershell
+# Check user has enrollment permission
+# In Intune: Device enrollment managers → Add your account
+
+# Or check MDM authority
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MDM" -Name "MdmAuthority"
+```
+
+## Quick Enrollment Checklist
+
+- [ ] User has Intune license
+- [ ] MDM auto-enroll is enabled in Azure AD
+- [ ] No conflicting MDM enrollment
+- [ ] Network can reach required endpoints
+- [ ] Date/time is correct on client
+- [ ] No third-party security software blocking
+
+## Required Endpoints
+
+```
+enterprisesEnrollment.windows.net
+enterpriseregistration.windows.net
+management.azure.com
+graph.windows.net
+```
+
+## Wrap-Up
+
+Enrollment errors are usually licensing, network, or stale records. Clear the old enrollment and try again.
+
+Questions? Drop them below!

@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const scripts = await getCollection('scripts', ({ data }) => !data.draft);
+  return scripts.map(script => ({
+    params: { slug: script.slug },
+    props: { script }
+  }));
+}
+
+const { script } = Astro.props;
+const { Content } = await script.render();
+---
+
+<BaseLayout title={script.data.title} description={script.data.description}>
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
+      <a href="/" class="hover:text-accent">Home</a>
+      <span>/</span>
+      <a href="/scripts/" class="hover:text-accent">Scripts</a>
+      <span>/</span>
+      <span class="text-gray-900 dark:text-white">{script.data.title}</span>
+    </nav>
+    
+    <article>
+      <header class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-sm text-gray-600 dark:text-gray-400">
+            {new Date(script.data.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </span>
+          <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            {script.data.language}
+          </span>
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">{script.data.title}</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-400">{script.data.description}</p>
+      </header>
+      
+      <div class="prose dark:prose-invert max-w-none">
+        <Content />
+      </div>
+    </article>
+  </div>
+</BaseLayout>

@@ -1,0 +1,54 @@
+---
+name: Vaultwarden
+description: Lightweight Bitwarden-compatible password manager server. Run your own password vault for free.
+category: passwords
+website: https://vaultwarden.dev/
+github: https://github.com/dani-garcia/vaultwarden
+stars: '35K+'
+license: GPL
+publishedAt: '2026-03-16'
+selfHosted: true
+draft: false
+---
+
+## Why Vaultwarden?
+
+1Password and Bitwarden are great, but why pay monthly when you can host your own? Vaultwarden is a lightweight, compatible server that works with all official Bitwarden apps (iOS, Android, browser extensions).
+
+## Key Features
+
+- **Full Bitwarden Compatibility** — Works with all official Bitwarden clients
+- **Lightweight** — Runs on a Raspberry Pi with minimal resources
+- **Two-Factor Auth** — TOTP support built-in
+- **Organization Vaults** — Team/shared password collections
+- **Automatic Backups** — Simple SQLite database, easy to backup
+
+## Self-Hosted Setup
+
+```bash
+docker run -d \
+  --name vaultwarden \
+  -v vw-data:/data \
+  -p 80:80 \
+  --restart=always \
+  vaultwarden/server:latest
+```
+
+## Who It's For
+
+- IT teams needing centralized password management
+- Companies that can't use cloud password managers (compliance)
+- Homelabbers who want full control of their credentials
+- MSPs managing client credentials
+
+## Cost Comparison
+
+| Solution | Cost (10 users) | Self-hosted | Mobile Apps |
+|----------|-----------------|-------------|-------------|
+| 1Password Teams | $19.95/mo | ❌ | ✅ |
+| Bitwarden Teams | $40/mo | ❌ | ✅ |
+| **Vaultwarden** | $0 | ✅ | ✅ (via Bitwarden apps) |
+
+## Verdict
+
+**Rating: 9/10** — Best self-hosted password solution. Pair it with a Synology NAS or small VPS for a secure, zero-cost password vault.

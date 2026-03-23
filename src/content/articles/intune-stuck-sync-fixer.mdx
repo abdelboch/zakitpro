@@ -1,0 +1,156 @@
+---
+title: "Fix Intune Stuck in Sync Loop"
+slug: "intune-stuck-sync-fixer"
+description: "Troubleshooting devices stuck in sync loops in Microsoft Intune. Get your endpoints back to a managed state quickly."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["intune", "sync", "stuck", "endpoint-manager", "troubleshooting"]
+draft: false
+---
+
+# Fix Intune Stuck in Sync Loop
+
+You check your Intune console and see it — a device that's been "Syncing" for hours. Or maybe it syncs successfully, but the policies you deployed just won't apply. This is one of the most common issues in endpoint management, and in this guide, I'll show you exactly how to fix it.
+
+## The Symptoms
+
+- Device shows "Sync in progress" for hours/days
+- Policies don't apply even though deployment shows successful
+- Device appears in console but shows stale last check-in time
+- User complains their machine "isn't getting updates"
+
+## Why This Happens
+
+The sync loop usually breaks because:
+1. **Network issues** blocking the check-in
+2. **Policy conflicts** causing the service to retry endlessly
+3. **Corrupted registry/certificates** on the device
+4. **Intune Service Synchronization Certificate** expired
+
+Let's fix it.
+
+## Method 1: Remote Sync from Intune Console
+
+The easiest fix — try forcing a sync from the admin center.
+
+1. Go to **Devices** → **All devices**
+2. Select the stuck device
+3. Click **Sync** (top menu)
+
+> **Screenshot placeholder:** *Show the Sync button location in Endpoint Manager*
+
+If this doesn't work, move to Method 2.
+
+## Method 2: Client-Side Sync (User-Initiated)
+
+On the affected Windows device:
+
+1. Click **Start** → type **"Company Portal"**
+2. Open Company Portal app
+3. Click on **Devices**
+4. Select the device
+5. Click **Check Settings**
+
+This triggers a check-in using the logged-in user's context.
+
+```powershell
+# Alternative: Trigger via PowerShell (as admin)
+# On the client machine
+Start-Process "companyportal://syncdevice"
+```
+
+## Method 3: Restart Intune Services
+
+Sometimes the local services get stuck. Restart them:
+
+```powershell
+# Run as Administrator on the client
+Restart-Service -Name "Intune Management Extension" -Force
+Start-Sleep -Seconds 5
+Start-Service -Name "Intune Management Extension"
+
+# Also restart the MDMWaitron service
+Restart-Service -Name "MDMWaitron" -ErrorAction SilentlyContinue
+```
+
+Then try syncing again.
+
+## Method 4: Clear Cache and Re-register
+
+This is the most effective fix for persistent sync issues:
+
+### Step 1: Remove Device from Intune
+
+```powershell
+# On client - get device ID
+$DeviceID = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Provisioning\Diagnostics\IntuneProvisioning" -ErrorAction SilentlyContinue).AgentVersion
+if (-not $DeviceID) {
+    $DeviceID = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\MDM\AutoEnrollMDM" -ErrorAction SilentlyContinue).DeviceID
+}
+Write-Host "Device ID: $DeviceID"
+```
+
+### Step 2: Clean Local Cache
+
+```powershell
+# Stop services
+Get-Service -Name "Intune*" | Stop-Service -Force
+
+# Remove cached data
+Remove-Item -Path "$env:ProgramData\Microsoft\Intune\*" -Recurse -Force -Confirm:$false
+
+# Restart services  
+Get-Service -Name "Intune*" | Start-Service
+```
+
+### Step 3: Re-provision
+
+```powershell
+# Trigger re-provisioning
+"C:\Program Files\Microsoft\OnlineManagement\ProvTool\ProvTool.exe" /Oobe /Q
+```
+
+## Method 5: Check for Certificate Issues
+
+Expired certificates are a common cause. Check on the client:
+
+```powershell
+# Check Intune certificate validity
+Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Subject -like "*Intune*" } | 
+    Select-Object Subject, NotAfter, Thumbprint
+```
+
+If expired:
+1. Go to **Settings** → **Access work or school**
+2. Disconnect the work/school account
+3. Re-enroll via **Settings** → **Accounts** → **Access work or school** → **Connect**
+
+## Method 6: Check for Policy Conflicts
+
+Multiple policies targeting the same setting can cause sync loops:
+
+1. In Intune, go to **Devices** → **Configuration profiles**
+2. Filter by the device platform
+3. Look for duplicate or conflicting profiles
+4. Check the device's **Device conflicts** view
+
+```powershell
+# Graph API: Get device conflict info
+Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'TARGETDEVICE'" | 
+    Select-Object -ExpandProperty ConfigurationStates
+```
+
+## Prevention Tips
+
+1. **Don't deploy too many policies at once** — stagger deployments
+2. **Use groups wisely** — avoid rapid group changes
+3. **Monitor the Enrollment status** — catch issues early
+4. **Keep certificates updated** — check expiration quarterly
+
+## Wrap-Up
+
+Stuck sync is frustrating but usually fixable. Start with a simple console sync, move to client-side restart, and go full cache clear if needed. 
+
+Need help? Leave a comment with what you're seeing.

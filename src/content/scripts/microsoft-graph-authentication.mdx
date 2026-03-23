@@ -1,0 +1,336 @@
+---
+title: "Microsoft.Graph.Authentication: Intune and Entra PowerShell Access"
+description: "Learn how Microsoft.Graph.Authentication helps desktop engineers connect PowerShell to Microsoft Graph for Intune, Entra ID, Autopilot, and endpoint automation workflows."
+language: "powershell"
+pillar: "scripting"
+publishedAt: "2026-03-10"
+draft: false
+---
+
+# Microsoft.Graph.Authentication: Intune and Entra PowerShell Access
+
+If you automate Microsoft Intune, Windows Autopilot, or Entra ID long enough, you eventually hit the same wall: the hard part is not always the cmdlet you want to run. The hard part is **authenticating cleanly to Microsoft Graph** without turning your script into a credential landfill.
+
+That is why **[Microsoft.Graph.Authentication](https://www.powershellgallery.com/packages/Microsoft.Graph.Authentication)** matters. It is the authentication module behind Microsoft Graph PowerShell, and it gives desktop engineers a supported way to connect PowerShell sessions to Microsoft Graph for delegated sign-in, app-only access, managed identity, device code flow, and token-based automation. According to the PowerShell Gallery, the current package version is **2.35.1**, it supports **PowerShell 5.1+**, and that version alone has more than **6.7 million downloads**. Microsoft Learn also recommends **PowerShell 7 or later** for Graph PowerShell usage across platforms.
+
+For desktop engineers, this module is the front door to a lot of the work that actually matters now:
+
+- querying Intune-managed devices
+- checking Entra ID group and user state
+- automating Autopilot and device lifecycle tasks
+- building unattended admin jobs with app-only auth
+- replacing older AzureAD and MSOnline-era auth patterns with something less haunted
+
+## Table of Contents
+
+- [What Microsoft.Graph.Authentication Does](#what-microsoftgraphauthentication-does)
+- [Why Desktop Engineers Need It](#why-desktop-engineers-need-it)
+- [How to Install Microsoft.Graph.Authentication](#how-to-install-microsoftgraphauthentication)
+- [Core Authentication Methods to Know](#core-authentication-methods-to-know)
+- [Real Desktop Engineering Examples](#real-desktop-engineering-examples)
+- [Where It Fits in an Intune and Entra Workflow](#where-it-fits-in-an-intune-and-entra-workflow)
+- [Troubleshooting Tips](#troubleshooting-tips)
+- [FAQ](#faq)
+- [Final Take](#final-take)
+
+## What Microsoft.Graph.Authentication Does
+
+`Microsoft.Graph.Authentication` is the PowerShell module that handles authentication for Microsoft Graph PowerShell. In plain English, it is what lets your script establish a session before you run Graph cmdlets against users, groups, devices, apps, policies, and tenant data.
+
+The module is built around cmdlets such as:
+
+- `Connect-MgGraph`
+- `Disconnect-MgGraph`
+- `Get-MgContext`
+- `Invoke-MgGraphRequest`
+- `Find-MgGraphCommand`
+- `Find-MgGraphPermission`
+
+Microsoft’s `Connect-MgGraph` documentation shows multiple supported auth patterns, including:
+
+- delegated sign-in with scopes
+- device code flow
+- client secret credentials
+- certificate-based app-only access
+- managed identity
+- access token input
+- environment variable-based authentication
+
+That flexibility is a big deal for desktop teams, because modern endpoint work is split between interactive admin tasks and unattended automation.
+
+## Why Desktop Engineers Need It
+
+A lot of endpoint teams still think of Graph authentication as “the annoying bit before the real script.” That is backwards. Authentication is the real script foundation.
+
+### 1. Intune and Entra automation depend on Microsoft Graph
+
+If you work with Intune compliance, device inventory, application assignments, Autopilot data, or Entra group relationships, you are already living in Graph territory. `Microsoft.Graph.Authentication` is what gets you into that management plane without weird homegrown token hacks.
+
+### 2. It is cleaner than legacy auth patterns
+
+The old AzureAD and MSOnline approach still shows up in far too many internal scripts. It works until it does not, then everyone spends the afternoon arguing with deprecated modules and stale auth flows. Graph PowerShell is the direction Microsoft actually wants you to use, and this module is the authentication entry point.
+
+### 3. It supports both human and unattended workflows
+
+Desktop engineering is never just one kind of work. You need:
+
+- **interactive auth** for ad hoc support and troubleshooting
+- **device code flow** for jump boxes and limited-browser sessions
+- **app-only auth** for scheduled jobs and backend automation
+- **managed identity** for Azure-hosted runbooks or functions
+
+That is a much better toolbox than pretending every job should run under one shared admin account. That path ends in pain and audit findings.
+
+### 4. It scales with modern endpoint operations
+
+Microsoft Learn notes that installing the full `Microsoft.Graph` module pulls in **more than 47 submodules**. If you only need targeted Graph cmdlets, `Microsoft.Graph.Authentication` is one of the core pieces you will still use when building a leaner, role-focused PowerShell setup.
+
+## How to Install Microsoft.Graph.Authentication
+
+Install the module directly from the PowerShell Gallery:
+
+```powershell
+Install-Module -Name Microsoft.Graph.Authentication
+Import-Module Microsoft.Graph.Authentication
+```
+
+If your environment uses PSResourceGet, you can also install it with:
+
+```powershell
+Install-PSResource -Name Microsoft.Graph.Authentication
+```
+
+A couple of practical prerequisites matter here:
+
+- The PowerShell Gallery page lists **PowerShell 5.1** as the minimum version.
+- Microsoft Learn recommends **PowerShell 7 and later** for Microsoft Graph PowerShell.
+- If you are stuck on Windows PowerShell, Microsoft Learn calls out **.NET Framework 4.7.2 or later** as a prerequisite.
+- Microsoft also notes that Graph PowerShell installs are **per PowerShell version**, so installing in one shell does not magically install it everywhere.
+
+Verify the module after install:
+
+```powershell
+Get-Module Microsoft.Graph.Authentication -ListAvailable
+```
+
+## Core Authentication Methods to Know
+
+This is where the module becomes useful instead of theoretical.
+
+### Interactive delegated auth
+
+For day-to-day admin work, the basic pattern is:
+
+```powershell
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All", "Group.Read.All"
+Get-MgContext
+```
+
+That gives you a user-authenticated session with the scopes needed for the task. It is ideal for investigations, reporting, and one-off admin work.
+
+### Device code flow
+
+If you are working on a server, jump box, or weird remote shell where interactive browser auth is inconvenient, use device code flow:
+
+```powershell
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All" -UseDeviceCode
+```
+
+That is one of those boring but lifesaving options when a machine refuses to behave like a normal admin workstation.
+
+### App-only authentication with a certificate
+
+For scheduled automation, certificate-based auth is usually the grown-up option:
+
+```powershell
+Connect-MgGraph \
+  -ClientId "11111111-2222-3333-4444-555555555555" \
+  -TenantId "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee" \
+  -CertificateThumbprint "0123456789ABCDEF0123456789ABCDEF01234567"
+```
+
+This works well for reporting, compliance exports, and background automation where you do not want a human sign-in prompt involved.
+
+### Managed identity
+
+If the automation runs in Azure and the host has a managed identity, this gets pleasantly simple:
+
+```powershell
+Connect-MgGraph -Identity
+```
+
+That is a much cleaner pattern than squirreling secrets into variables and praying nobody copies the script into the wrong place.
+
+## Real Desktop Engineering Examples
+
+### Example 1: Query Intune-managed devices
+
+A very normal desktop engineering task is checking managed device inventory.
+
+```powershell
+Import-Module Microsoft.Graph.Authentication
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All"
+
+Get-MgDeviceManagementManagedDevice -Top 10 |
+    Select-Object DeviceName, OperatingSystem, ComplianceState, LastSyncDateTime
+```
+
+That is useful for:
+
+- quick compliance spot checks
+- validating that a device actually enrolled
+- comparing stale devices against user claims of “yeah it’s definitely in Intune”
+
+### Example 2: Pull Entra group details for device targeting
+
+If your app deployment or policy assignment depends on group targeting, checking group membership with Graph is often faster than clicking through the portal.
+
+```powershell
+Connect-MgGraph -Scopes "Group.Read.All"
+
+Get-MgGroup -Filter "displayName eq 'Intune-Windows-Production'"
+```
+
+That is a good building block for automation that validates whether device or user targeting is configured the way you think it is.
+
+### Example 3: Build a safe pre-flight auth block
+
+This is the pattern I would actually standardize across a desktop team:
+
+```powershell
+Import-Module Microsoft.Graph.Authentication
+
+$requiredScopes = @(
+    "DeviceManagementManagedDevices.Read.All",
+    "Group.Read.All"
+)
+
+try {
+    Connect-MgGraph -Scopes $requiredScopes -NoWelcome
+    $context = Get-MgContext
+
+    if (-not $context) {
+        throw "No Microsoft Graph context was established."
+    }
+
+    Write-Host "Tenant: $($context.TenantId)"
+    Write-Host "Auth type: $($context.AuthType)"
+    Write-Host "Scopes: $($context.Scopes -join ', ')"
+}
+catch {
+    Write-Error "Graph authentication failed: $($_.Exception.Message)"
+    throw
+}
+```
+
+That pre-flight block is not glamorous, but it prevents the very expensive kind of confusion where a script fails halfway through because nobody validated auth up front.
+
+### Example 4: Use raw Graph calls when you need something specific
+
+The module also supports raw requests through `Invoke-MgGraphRequest`, which is useful when the exact cmdlet you want is awkward or not yet in your working flow.
+
+```powershell
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All"
+
+Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/v1.0/deviceManagement/managedDevices?$top=5"
+```
+
+That is handy for troubleshooting, prototyping, and mapping portal views to actual API calls.
+
+## Where It Fits in an Intune and Entra Workflow
+
+`Microsoft.Graph.Authentication` is not the whole answer. It is the thing that makes the rest of the answer possible.
+
+A sensible desktop engineering pattern looks like this:
+
+1. **Authenticate with Microsoft.Graph.Authentication** using the correct auth method.
+2. **Use Graph cmdlets or Graph requests** to gather device, user, group, app, or policy data.
+3. **Validate permissions and scope** before running broad changes.
+4. **Run reporting or remediation logic** only after the session context is verified.
+5. **Disconnect and clean up** when the script completes.
+
+That pattern is especially useful in environments that depend on:
+
+- Microsoft Intune
+- Windows Autopilot
+- Microsoft Entra ID
+- Conditional Access-aware admin workflows
+- Azure-hosted automation that talks to Graph
+
+For broader PowerShell operations, see [PowerShell modules guide](/articles/powershell-modules-guide/). For packaging workflows, see [AI-assisted Win32 app packaging for Intune desktop engineers](/articles/ai-assisted-win32-app-packaging-intune-desktop-engineers/). For policy troubleshooting, see [AI Intune policy troubleshooting](/articles/ai-intune-policy-troubleshooting/).
+
+## Troubleshooting Tips
+
+When Graph auth breaks, it usually breaks in the same few ways.
+
+### Wrong scopes
+
+If your query fails even though sign-in succeeded, the problem may be permissions rather than connectivity. Check the session context:
+
+```powershell
+Get-MgContext
+```
+
+Review the returned scopes and compare them to the cmdlet or API you are trying to use.
+
+### Mixed module versions
+
+If one admin machine behaves differently from another, inspect installed versions:
+
+```powershell
+Get-InstalledModule Microsoft.Graph.Authentication -AllVersions
+```
+
+Module drift is not exotic. It is Tuesday.
+
+### Using full Microsoft.Graph when you only need a few modules
+
+Microsoft Learn explicitly notes that the main `Microsoft.Graph` install brings in **more than 47 submodules**. If your workstation or automation runner only needs specific functionality, install only the needed modules and keep the footprint tighter.
+
+### App-only auth failures
+
+If certificate or app-only auth fails, validate the boring basics first:
+
+- correct tenant ID
+- correct application ID
+- valid certificate thumbprint
+- proper Microsoft Graph application permissions
+- granted admin consent where required
+
+The boring basics are usually where the fire is.
+
+## FAQ
+
+### What does Microsoft.Graph.Authentication do?
+
+It provides the authentication layer for Microsoft Graph PowerShell. That includes sign-in, context handling, and supported auth flows such as delegated auth, device code, app-only auth, managed identity, and token-based access.
+
+### Is Microsoft.Graph.Authentication useful for Intune admins?
+
+Yes. It is one of the most important modules for Intune automation because Microsoft Intune data and actions increasingly live behind Microsoft Graph. If you script device inventory, policy checks, app assignments, or Autopilot-related work, this module matters.
+
+### Can desktop engineers use Microsoft.Graph.Authentication for unattended jobs?
+
+Yes. Certificate-based app-only auth and managed identity support make it practical for scheduled reporting, compliance exports, and Azure-hosted automation.
+
+### What is the minimum PowerShell version for Microsoft.Graph.Authentication?
+
+The PowerShell Gallery package page lists **PowerShell 5.1** as the minimum. Microsoft Learn recommends **PowerShell 7 or later** when possible.
+
+### Should I install Microsoft.Graph or only Microsoft.Graph.Authentication?
+
+It depends on the job. If you need a wide Graph cmdlet surface, install `Microsoft.Graph`. If you want a smaller footprint and only the modules required for a targeted workflow, starting with `Microsoft.Graph.Authentication` plus the specific submodules you need is often the cleaner move.
+
+## Final Take
+
+If you manage cloud-connected Windows endpoints in 2026, `Microsoft.Graph.Authentication` is not optional trivia. It is one of the core PowerShell modules that lets desktop engineers connect securely to Microsoft Graph for Intune, Entra ID, Autopilot, and modern endpoint automation.
+
+It is useful because it solves the least glamorous problem well: **getting authenticated in a supported, repeatable way**. And in desktop engineering, the unglamorous layers are usually the ones keeping the rest of your automation from face-planting.
+
+If your current Graph workflow involves copied tokens, ancient AzureAD scripts, or a sticky note’s worth of mystery auth steps, this module is the upgrade.
+
+## Sources
+
+- [PowerShell Gallery: Microsoft.Graph.Authentication](https://www.powershellgallery.com/packages/Microsoft.Graph.Authentication)
+- [Microsoft Learn: Install the Microsoft Graph PowerShell SDK](https://learn.microsoft.com/en-us/powershell/microsoftgraph/installation?view=graph-powershell-1.0)
+- [Microsoft Learn: Connect-MgGraph](https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0)

@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const scripts = await getCollection('scripts', ({ data }) => !data.draft);
+
+const pillarNames = {
+  troubleshooting: 'Windows Troubleshooting',
+  scripting: 'Scripting & Automation',
+  deployment: 'Deployment & Imaging',
+  security: 'Endpoint Security',
+  packaging: 'App Packaging',
+  career: 'Career & Craft',
+  ai: 'AI-Augmented Engineering'
+};
+
+const languageColors = {
+  powershell: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  cmd: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  batch: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  registry: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+};
+---
+
+<BaseLayout title="Scripts" description="PowerShell scripts, automation tools, and utilities for IT pros">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Scripts Library</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+      Downloadable PowerShell scripts, batch files, and registry tweaks for IT professionals.
+    </p>
+    
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-8">
+      <select id="language-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+        <option value="">All Languages</option>
+        <option value="powershell">PowerShell</option>
+        <option value="cmd">CMD</option>
+        <option value="batch">Batch</option>
+        <option value="registry">Registry</option>
+      </select>
+      
+      <select id="pillar-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+        <option value="">All Pillars</option>
+        {Object.entries(pillarNames).map(([id, name]) => (
+          <option value={id}>{name}</option>
+        ))}
+      </select>
+    </div>
+    
+    <!-- Scripts Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="scripts-grid">
+      {scripts.length > 0 ? (
+        scripts.map(script => (
+          <div class="script-item" data-language={script.data.language} data-pillar={script.data.pillar}>
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+              <div class="flex items-center gap-2 mb-3">
+                <span class={`px-2 py-1 text-xs font-medium rounded-full ${languageColors[script.data.language]}`}>
+                  {script.data.language}
+                </span>
+                <span class="text-xs text-gray-500">{pillarNames[script.data.pillar]}</span>
+              </div>
+              
+              <h3 class="text-lg font-semibold mb-2">{script.data.title}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{script.data.description}</p>
+              
+              <a 
+                href={`/scripts/${script.slug}/`}
+                class="inline-flex items-center gap-2 text-accent hover:underline"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                View & Download
+              </a>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p class="text-gray-500 col-span-full">No scripts yet. Coming soon!</p>
+      )}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const languageFilter = document.getElementById('language-filter');
+  const pillarFilter = document.getElementById('pillar-filter');
+  const scripts = document.querySelectorAll('.script-item');
+  
+  function filterScripts() {
+    const language = languageFilter?.value || '';
+    const pillar = pillarFilter?.value || '';
+    
+    scripts.forEach(script => {
+      const scriptLanguage = script.getAttribute('data-language');
+      const scriptPillar = script.getAttribute('data-pillar');
+      
+      const matchesLanguage = !language || scriptLanguage === language;
+      const matchesPillar = !pillar || scriptPillar === pillar;
+      
+      (script as HTMLElement).style.display = matchesLanguage && matchesPillar ? 'block' : 'none';
+    });
+  }
+  
+  languageFilter?.addEventListener('change', filterScripts);
+  pillarFilter?.addEventListener('change', filterScripts);
+</script>

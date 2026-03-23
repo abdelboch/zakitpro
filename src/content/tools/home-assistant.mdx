@@ -1,0 +1,59 @@
+---
+name: Home Assistant
+description: Open-source home automation platform that puts local control and privacy first. Connect thousands of smart devices.
+category: automation
+website: https://www.home-assistant.io/
+github: https://github.com/home-assistant/core
+stars: '75K+'
+license: Apache
+publishedAt: '2026-03-16'
+selfHosted: true
+draft: false
+---
+
+## Why Home Assistant?
+
+For home automation, nothing beats Home Assistant's ecosystem. It connects to 2000+ devices and services, runs locally (no cloud required), and has the most active community in the space. For IT pros, it's also a great way to learn YAML, APIs, and IoT architecture.
+
+## Key Features
+
+- **2000+ Integrations** — Philips Hue, Zigbee, Z-Wave, MQTT, Wi-Fi, Bluetooth
+- **Local Control** — No cloud dependency, works even when internet is down
+- **Automations** — Powerful YAML or visual automation editor
+- **Dashboards** — Custom Lovelace UI for monitoring and control
+- **Energy Monitoring** — Track power consumption per device
+
+## Self-Hosted Setup
+
+**Recommended:** Home Assistant OS on a dedicated device (Raspberry Pi 4, Intel NUC, or ODROID)
+
+```bash
+# Docker alternative (limited functionality)
+docker run -d \
+  --name homeassistant \
+  --privileged \
+  --restart=unless-stopped \
+  -e TZ=America/Denver \
+  -v /path/to/config:/config \
+  --network=host \
+  ghcr.io/home-assistant/home-assistant:stable
+```
+
+## Hardware Recommendations
+
+| Device | Best For | Price |
+|--------|----------|-------|
+| Raspberry Pi 4 (4GB) | Basic automations, 10-20 devices | ~$55 |
+| Intel NUC | Heavy automations, 50+ devices | ~$200 |
+| ODROID-N2+ | Best performance per watt | ~$100 |
+
+## Who It's For
+
+- Homeowners automating lights, climate, security
+- IT pros exploring IoT and edge computing
+- Property managers monitoring multiple units
+- Privacy enthusiasts who refuse cloud IoT
+
+## Verdict
+
+**Rating: 9.5/10** — The most powerful home automation platform available. Steeper learning curve than cloud solutions, but infinitely more capable.

@@ -1,0 +1,180 @@
+---
+title: "Windows Autopilot Part 2: Register Devices & Create Profiles"
+slug: "autopilot-part-2-registration-profiles"
+description: "Learn how to register devices in Intune and create Autopilot deployment profiles."
+publishedAt: "2026-03-01"
+pillar: deployment
+difficulty: junior
+type: how-to
+tags: ["autopilot", "intune", "deployment", "beginner"]
+seriesId: "autopilot-beginners"
+seriesPart: 2
+draft: false
+---
+
+In [Part 1](/autopilot-part-1-prerequisites), we set up our prerequisites. Now it's time to register your first device in Intune and create a deployment profile that tells Autopilot how to configure new PCs.
+
+Let's dive in!
+
+## Understanding the Hardware Hash
+
+Before we register a device, you need to understand what Autopilot actually needs. Each Windows device has a unique identifier called a **hardware hash** — a long string of characters that identifies that specific machine.
+
+Autopilot uses this hash to:
+1. Identify the device uniquely
+2. Look up which profile to apply
+3. Enroll it in your Intune tenant
+
+> 💡 **Tip:** Think of the hardware hash like a serial number that Intune uses to recognize and claim the device.
+
+## Method 1: Automatic Registration (From OEM)
+
+If you're buying new devices from major manufacturers like Dell, HP, or Lenovo, you can skip the manual registration! These OEMs automatically submit their devices to Microsoft, and you can claim them in Intune.
+
+**How to claim OEM devices:**
+1. Go to **Devices → Windows → Windows devices** in Endpoint Manager
+2. Click **Add** and select **Search OEM devices**
+3. The devices will appear — just claim them!
+
+This is the easiest method for purchasing new hardware.
+
+## Method 2: Manual Registration (Using PowerShell)
+
+For testing, used devices, or devices not registered by an OEM, you'll need to gather the hardware hash manually.
+
+### Step 1: Install the AutoPilot Script
+
+On the Windows device you want to register (it should be running Windows 10/11 and have network access):
+
+```powershell
+# Open PowerShell as Administrator and run:
+Install-Script -Name Get-WindowsAutoPilotInfo -Scope CurrentUser
+```
+
+When prompted to install NuGet, type **Y** and press Enter.
+
+### Step 2: Generate the Hardware Hash
+
+Now run the script to capture the hardware hash:
+
+```powershell
+# Generate the CSV file
+Get-WindowsAutoPilotInfo -Computer . -OutputFile autopilot.csv
+```
+
+> **Screenshot:** *PowerShell script running and generating the CSV file*
+
+This creates a file called `autopilot.csv` in your current folder. Open it — you should see something like:
+
+> **Screenshot:** *Contents of autopilot.csv showing hardware hash, serial number, etc.*
+
+The CSV contains:
+- **Device Serial Number**
+- **Windows Product ID**
+- **Hardware Hash** (the important part!)
+- **Make/Model**
+
+## Step-by-Step: Import Devices to Intune
+
+Now let's get that CSV into Intune.
+
+1. Open the **[Microsoft Endpoint Manager admin center](https://endpoint.microsoft.com)**
+2. Go to **Devices → Windows → Windows devices**
+3. Click **Add**
+4. Select **Import Windows devices**
+
+> **Screenshot:** *Intune device import page*
+
+5. Click **Browse** and select your `autopilot.csv` file
+6. Click **Import**
+
+> **Screenshot:** *Upload CSV file to Intune*
+
+Wait a minute or two for the import to complete. You should see a success message when done.
+
+> 💡 **Tip:** You can import multiple devices at once — just add more rows to your CSV file!
+
+## Create an Autopilot Deployment Profile
+
+Now for the magic — the deployment profile tells Autopilot how to set up the device. Let's create one.
+
+1. In Endpoint Manager, go to **Devices → Windows → Autopilot deployment profiles**
+2. Click **Create profile**
+3. Select **Windows PC**
+
+> **Screenshot:** *Profile creation wizard - getting started*
+
+### Step 1: Basics
+
+Fill in the basics:
+- **Name:** `Standard User Profile` (or whatever makes sense)
+- **Description:** `Default profile for standard user devices`
+
+Click **Next**.
+
+### Step 2: Out-of-Box Experience (OOBE)
+
+This is where you configure what the user sees during setup:
+
+| Setting | Recommended Value | Why |
+|---------|-------------------|-----|
+| Deployment mode | User-driven | User sets up their own device |
+| Join to | Azure AD joined | Modern cloud management |
+| Language (OS) | Match hardware | Uses the keyboard/language detected |
+| Hide change account options | Yes | Keeps experience simple |
+| Hide privacy settings | Yes | Reduces user clicks |
+| Skip Cortana | Yes | Faster setup |
+| OEM Registration | Skip | We're using Intune |
+| Auto-logon | Disable | Security best practice |
+
+> **Screenshot:** *Profile creation wizard - OOBE settings*
+
+For **Keyboard**, you can:
+- Leave blank (uses detected keyboard)
+- Add a primary keyboard (e.g., US English)
+- Add a login keyboard if different
+
+Click **Next** → **Create** to save your profile.
+
+> **Screenshot:** *Profile created successfully*
+
+## Assign the Profile to Devices
+
+Your profile is created, but it's not attached to any devices yet. Let's fix that.
+
+1. Go to **Devices → Windows → Autopilot deployment profiles**
+2. Select your new profile
+3. Click **Assign**
+
+> **Screenshot:** *Assignment blade*
+
+4. Choose one of these options:
+   - **Select groups** — assign to a specific Azure AD group
+   - **All devices** — every Autopilot device gets this profile
+
+> 💡 **Tip:** For testing, create a small Azure AD group called "Autopilot Test Devices" and assign only a few devices to it. This lets you validate before rolling out to everyone.
+
+> **Screenshot:** *Profile assigned to devices*
+
+## Verify the Assignment
+
+After assigning, your devices should show up in the profile's device list. You can check this by:
+1. Opening the profile
+2. Looking at the **Devices** tab
+
+It may take a few minutes for the assignment to propagate.
+
+## Quick Recap
+
+In this part, you learned:
+- ✅ What a hardware hash is
+- ✅ How to get the hardware hash using PowerShell
+- ✅ How to import devices into Intune
+- ✅ How to create an Autopilot deployment profile
+- ✅ How to assign the profile to devices
+
+## What's Next?
+
+In [Part 3](/autopilot-part-3-testing-troubleshooting), we'll actually test the deployment, verify the device enrolls correctly, and troubleshoot common issues that might come up.
+
+**Questions?** Let me know in the comments!

@@ -1,0 +1,13 @@
+AI won't replace desktop engineers.
+
+But desktop engineers who use AI will replace those who don't. 🚀
+
+We are moving away from the era of 'knowing the syntax' to the era of 'knowing what to ask and how to verify it.' 
+
+If you spend 3 hours writing a complex remediation script from scratch, you're falling behind the engineer who generated the baseline in 15 seconds and spent the next 2 hours and 59 minutes testing, refining, and implementing it safely at scale.
+
+Adapt or get left behind. Start small: ask an LLM to explain a weird event viewer log or draft a basic regex for your Intune compliance policy.
+
+#FutureOfWork #ITCareers #DesktopEngineering #SysAdmin
+
+I just published a deep dive on exactly this: How Desktop Engineers Can Safely Use AI for Intune Detection Rules. Check out the full breakdown and operator checklist here: https://zakitpro.com/articles/how-to-safely-use-ai-for-intune-detection-rules

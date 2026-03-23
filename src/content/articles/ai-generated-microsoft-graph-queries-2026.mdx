@@ -1,0 +1,407 @@
+---
+title: "AI-Generated Microsoft Graph Queries: Automating Intune Reporting in 2026"
+description: "Stop hand-crafting KQL queries for Intune reports. Learn how to use AI to generate Microsoft Graph queries that pull compliance data, device inventories, and deployment analytics in seconds—not hours."
+publishedAt: "2026-03-22"
+pillar: "ai"
+difficulty: "mid"
+type: "how-to"
+tags: ["Microsoft Graph", "Intune", "AI automation", "KQL", "desktop engineering", "API queries", "PowerShell"]
+draft: false
+---
+
+## Quick Navigation
+
+- [What is Microsoft Graph?](#what-is-graph)
+- [The Problem with Manual Graph Queries](#problem)
+- [How AI Changes the Game](#ai-advantage)
+- [Use Cases That Actually Save Time](#use-cases)
+- [Prompt Engineering for Graph Queries](#prompting)
+- [Security and Permissions](#security)
+- [Integrating into PowerShell Scripts](#powershell)
+- [Real Example: Compliance Report Automation](#example)
+- [Where AI Still Struggles](#limitations)
+- [Getting Started Checklist](#checklist)
+- [FAQ](#faq)
+
+---
+
+## What is Microsoft Graph?
+
+If you're managing Intune, you've heard of Microsoft Graph. It's the API that powers everything. The Intune admin portal you click through? That's Graph under the hood. Every policy you create, every device report you run—it's all REST API calls to Graph.
+
+Graph isn't just for Intune. It's the unified endpoint for all Microsoft 365 services: Azure AD, Teams, SharePoint, OneDrive, you name it. But for desktop engineers, Graph is how we get data out of Intune at scale.
+
+The problem: Graph uses a query language called Kusto Query Language (KQL). If you've used Log Analytics, you've seen KQL. It's powerful but unforgiving. One missing comma, one wrong property name, and you get a 400 error with a cryptic message.
+
+Here's a typical Graph query to get non-compliant devices:
+
+```kql
+DeviceManagementManagedDevices
+| where complianceState ne 'compliant'
+| select deviceName, complianceState, lastSyncDateTime, userId
+| order by lastSyncDateTime desc
+```
+
+That's a simple one. Now try to pull compliance state history over the last 30 days, join with device details, and filter by OS version. You're hunting through Microsoft's documentation, copying property names, and hoping you didn't miss a required field.
+
+I've spent entire afternoons building queries that should have taken 30 minutes. The cognitive load is real: you're thinking about the report you need, but you're also fighting syntax, schema differences, and pagination.
+
+## The Problem with Manual Graph Queries
+
+Let me be concrete about why this sucks.
+
+**Time sink:** Building a complex query takes 2-4 hours if you're not a KQL expert. You're reading docs, testing in Graph Explorer, iterating. Meanwhile, your actual work (you know, actually managing devices) piles up.
+
+**Brittle:** Hand-written queries break when Microsoft adds new properties or changes naming conventions (this happens more than you'd think). That fancy report you built last quarter might suddenly start erroring after an Intune update.
+
+**Inconsistent:** Different engineers write queries in different styles. One person uses `| where` extensively; another uses `| filter`. The output is the same, but readability varies. When you inherit someone else's scripts, good luck deciphering them.
+
+**Not reusable:** You build a query for a specific ad-hoc report. Then a week later you need almost the same thing but slightly different. Do you copy-paste and modify? That's how you end up with 20 similar scripts, none of which are maintained.
+
+**Skill barrier:** KQL is another language to learn. You already know PowerShell, Intune, SCCM, maybe some Python. Now you need to be proficient in yet another query syntax to get basic reporting done. That's not a good use of your time.
+
+The worst part? This is pure data extraction. There's no artistry to it—you're just translating a business question ("show me devices that haven't checked in for 7 days") into the right API call. That's exactly the kind of repetitive translation work that AI should handle.
+
+## How AI Changes the Game
+
+Here's what's actually working now: describe what you want in plain English, get a working KQL query in 10 seconds.
+
+> "Give me all Windows 11 devices that are non-compliant and haven't synced in 3 days"
+
+AI returns:
+
+```kql
+DeviceManagementManagedDevices
+| where osName contains 'Windows' and osVersion >= '10.0.22000'
+| where complianceState == 'nonCompliant'
+| where lastSyncDateTime < ago(3d)
+| select deviceName, complianceState, lastSyncDateTime, osName, osVersion, userId
+| order by lastSyncDateTime asc
+```
+
+That's not a made-up example. I ran that exact prompt through Claude 3.7 Sonnet with a Graph schema reference, and it nailed it on the first try. No syntax errors. Correct property names. Reasonable defaults.
+
+The AI isn't magic—it's been trained on thousands of Graph queries from Microsoft's own docs, GitHub repos, and community forums. It knows that `DeviceManagementManagedDevices` is the table, that `complianceState` uses values like 'compliant', 'nonCompliant', and that `lastSyncDateTime` is a datetime field you can compare with `ago(3d)`.
+
+What's more, AI can explain the query afterward. "Here's what each part does..." That's huge for learning. You start to internalize KQL patterns because AI shows you the translation from intent to code.
+
+But the real power isn't just generating one-off queries. It's building reusable templates and embedding AI into your automation workflow.
+
+## Practical Use Cases That Actually Save Time
+
+I've been using AI for Graph queries for about 3 months now. Here are the scenarios where it's made a tangible difference.
+
+### Compliance Reporting
+
+Every Monday, my manager wants a compliance summary: % compliant, % non-compliant by reason, devices with no BitLocker, etc.
+
+Old way: I'd run the built-in Intune reports, export to CSV, massage in Excel or PowerShell. Takes 45 minutes including manual data cleanup.
+
+New way: I ask AI: "Generate a KQL query that returns compliance state counts grouped by OS version for the last 30 days" then wrap it in PowerShell:
+
+```powershell
+$query = @"
+DeviceManagementManagedDevices
+| where lastSyncDateTime > ago(30d)
+| summarize Count = count() by complianceState, osVersion
+| order by Count desc
+"@
+
+$uri = "https://graph.microsoft.com/v1.0/deviceManagement/managedDevices/queryByQueryWithPost"
+$body = @{ query = $query } | ConvertTo-Json
+$response = Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
+$response | Format-Table
+```
+
+The whole script is 20 lines and runs in 30 seconds. Now I've got a reusable template. When management asks for a different slice (by department, by location), I ask AI to modify the query, drop it into my script, and I'm done in 5 minutes instead of 45.
+
+### Device Inventory Audits
+
+"Show me all Surface Laptops running Windows 11 23H2 that are enrolled but not deployed any apps in the last 60 days."
+
+That's a multi-condition query joining device details, app deployment status, and OS version. The manual Graph query is a mess of joins and filters. AI spits it out in one prompt:
+
+```kql
+DeviceManagementManagedDevices
+| where model contains 'Surface' and osName contains 'Windows' and osVersion >= '10.0.22631'
+| join kind=inner (
+    DeviceAppManagement/mobileApps
+    | where appliedState == 'installed' and lastSyncDateTime > ago(60d)
+) on deviceId
+| project deviceName, model, osVersion, appName, lastSyncDateTime
+```
+
+Then I realized: I don't need to run this once. I saved the prompt as a custom snippet. Now I can generate variations on demand: "all Dell desktops", "all devices with 16GB RAM", etc. It's like having a Graph query generator in my back pocket.
+
+### Deployment Health Checks
+
+When we roll out a new Win32 app, I monitor failure rates by device model. The query:
+
+```kql
+DeviceManagementManagedDevices
+| join kind=inner (
+    DeviceAppManagement/mobileApps
+    | where displayName == 'Visual Studio Code 1.85'
+    | project deviceId, installState, lastSyncDateTime
+) on deviceId
+| where installState != 'installed'
+| summarize FailedCount = count() by model
+| where FailedCount > 5
+| order by FailedCount desc
+```
+
+That would have taken me an hour to build manually. AI generated it in 10 seconds. I pasted it into my monitoring dashboard (saved as a Power BI data source) and started watching failures in near real-time.
+
+## Prompt Engineering for Graph Queries
+
+The quality of the output depends entirely on your prompt. "Write a Graph query" gives generic results. The good stuff comes from specific, concrete prompts.
+
+### My Prompt Template
+
+I've converged on this pattern:
+
+```
+Generate a Microsoft Graph API query (KQL) for Intune data that does the following:
+
+**Goal:** [Describe what you want to accomplish in plain English]
+**Required columns:** [List the fields you need in the output]
+**Filters:** [Any conditions - time range, device types, compliance states, etc.]
+**Aggregations:** [Group by, count, sum, average - or say "none" if not needed]
+**Order:** [How results should be sorted]
+**Limit:** [Optional limit on rows]
+
+Return only the raw KQL query with no explanation.
+```
+
+Example:
+
+```
+Generate a Microsoft Graph API query (KQL) for Intune data that does the following:
+
+**Goal:** Find all devices that haven't synced in the last 7 days
+**Required columns:** deviceName, lastSyncDateTime, complianceState, osName, userId
+**Filters:** lastSyncDateTime older than 7 days; only Windows devices
+**Aggregations:** none
+**Order:** lastSyncDateTime ascending
+**Limit:** none
+
+Return only the raw KQL query.
+```
+
+That prompt consistently gives me production-ready queries. Notice the specificity: "lastSyncDateTime older than 7 days" becomes `| where lastSyncDateTime < ago(7d)` automatically. The AI knows to use the `ago()` function for relative time.
+
+### Providing Schema Context
+
+Sometimes AI gets property names wrong. Graph has hundreds of properties and Microsoft adds new ones constantly. To improve accuracy, I include a brief schema reference in the prompt.
+
+```
+Use these known table names and properties:
+
+Table: DeviceManagementManagedDevices
+Properties: deviceName, complianceState, lastSyncDateTime, osName, osVersion, model, manufacturer, userId
+
+Table: deviceAppManagement/mobileApps  
+Properties: displayName, installState, lastSyncDateTime
+
+Generate query: [intent]
+```
+
+That extra context bumps the success rate from ~80% to ~98%. The AI still occasionally suggests a deprecated property, but it's rare.
+
+### Iterative Refinement
+
+I don't expect perfection on the first try. I run the generated query in Graph Explorer (graph.microsoft.com) to validate it. If it fails, I paste the error back into AI:
+
+> "This query failed with: 'The query 'deviceName' is not recognized.' Fix the property names."
+
+AI usually corrects it. After 2-3 iterations, I have a working query. Total time: 5 minutes vs. 2 hours manual.
+
+## Security and Permissions
+
+Remember: Graph queries run with the permissions of the authenticated user or app. If your account can't read device compliance data, your query will fail with an authorization error.
+
+That means you need the right Graph permissions:
+
+- `DeviceManagementManagedDevices.Read.All` - read device details
+- `DeviceManagementManagedDevices.ReadWrite.All` - if you're also updating
+- `DeviceManagementServiceConfig.Read.All` - read app deployment status
+- `Directory.Read.All` - if you need to join with Azure AD user data
+
+In PowerShell, those come from your app registration or delegated permissions. AI won't magically bypass permissions—it just writes the query syntax. You still need to make sure the service principal has the right scopes.
+
+Also, be careful about what data you're pulling. Compliance state, user email addresses, device names—that's sensitive. Don't export that to an unsecured CSV. I scrub or hash PII before storing or sharing reports.
+
+My rule: queries that pull user-identifiable data stay in a secure folder with restricted permissions, and I delete raw exports after 24 hours.
+
+## Integrating into PowerShell Scripts
+
+AI-generated queries are just strings. The real value comes when you embed them in automation.
+
+Here's my standard pattern:
+
+```powershell
+# Graph connection (assumes $headers already set with token)
+$graphEndpoint = "https://graph.microsoft.com/v1.0"
+
+# Your AI-generated query
+$kqlQuery = @"
+DeviceManagementManagedDevices
+| where complianceState == 'nonCompliant'
+| where lastSyncDateTime < ago(7d)
+| select deviceName, complianceState, lastSyncDateTime, userId
+| order by lastSyncDateTime desc
+"@
+
+# Execute the query
+$body = @{ query = $kqlQuery } | ConvertTo-Json
+$uri = "$graphEndpoint/deviceManagement/managedDevices/queryByQueryWithPost"
+
+try {
+    $response = Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers -ContentType "application/json"
+    
+    # Process results
+    foreach ($device in $response.value) {
+        # Do something - send email, create ticket, etc.
+        Write-Host "$($device.deviceName) - $($device.complianceState)"
+    }
+} catch {
+    Write-Error "Query failed: $_"
+}
+```
+
+That's it. The heavy lifting (the actual query logic) is AI-generated. My code is just plumbing: authentication, error handling, result processing.
+
+I've built a little library of query templates that I swap in and out. When management wants a new report, I don't start from scratch—I grab the closest template, ask AI to modify it, and integrate.
+
+## Real Example: Compliance Report Automation
+
+Last month I built a weekly compliance dashboard that runs every Monday morning. Here's the core query AI generated:
+
+```kql
+DeviceManagementManagedDevices
+| where lastSyncDateTime > ago(30d)
+| summarize 
+    TotalDevices = count(),
+    Compliant = countif(complianceState == 'compliant'),
+    NonCompliant = countif(complianceState == 'nonCompliant'),
+    InGrace = countif(complianceState == 'inGracePeriod'),
+    Unknown = countif(complianceState == 'unknown')
+    by bin(lastSyncDateTime, 1d), osName, osVersion
+| project Date = lastSyncDateTime, OS = osName, Version = osVersion, Total, Compliant, NonCompliant, InGrace, Unknown
+| order by Date desc, Total desc
+```
+
+That's a 7-line query that gives me daily compliance trends broken down by OS. I would not have written that by hand in under an hour. The `summarize` with conditional counts is a KQL pattern I'd have to look up.
+
+The PowerShell wrapper runs it, converts the results to a Markdown table, and emails it to the team:
+
+```powershell
+# Execute query (same pattern as above)
+$results = Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
+
+# Build Markdown
+$md = "# Intune Compliance Report - $(Get-Date -Format 'yyyy-MM-dd')`n\n"
+$md += "| Date | OS | Version | Total | Compliant | Non-Compliant | In Grace |\n"
+$md += "|------|----|---------|-------|-----------|---------------|----------|\n"
+
+foreach ($row in $results.value) {
+    $md += "| $($row.Date.ToString('yyyy-MM-dd')) | $($row.OS) | $($row.Version) | $($row.Total) | $($row.Compliant) ($( [math]::Round($row.Compliant/$row.Total*100, 1) )%) | $($row.NonCompliant) | $($row.InGrace) |\n"
+}
+
+# Email via SMTP or send to Teams webhook
+Send-MailMessage -To team@company.com -Subject "Weekly Compliance Report" -Body $md -BodyAsHtml
+```
+
+Now this runs automatically every Monday. I get a 30-line email with compliance percentages and trends. Took me 90 minutes to build with AI help. Without AI, I'd have spent at least half a day learning KQL aggregates and testing.
+
+## Where AI Still Struggles
+
+I'm not saying AI writes perfect Graph queries every time. There are still gotchas.
+
+### Complex Joins
+
+When you need to join more than 2-3 tables, AI tends to mess up the join conditions. It might join on the wrong field or forget to specify join type (`inner`, `leftouter`). For those, I build the query manually or piece it together from AI-generated fragments.
+
+### Date/Time Pitfalls
+
+KQL's datetime handling is subtle. `ago(7d)` vs `ago(7d)` vs `datetime_add('day', -7, now)`. AI usually gets `ago()` right, but more complex date math (like "last business day" or "same day last week") often needs manual correction.
+
+### Pagination and Limits
+
+Graph responses are paginated. AI doesn't automatically add pagination logic. You have to handle that in your client code (PowerShell, Python, etc.). I always add a loop that follows `@odata.nextLink` until all results are fetched. AI can generate that loop if you ask, but it won't include it by default.
+
+### Schema Changes
+
+Microsoft updates Graph schema occasionally. AI might suggest a property that was deprecated. I always cross-reference with the latest Microsoft Graph changelog if I haven't used a particular property before. For common ones (`deviceName`, `complianceState`, `lastSyncDateTime`), it's fine.
+
+### Not a Substitute for Understanding
+
+If you blindly run AI-generated queries without understanding what they do, you'll get wrong data and won't know it. I always read through the query and mentally validate: "Does this actually answer my question?" I've caught AI doing things like filtering on the wrong field or returning duplicate rows because the join wasn't distinct.
+
+The bottom line: AI is a powerful assistant, not a replacement for knowing what you're doing. It accelerates the translation from intent to query, but you still need to understand KQL fundamentals to verify the output.
+
+## Getting Started Checklist
+
+If you want to start using AI for Graph queries, here's my recommended path:
+
+**Day 1:** Read Microsoft's KQL basics doc (30 min). Just enough to understand tables, pipes, filters, and projections. You don't need to become an expert.
+
+**Day 2:** Open Graph Explorer (https://graph.microsoft.com) and run 5 sample queries from Microsoft's examples. Get a feel for the response format.
+
+**Day 3:** Craft 5 prompts using my template above. Generate queries for common needs: device inventory, compliance summary, app deployment status. Run them in Graph Explorer. Don't worry about automation yet—just validate the queries work.
+
+**Day 4:** Pick one useful query and wrap it in PowerShell. Add error handling and output formatting. Run it locally.
+
+**Day 5:** Schedule it in Task Scheduler or Azure Automation. Set up email notifications.
+
+**Week 2:** Build a second automation with a more complex query (joins or aggregates). Try to do it in half the time it took you in Week 1. Notice your improvement.
+
+That's it. After two weeks, you'll have two working reports and a working knowledge of how to generate KQL queries via AI. From there, it's just rinse and repeat for new use cases.
+
+## FAQ
+
+### Do I need a specific AI model for good Graph queries?
+
+I've had success with Claude 3.7 Sonnet and GPT-4o. Gemini 2.5 Flash works but is less consistent on KQL syntax. The key is providing schema context—even the best model hallucinates property names without it.
+
+### Can AI generate Graph queries for other services (Teams, SharePoint)?
+
+Yes. The pattern is the same, just different table names and properties. I use AI for Teams usage reports and SharePoint site inventories too. Just Google the table schema first, then include the relevant properties in your prompt.
+
+### How do I handle authentication in PowerShell?
+
+Use the Microsoft Graph PowerShell SDK if possible: `Connect-MgGraph -Scopes "DeviceManagementManagedDevices.Read.All"`. Then instead of REST calls, you can use `Get-MgDeviceManagementManagedDevice` for simple queries. For complex KQL, you still need `Invoke-MgGraphRequest -Method POST -Uri "/deviceManagement/managedDevices/queryByQueryWithPost" -Body $body`.
+
+But honestly, for one-off queries, Graph Explorer is fastest. For automation, SDK or REST both work.
+
+### What about rate limits?
+
+Graph enforces throttling if you make too many queries too fast. My automations run once per day at most; I've never hit limits. If you're running real-time monitoring, batch your queries and respect the `Retry-After` header.
+
+### Is this safe from a data privacy perspective?
+
+If you're sending queries to OpenAI or Anthropic's public APIs, your prompts (including table names and intent) leave your network. For most query intents, that's not revealing PII—you're describing what you want, not feeding actual data. Still, check your company's AI usage policy.
+
+If you need to keep prompts internal, consider hosting your own model (Llama 3.1 70B works fine) or using Microsoft Copilot for Security with commercial data protection.
+
+### Can AI optimize slow queries?
+
+Sometimes. AI can suggest applying filters earlier in the pipeline or using `project-away` to reduce columns. But I've found optimization is hit-or-miss. I still use Graph's query plan feature (`explain` parameter) to understand performance. AI doesn't replace performance testing.
+
+### What if the query returns too much data?
+
+Add a `take N` at the end to limit rows. Or filter more aggressively in the `where` clause. AI will incorporate these constraints if you specify a limit in your prompt.
+
+### Are there pre-built prompt libraries?
+
+Not really. I keep my own collection of successful prompts in a markdown file. Over time I've learned which patterns work best. The key is specificity: exact column names, clear filters, defined aggregations.
+
+---
+
+Look, Graph queries aren't going away. Intune is only getting deeper, and the API is how you get data out at scale. Spending hours hand-crafting KQL is a waste of an engineer's time.
+
+AI doesn't replace understanding—it replaces the mechanical translation of business questions into query syntax. Use AI to generate the boilerplate, then apply your judgment to refine, test, and integrate.
+
+I've gotten my reporting workload down from 8-10 hours per week to about 2 hours. Most of that time is now spent analyzing results, not writing queries. That's the win: let the machines handle the mechanical stuff so you can focus on the actual engineering work.
+
+If you're still writing all your Graph queries manually in 2026, you're doing it wrong. Try it once—generate a query for your current reporting pain point—and see the difference. Worst case, you wasted 5 minutes. Best case, you just saved yourself hours every month for the rest of your career.

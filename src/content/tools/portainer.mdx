@@ -1,0 +1,55 @@
+---
+name: Portainer
+description: Lightweight container management UI for Docker, Kubernetes, and Swarm. The easiest way to manage your containers.
+category: docker
+website: https://www.portainer.io/
+github: https://github.com/portainer/portainer
+stars: '20K+'
+license: BSL
+publishedAt: '2026-03-16'
+selfHosted: true
+draft: false
+---
+
+## Why Portainer?
+
+After managing Docker deployments for 20+ years, Portainer is the one tool I recommend to every IT team starting with containers. It turns Docker's command-line complexity into a clean web UI.
+
+## Key Features
+
+- **Visual Container Management** — Start, stop, restart, and monitor containers without touching the CLI
+- **Stack Deployment** — Deploy Docker Compose stacks directly from the UI
+- **Image Management** — Pull, build, and manage images visually
+- **Multi-Environment** — Connect to local Docker, remote hosts, Kubernetes clusters
+- **Access Control** — Team-based permissions for multi-user environments
+
+## Self-Hosted Setup
+
+```bash
+docker volume create portainer_data
+docker run -d -p 9443:9443 --name portainer \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce:latest
+```
+
+## Who It's For
+
+- IT teams managing 5-500 containers
+- Homelab enthusiasts with multiple services
+- MSPs managing client container deployments
+- Dev teams who prefer GUI over CLI
+
+## Alternatives Compared
+
+| Feature | Portainer | Yacht | Dockge |
+|---------|-----------|-------|--------|
+| Docker Support | ✅ | ✅ | ✅ |
+| Kubernetes | ✅ | ❌ | ❌ |
+| Enterprise | ✅ | ❌ | ❌ |
+| Community Size | Largest | Small | Growing |
+
+## Verdict
+
+**Rating: 9/10** — The best container management UI for teams of any size. Start here if you're new to Docker.

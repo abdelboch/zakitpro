@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import ArticleCard from '../../components/ArticleCard.astro';
+
+// Get all articles sorted by date
+const allArticles = await getCollection('articles', ({ data }) => !data.draft);
+const sortedArticles = allArticles.sort(
+  (a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
+);
+
+const pillars = [...new Set(allArticles.map(a => a.data.pillar))];
+---
+
+<BaseLayout title="All Articles" description="Complete archive of IT desktop engineering articles, PowerShell scripts, and career guides">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">All Articles</h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400">
+        {sortedArticles.length} articles covering Windows troubleshooting, scripting, deployment, security, and more.
+      </p>
+    </div>
+
+    <!-- Pillar Quick Links -->
+    <div class="flex flex-wrap gap-3 mb-8">
+      {pillars.map(pillar => (
+        <a 
+          href={`/${pillar}/`}
+          class="px-4 py-2 bg-accent/10 text-accent rounded-lg hover:bg-accent/20 transition-colors font-medium"
+        >
+          {pillar.charAt(0).toUpperCase() + pillar.slice(1)}
+        </a>
+      ))}
+    </div>
+    
+    <!-- Articles Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {sortedArticles.map(article => (
+        <ArticleCard article={{ ...article.data, slug: article.slug }} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>

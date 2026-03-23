@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import ArticleCard from '../../components/ArticleCard.astro';
+
+// Fetch all non-draft articles, filter for certification/training content
+const allArticles = await getCollection('articles', ({ data }) => !data.draft);
+const certArticles = allArticles
+  .filter(a =>
+    a.data.type === 'career-guide' ||
+    a.data.tags?.some(t => ['certifications', 'training', 'certification'].includes(t))
+  )
+  .sort((a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime());
+---
+
+<BaseLayout title="Trainings & Certificates" description="Articles about AI and IT certifications for desktop engineers — guides, roadmaps, and exam breakdowns.">
+
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Header -->
+    <div class="mb-10">
+      <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4 text-gray-900 dark:text-white">
+        Trainings &amp; Certificates
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl">
+        Certification guides, exam breakdowns, and career-focused training articles for AI, cloud, and IT infrastructure.
+      </p>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {certArticles.length > 0 ? (
+        certArticles.map(article => (
+          <ArticleCard article={{ ...article.data, slug: article.slug }} />
+        ))
+      ) : (
+        <p class="text-gray-500 col-span-full">No certification articles yet. Coming soon!</p>
+      )}
+    </div>
+  </div>
+
+</BaseLayout>

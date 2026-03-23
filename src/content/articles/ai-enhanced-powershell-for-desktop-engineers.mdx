@@ -1,0 +1,64 @@
+---
+title: "AI-Enhanced PowerShell for Desktop Engineers"
+slug: "ai-enhanced-powershell-for-desktop-engineers"
+description: "How to use AI assistants to write, review, and optimize PowerShell scripts for enterprise endpoint management."
+publishedAt: "2026-03-10"
+updatedAt: "2026-03-10"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["powershell", "ai", "automation", "desktop-engineering"]
+draft: false
+---
+
+# AI-Enhanced PowerShell for Desktop Engineers
+
+PowerShell remains the backbone of Windows endpoint management. AI assistants can dramatically accelerate script development, but they require careful oversight to produce production-ready code.
+
+## Why AI + PowerShell?
+
+- **Faster prototyping** — generate boilerplate in seconds
+- **Pattern recognition** — AI identifies edge cases you might miss
+- **Documentation** — auto-generate comment-based help
+- **Error handling** — structured try/catch patterns on demand
+
+## Practical Workflow
+
+1. Describe what the script needs to do
+2. Ask the AI to generate a skeleton
+3. Review every line — especially WMI calls and registry operations
+4. Test in a non-production environment
+5. Add your organizational context and hardening
+
+## Common Pitfalls
+
+- **Blind trust**: AI-generated scripts may use deprecated cmdlets
+- **Security gaps**: Credential handling needs human review
+- **Scope creep**: Keep scripts focused on one task
+- **Missing logging**: Always add transcript logging for audit trails
+
+## Example: Intune Device Compliance Check
+
+```powershell
+# AI-assisted compliance check with proper error handling
+try {
+    $deviceInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+    $lastBoot = $deviceInfo.LastBootUpTime
+    
+    if ((Get-Date) - $lastBoot -gt [TimeSpan]::FromDays(30)) {
+        Write-Warning "Device needs restart - last boot: $lastBoot"
+        exit 1
+    }
+    
+    Write-Output "Compliance check passed"
+    exit 0
+}
+catch {
+    Write-Error "Compliance check failed: $_"
+    exit 2
+}
+```
+
+## Key Takeaways
+
+AI is a force multiplier, not a replacement for engineering judgment. Use it to speed up the rote work — typing, patterns, documentation — but keep your hands on the keyboard for security review and testing.

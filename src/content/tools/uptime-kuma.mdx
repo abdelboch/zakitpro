@@ -1,0 +1,57 @@
+---
+name: Uptime Kuma
+description: Fancy self-hosted uptime monitoring tool with beautiful dashboards. Monitor HTTP, TCP, DNS, and 50+ resource types.
+category: monitoring
+website: https://uptime.kuma.pet/
+github: https://github.com/louislam/uptime-kuma
+stars: '60K+'
+license: MIT
+publishedAt: '2026-03-16'
+selfHosted: true
+draft: false
+---
+
+## Why Uptime Kuma?
+
+Most uptime monitors are ugly and overcomplicated. Uptime Kuma fixes both problems — it's beautiful AND it just works. I've replaced PRTG's basic monitoring with this for small teams.
+
+## Key Features
+
+- **50+ Monitor Types** — HTTP(s), TCP, Ping, DNS, Docker, gRPC, and more
+- **Beautiful Dashboard** — Status pages your non-technical stakeholders will actually look at
+- **Multi-Notification Channels** — Slack, Discord, Telegram, Email, Webhook, 90+ integrations
+- **Certificate Monitoring** — Get alerted before SSL certs expire
+- **Multi-User** — Team access with different permission levels
+
+## Self-Hosted Setup
+
+```bash
+docker run -d \
+  --restart=always \
+  -p 3001:3001 \
+  -v uptime-kuma:/app/data \
+  --name uptime-kuma \
+  louislam/uptime-kuma:1
+```
+
+Access at `http://your-server:3001` and create your admin account.
+
+## Who It's For
+
+- IT teams monitoring internal services
+- MSPs providing status pages for clients
+- Homelabbers who want visibility into their services
+- DevOps teams needing lightweight monitoring
+
+## Alternatives Compared
+
+| Feature | Uptime Kuma | UptimeRobot | Pingdom |
+|---------|-------------|-------------|---------|
+| Self-hosted | ✅ | ❌ | ❌ |
+| Price | Free | $8/mo | $10/mo |
+| Status Page | ✅ | ✅ | ✅ |
+| Data Ownership | ✅ | ❌ | ❌ |
+
+## Verdict
+
+**Rating: 9.5/10** — The best uptime monitoring tool for teams that want control. Free, beautiful, and dead simple to deploy.

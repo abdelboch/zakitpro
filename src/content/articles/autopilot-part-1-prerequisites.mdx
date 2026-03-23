@@ -1,0 +1,125 @@
+---
+title: "Windows Autopilot Part 1: Prerequisites & Getting Started"
+slug: "autopilot-part-1-prerequisites"
+description: "Learn what you need before starting with Windows Autopilot — from licenses to account setup."
+publishedAt: "2026-03-01"
+pillar: deployment
+difficulty: junior
+type: how-to
+tags: ["autopilot", "intune", "deployment", "beginner"]
+seriesId: "autopilot-beginners"
+seriesPart: 1
+draft: false
+---
+
+Ready to automate your Windows device deployment? Windows Autopilot lets you take a brand-new PC straight from the box and transform it into a fully managed, ready-to-use machine — without ever touching it in your IT lab.
+
+In this first part of our series, we'll cover everything you need before you can start using Autopilot.
+
+## What is Windows Autopilot?
+
+Think of Autopilot as the "magic button" for new devices. Instead of imaging computers manually (loading Windows onto each one, installing apps, configuring settings), Autopilot handles all of that automatically when a user first turns on their new PC.
+
+**Why IT teams love it:**
+- No need for imaging labs or USB drives
+- Less hands-on time per device
+- Consistent configuration across your organization
+
+**Why users love it:**
+- Faster setup — they're productive quicker
+- Simple, guided experience
+- They get a professionally configured machine from day one
+
+## What You Need Before Starting
+
+Before you can use Autopilot, make sure you have these prerequisites in place:
+
+### 1. The Right Microsoft Licenses
+
+You need one of the following:
+- **Microsoft 365 Business Premium** (includes everything)
+- **Intune Plan 1 or Plan 2** (standalone)
+- **Microsoft 365 E3/E5** with Intune
+
+> 💡 **Tip:** Microsoft 365 Business Premium is the easiest starting point — it includes Intune, Azure AD, and all the features you need.
+
+### 2. Azure AD Premium (Included)
+
+Autopilot requires Azure Active Directory (now called Microsoft Entra ID) to join devices. This is included with M365 Business Premium, or you need Azure AD P1/P2 for standalone Intune.
+
+### 3. Windows Version
+
+Your devices must run:
+- **Windows 10** (version 1809 or later) or
+- **Windows 11**
+
+The Windows edition should be **Pro** or **Enterprise** (Home won't work for Autopilot enrollment).
+
+### 4. An Admin Account
+
+You'll need an account with one of these roles:
+- **Global Administrator** (full access)
+- **Intune Administrator** (manages Intune only)
+- **Device Enrollment Manager** (specifically for enrolling devices)
+
+## Step-by-Step: Check Your M365 Licenses
+
+Let's verify you have Intune available in your tenant.
+
+1. Go to the **[Microsoft 365 Admin Center](https://admin.microsoft.com)**
+2. Navigate to **Billing → Your products**
+3. Look for your subscription and verify **Intune** is listed
+
+> **Screenshot:** ![](/images/autopilot-part-1-m365-dashboard.png)
+
+If you don't see Intune, you may need to add it or upgrade your subscription.
+
+## Step-by-Step: Enable Device Enrollment
+
+Now let's make sure devices can actually enroll in Intune.
+
+1. Open the **[Microsoft Endpoint Manager admin center](https://endpoint.microsoft.com)**
+2. Go to **Devices → Enrollment**
+3. Click on **Enrollment options**
+
+> **Screenshot:** ![](/images/autopilot-part-1-endpoint-manager-enrollment.png)
+
+Here you can configure:
+- **MDM authority** — set this to "Intune" (it usually is by default)
+- **MAM user scope** — decide who can enroll devices
+- **Device enrollment restrictions** — set limits on who can enroll what types of devices
+
+> ⚠️ **Warning:** Don't disable enrollment unless you have a specific reason — you won't be able to deploy new devices!
+
+## Step-by-Step: Verify Azure AD Device Settings
+
+Autopilot devices join Azure AD, so let's check your tenant settings.
+
+1. Go to the **[Microsoft Endpoint Manager admin center](https://endpoint.microsoft.com)**
+2. Navigate to **Devices → Azure AD devices**
+3. Click on **Device settings**
+
+> **Screenshot:** ![](/images/autopilot-part-1-azure-ad-device-settings.png)
+
+Check that:
+- **Users may join devices to Azure AD** is set to "All" or a specific group
+- **Maximum number of devices per user** is appropriate for your organization
+- **Device sync** is enabled
+
+## Account Setup Checklist
+
+Before moving on to Part 2, verify you've completed these items:
+
+- [ ] Global Admin or Intune Admin account ready
+- [ ] User with Device Enrollment Manager role (optional but helpful)
+- [ ] Azure AD tenant configured and working
+- [ ] At least a few test users created in Azure AD
+- [ ] Microsoft 365 subscription with Intune enabled
+
+> 💡 **Tip:** Create a dedicated "test user" account in Azure AD — you'll use this to test your Autopilot deployments before rolling out to real employees.
+
+## What's Next?
+
+Once your prerequisites are in place, you're ready for Part 2: **Registering your first device and creating deployment profiles**. We'll show you how to get the hardware hash from a device and import it into Intune.
+
+**Questions?** Drop a comment below if anything in this guide wasn't clear!

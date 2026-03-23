@@ -1,0 +1,120 @@
+---
+title: "Windows Autopilot: The Complete Guide"
+slug: "windows-autopilot-complete-guide"
+description: "Everything you need to know about Windows Autopilot. From profile creation to device enrollment, covered."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["autopilot", "intune", "deployment", "oobe", "mdm"]
+draft: false
+---
+
+# Windows Autopilot: The Complete Guide
+
+Windows Autopilot is Microsoft's modern deployment solution. Here's everything you need to know.
+
+## What is Autopilot?
+
+A cloud-based deployment service that:
+- Transforms new devices from "blank" to "ready to use"
+- Requires no IT infrastructure
+- Configures devices via Intune
+
+## Deployment Modes
+
+### User-Driven
+- Traditional OOBE experience
+- User logs in with corporate credentials
+- Device joins Azure AD and enrolls in Intune
+
+### Self-Deploying (Zero-Touch)
+- No user interaction required
+- Device provisions itself
+- Great for kiosks, digital signage
+
+### White Glove
+- IT pre-provisions device
+- User gets fresh out-of-box experience
+
+## Getting Started
+
+### Step 1: Register Devices
+
+```powershell
+# Get hardware hash
+Get-WindowsAutoPilotInfo -Computer . | Export-CSV -Path ".\hardwarehash.csv"
+
+# Or use CSV import in Intune
+```
+
+### Step 2: Create Profile
+
+1. Go to **Intune** → **Devices** → **Windows** → **Autopilot deployment profiles**
+2. **Create profile**
+3. Configure settings:
+   - Join type: Azure AD joined
+   - Out-of-box experience: User-driven
+   - Language: Match device
+   - Account type: Standard user
+
+### Step 3: Assign Profile
+
+- Assign to device group
+- Or auto-assign based on order ID
+
+## Profile Settings
+
+| Setting | Options |
+|---------|---------|
+| Deployment mode | User-driven / Self-deploying |
+| Join to | Azure AD |
+| Out-of-box experience | Full customization |
+| Language | en-US, etc. |
+| Keyboard | Primary + login |
+| Device name template | CORP-%SERIAL% |
+
+## Device Preparation
+
+### For Self-Deploying Mode
+- TPM 2.0 required
+- Ethernet recommended
+- Wired connection for initial setup
+
+### For User-Driven
+- Works over WiFi
+- User needs credentials
+
+## Troubleshooting
+
+### Profile Not Applying
+
+```powershell
+# Check device enrollment
+dsregcmd /status
+
+# Check Autopilot state
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Provisioning\Diagnostics\Autopilot"
+```
+
+### Device Not Showing
+
+- Import hardware hash again
+- Check assigned group
+- Verify profile status
+
+## Autopilot Reset
+
+```powershell
+# Local reset (preserve enrollment)
+Reset-AzureAutopilotDevice -DeviceId "device-id"
+
+# Full reset (wipe and re-enroll)
+Wipe-AzureAutopilotDevice -DeviceId "device-id"
+```
+
+## Wrap-Up
+
+Autopilot transforms device deployment. Start with user-driven mode, then explore self-deploying as you mature.
+
+Questions? Drop them below!

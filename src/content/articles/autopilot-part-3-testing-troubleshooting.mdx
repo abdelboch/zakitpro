@@ -1,0 +1,228 @@
+---
+title: "Windows Autopilot Part 3: Testing & Troubleshooting"
+slug: "autopilot-part-3-testing-troubleshooting"
+description: "Test your Autopilot deployment, verify device enrollment, and fix common issues."
+publishedAt: "2026-03-01"
+pillar: deployment
+difficulty: junior
+type: how-to
+tags: ["autopilot", "intune", "deployment", "beginner"]
+seriesId: "autopilot-beginners"
+seriesPart: 3
+draft: false
+---
+
+Congratulations! You've set up your prerequisites, registered devices, and created deployment profiles. Now it's time for the moment of truth — actually testing your Autopilot deployment.
+
+In this final part, we'll walk through what to expect, verify everything works, and troubleshoot any issues.
+
+## What Happens When a User First Turns On the Device
+
+When a user unpacks a new Autopilot-configured PC and turns it on, here's the journey they go through:
+
+1. **Welcome Screen** — Language and keyboard selection
+2. **Network Connection** — Connect to WiFi or Ethernet
+3. **Sign In** — Enter their Azure AD credentials
+4. **Enrollment** — Intune configures the device (this happens automatically!)
+5. **Desktop** — User lands on a ready-to-use machine
+
+> **Screenshot:** *OOBE welcome screen*
+
+> **Screenshot:** *User sign-in page*
+
+> **Screenshot:** *Enrollment in progress*
+
+> **Screenshot:** *Desktop ready*
+
+> 💡 **Tip:** This entire process typically takes 10-20 minutes depending on network speed and how many policies you deploy.
+
+## Step-by-Step: Test Your First Device
+
+### 1. Reset the Device (If Previously Used)
+
+If you're testing with a device that's been used before, you'll want to reset it first:
+
+```powershell
+# On the test device, run as Administrator:
+Windows + I → Recovery → Reset PC → Remove everything → Local reinstall
+```
+
+Or use the **Intune Wipe** command from Endpoint Manager if the device is already enrolled.
+
+### 2. Go Through OOBE
+
+Power on the device and walk through the out-of-box experience:
+
+1. Select your language and keyboard layout
+2. Connect to the internet (WiFi or Ethernet)
+3. When prompted, enter the Azure AD credentials of a test user
+4. Wait while enrollment completes
+5. You're on the desktop!
+
+### 3. Verify Device Appears in Intune
+
+Now let's confirm everything worked on the management side.
+
+1. Open the **[Microsoft Endpoint Manager admin center](https://endpoint.microsoft.com)**
+2. Go to **Devices → All devices**
+3. Look for your test device
+
+> **Screenshot:** *Device appearing in Intune*
+
+Click on the device to see its details:
+
+> **Screenshot:** *Device details page*
+
+Check these things:
+- ✅ **Enrollment status:** Should show "Enrolled"
+- ✅ **Last sync time:** Should be recent
+- ✅ **Compliance status:** Should be "Compliant" (or "Not evaluated" briefly after enrollment)
+- ✅ **Join type:** Should show "Azure AD joined"
+
+> 💡 **Tip:** If the device doesn't appear immediately, click **Sync** to force a refresh.
+
+## Deploy Your First Policy
+
+Now that your device is enrolled, let's verify you can actually manage it by deploying a simple policy.
+
+### Example: Rename the Computer Automatically
+
+Let's create a configuration profile that renames the enrolled computer.
+
+1. In Endpoint Manager, go to **Devices → Configuration profiles**
+2. Click **Create profile**
+3. Select **Windows 10 and later**
+4. Choose **Settings catalog** (or use a template)
+
+> **Screenshot:** *Create configuration profile*
+
+For this example, let's use the **Device rename** template:
+
+1. Search for "device rename" in settings
+2. Configure the rename rule:
+   - **Name pattern:** `{first}-{serial}` (e.g., "zak-DELL1234")
+   - **Action:** Update
+
+3. Assign to your test device or group
+
+> **Screenshot:** *Configure device rename policy*
+
+4. Click **Create**
+
+### Trigger a Sync
+
+After creating the policy, you need to push it to the device:
+
+1. Go to **Devices → All devices**
+2. Select your test device
+3. Click **Sync**
+
+> 💡 **Tip:** Wait 5-10 minutes for the policy to apply. The device checks in periodically.
+
+### Verify the Rename
+
+On your test device:
+1. Open **Settings → System → About**
+2. Check if the device name has changed to your new pattern!
+
+## Common Issues & How to Fix Them
+
+Don't panic if things don't work perfectly the first time. Here are the most common Autopilot issues and their solutions.
+
+### Issue: "Profile Not Found" Error
+
+**What you see:** During OOBE, the device says it can't find an Autopilot profile.
+
+**Cause:** The profile hasn't been assigned to the device or group.
+
+**Fix:**
+1. Go to **Devices → Windows → Autopilot deployment profiles**
+2. Open your profile
+3. Click **Assign**
+4. Make sure the device or its group is selected
+
+> **Screenshot:** *Profile assignment error*
+
+### Issue: Enrollment Failed
+
+**What you see:** "Enrollment failed" or similar error during setup.
+
+**Cause:** Usually a license issue — the user doesn't have an Intune license.
+
+**Fix:**
+1. Check the user's license in **Microsoft 365 Admin Center**
+2. Ensure they have Intune or M365 Business Premium
+3. Assign the license if missing
+
+### Issue: Can't Join Azure AD
+
+**What you see:** Device can't connect to Azure AD during enrollment.
+
+**Cause:** Network issues or Azure AD settings.
+
+**Fix:**
+1. Verify the device has internet access
+2. Check **Devices → Azure AD devices → Device settings** in Endpoint Manager
+3. Ensure "Users may join devices to Azure AD" is enabled
+4. Check that the user isn't hitting device limits
+
+### Issue: Device Not Appearing After Import
+
+**What you see:** You imported the CSV but the device doesn't show up anywhere.
+
+**Cause:** The hardware hash might be incorrect or the import failed silently.
+
+**Fix:**
+1. Go to **Devices → Windows → Windows devices**
+2. Check for import errors
+3. Re-run the PowerShell script and re-import
+4. Make sure the CSV format is correct (no extra headers or columns)
+
+### Issue: Policy Not Applying
+
+**What you see:** You created a policy but it hasn't reached the device.
+
+**Cause:** Timing or assignment issues.
+
+**Fix:**
+1. Check **Device status** in the policy details
+2. Verify the device is in the assigned group
+3. Click **Sync** on the device
+4. Wait — it can take up to 24 hours but usually faster
+
+> 💡 **Tip:** Most issues resolve by having the device **sync** or by **restarting** the device.
+
+## Next Steps: Where Do You Go From Here?
+
+You've completed the Autopilot basics! Here's where to explore next:
+
+### 1. Add More Devices
+- Register your organization's real devices
+- Consider buying from OEMs who pre-register (less work!)
+
+### 2. Explore Self-Deploying Mode
+- For kiosk, digital signage, or shared devices
+- No user login required — device automatically enrolls
+
+### 3. Set Up Device Groups
+- Create dynamic groups based on device attributes
+- Target policies more precisely
+
+### 4. Configure Compliance Policies
+- Set requirements for what makes a device "healthy"
+- Block access if devices aren't compliant
+
+### 5. Application Deployment
+- Push apps automatically during enrollment
+- Configure required apps that install silently
+
+## Quick Recap
+
+In this series, you learned:
+- ✅ **Part 1:** Prerequisites, licenses, and account setup
+- ✅ **Part 2:** Registering devices and creating deployment profiles
+- ✅ **Part 3:** Testing deployments and troubleshooting common issues
+
+You're now ready to deploy Windows devices with Autopilot in your organization!
+
+**Have questions or run into issues?** Drop a comment below and I'll help you figure it out.

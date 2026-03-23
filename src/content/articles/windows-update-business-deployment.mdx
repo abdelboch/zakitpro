@@ -1,0 +1,170 @@
+---
+title: "Windows Update for Business Deployment"
+slug: "windows-update-business-deployment"
+description: "Configure Windows Update for Business in Intune. Manage feature and quality updates, deployment rings, and deferral."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["windows-update", "intune", "deployment-rings", "updates"]
+draft: false
+---
+
+# Windows Update for Business Deployment
+
+Managing Windows updates in enterprise requires a strategy. Windows Update for Business Deployment in Intune gives you control over when and how updates are installed.
+
+## Understanding Update Types
+
+### Quality Updates
+- Security patches
+- Bug fixes
+- Released monthly (Patch Tuesday)
+- Mandatory
+
+### Feature Updates
+- New Windows versions (22H2 → 23H2)
+- Released bi-annually
+- Optional but recommended
+
+## Creating Deployment Rings
+
+### Ring 1: Pilot (IT)
+```powershell
+# Create via Intune or Graph
+$RingParams = @{
+    DisplayName = "Pilot - IT"
+    RingType = "featureUpdate"
+    TargetVersion = "Windows 11 24H2"
+    DeferralDays = 0
+    OfferDays = 0
+}
+```
+
+### Ring 2: Fast
+- Defer 7 days
+- IT and power users
+
+### Ring 3: Broad
+- Defer 14-30 days
+- General users
+
+### Ring 4: Critical
+- Defer 60+ days
+- Security only
+
+## Configuring Update Policies
+
+### Quality Update Policy
+```powershell
+# Via Intune:
+# Devices → Windows → Update rings → Create
+
+# Key settings:
+# - Automatic update behavior: Auto-install and restart
+# - Active hours start/end: Configure user work hours
+# - Days until deferral: 0-4 weeks
+# - Require user input: Yes/No
+```
+
+### Feature Update Policy
+```powershell
+# Devices → Windows → Feature updates → Create
+
+# Settings:
+# - Target version: Windows 11 24H2
+# - Deferral days: 0-365
+# - Offer days: 0-28 after release
+```
+
+## Business Hours Configuration
+
+```powershell
+# Configure active hours
+# This prevents restarts during work hours
+# 
+# Recommended:
+# - Start: 8:00 AM
+# - End: 6:00 PM
+# - User control: Allow
+```
+
+## Driver Updates
+
+```powershell
+# Enable driver updates
+# Devices → Configuration profiles → Delivery Optimization
+# 
+# Settings:
+# - Download mode: LAN (1)
+# - Enable peer caching: Yes
+# - Maximum cache size: 10-50%
+```
+
+## Managing Restarts
+
+```powershell
+# Configure restart behavior
+# 
+# Options:
+# - Auto restart after update: Yes
+# - Restart check frequency: Hourly
+# - Bypass active hours: No
+# - User can pause: Yes/No
+```
+
+## Delivery Optimization
+
+Reduces bandwidth by using peer caching:
+
+```powershell
+# Enable via Group Policy or Intune
+# 
+# Download modes:
+# 0 = BITS
+# 1 = HTTP only, no peering
+# 2 = HTTP blended with LAN
+# 3 = HTTP blended with WAN
+# 99 = Simple download mode
+# 100 = BITS only
+```
+
+## Monitoring Updates
+
+```powershell
+# Check update status via Graph
+Get-MgDeviceManagementWindowsQualityUpdate -All | 
+    Select-Object DisplayName, ComponentName, KBNumber, DeploymentDate
+
+# Check device compliance
+Get-MgDeviceManagementManagedDevice -All | 
+    Where-Object { $_.osVersion -like "*22H2*" }
+```
+
+## Common Issues
+
+### Updates Not Installing
+- Check network connectivity
+- Verify disk space (minimum 10GB)
+- Check for conflicting policies
+
+### Restart Loop
+- Configure active hours
+- Enable "Notify user"
+
+### Drivers Reverting
+- Exclude drivers from updates
+- Use specific driver versions
+
+## Best Practices
+
+1. **Start with pilot ring** — Test before broad deployment
+2. **Monitor closely** — Check for issues in first week
+3. **Communicate with users** — Tell them when updates happen
+4. **Keep rings staggered** — Don't deploy to everyone at once
+
+## Wrap-Up
+
+Windows Update for Business gives enterprise control. Use deployment rings, configure active hours, and monitor closely.
+
+Questions? Drop them below!

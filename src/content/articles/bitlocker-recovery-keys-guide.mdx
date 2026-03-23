@@ -1,0 +1,179 @@
+---
+title: "BitLocker Recovery Keys: The Complete Guide"
+slug: "bitlocker-recovery-keys-guide"
+description: "Managing BitLocker recovery keys in enterprise environments. Backup, recovery, and automation with Intune."
+publishedAt: "2026-02-27"
+pillar: security
+difficulty: mid
+type: how-to
+tags: ["bitlocker", "encryption", "recovery", "intune", "tpm"]
+draft: false
+---
+
+# BitLocker Recovery Keys: The Complete Guide
+
+BitLocker is essential for endpoint security, but if you lose the recovery keys, you're in trouble. This guide covers everything about managing BitLocker recovery keys in enterprise environments.
+
+## The Problem
+
+You encrypt a machine with BitLocker, the user forgets their PIN, the TPM resets, or the machine reboots after a BIOS update — and suddenly you need the recovery key.
+
+**If you don't have it backed up, you're locked out. Permanently.**
+
+## Where Recovery Keys Are Stored
+
+### 1. Active Directory (Best Option)
+
+```powershell
+# Enable BitLocker key backup to AD
+# Via Group Policy:
+# Computer Configuration → Administrative Templates → Windows Components → BitLocker Drive Encryption → Store BitLocker recovery information in Active Directory Domain Services
+
+# Enable for domain members
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\FVE" -Name "ADBackedUp" -Value 1 -Type DWord
+```
+
+### 2. Intune
+
+```powershell
+# In Intune:
+# Devices → Configuration profiles → Create → Endpoint protection → BitLocker
+
+# Enable key escrow
+# Settings: Select "Store recovery keys in Intune"
+```
+
+### 3. Azure AD
+
+Automatically backed up when:
+- Device is Azure AD joined
+- User has correct licenses
+
+## How to Recover Keys
+
+### From Intune
+
+1. Go to **Microsoft Endpoint Manager**
+2. **Devices** → **All devices**
+3. Select the device
+4. Click **BitLocker recovery keys**
+
+```powershell
+# Via Graph API
+Get-MgDeviceManagementManagedDeviceBitLockerRecoveryKey -ManagedDeviceId $DeviceID
+```
+
+### From Active Directory
+
+```powershell
+# Using ADUC (Active Directory Users and Computers)
+# View → Advanced Features
+# Find computer object → Properties → BitLocker Recovery tab
+```
+
+### From Backup (8-digit ID)
+
+If user has the 8-digit numerical ID:
+
+```powershell
+# In Intune recovery blade
+# Enter the 8-digit ID to retrieve the key
+```
+
+## Automating Key Backup
+
+### Script: Export Keys to SharePoint
+
+```powershell
+<#
+.SYNOPSIS
+    Export BitLocker keys to CSV
+#>
+
+$OutputFile = "$env:TEMP\BitLockerKeys_$(Get-Date -Format 'yyyyMMdd').csv"
+
+# Get all devices with BitLocker
+$Devices = Get-MgDeviceManagementManagedDevice -Filter "bitLockerEnabled eq true" -All
+
+$Results = @()
+
+foreach ($Device in $Devices) {
+    $Keys = Get-MgDeviceManagementManagedDeviceBitLockerRecoveryKey -ManagedDeviceId $Device.Id -ErrorAction SilentlyContinue
+    
+    foreach ($Key in $Keys) {
+        $Results += [PSCustomObject]@{
+            DeviceName = $Device.DeviceName
+            DeviceID = $Device.AzureADDeviceID
+            KeyID = $Key.Id
+            RecoveryKey = $Key.BitLockerRecoveryKey
+            CreatedDate = $Key.CreatedDateTime
+        }
+    }
+}
+
+$Results | Export-Csv -Path $OutputFile -NoTypeInformation
+Write-Host "Exported to: $OutputFile"
+```
+
+## Preventing Lockouts
+
+### 1. Save Recovery Keys EARLY
+
+```powershell
+# Script to save key during encryption
+$tpm = Get-Tpm
+if ($tvm.TpmPresent -and $tpm.TpmReady) {
+    Enable-BitLocker -MountPoint "C:" -EncryptionMethod XtsAes256 -UsedSpaceOnly -TpmProtector
+    
+    # Save recovery key locally as backup
+    $Key = Get-BitLockerVolume -MountPoint "C:" | Select-Object -ExpandProperty KeyProtector | Where-Object { $_.KeyProtectorType -eq "RecoveryPassword" }
+    
+    # Export to secure location
+    $Key.RecoveryPassword | Out-File "C:\BitLocker\$env:USERNAME-Recovery.txt"
+}
+```
+
+### 2. Configure TPM Properly
+
+```powershell
+# Check TPM status
+Get-Tpm
+
+# Clear TPM if needed (WARNING: may cause BitLocker to require recovery)
+Clear-Tpm -AllowClear
+```
+
+### 3. Set Up MBAM (Microsoft BitLocker Administration and Monitoring)
+
+For larger enterprises, MBAM provides:
+- Self-service portal
+- Admin key recovery
+- Compliance reporting
+
+## Common Errors
+
+### "The operation could not be completed because the BitLocker protection software could not be enabled"
+
+- Disable Secure Boot temporarily
+- Check TPM is enabled in BIOS
+- Update chipset/BIOS firmware
+
+### "This PC doesn't support BitLocker"
+
+- Check TPM version (must be 1.2+)
+- Check if Pro/Enterprise edition
+- Check Group Policy blocking
+
+## Quick Checklist
+
+- [ ] Keys backed up to AD or Intune
+- [ ] Users know their 8-digit ID
+- [ ] Self-service recovery portal configured
+- [ ] Documented recovery process for helpdesk
+- [ ] Test recovery before you need it
+
+## Wrap-Up
+
+BitLocker recovery keys are not optional in enterprise. Back them up, test recovery, and have a process.
+
+Questions? Drop them below!

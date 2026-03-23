@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all series from the series collection
+const seriesList = await getCollection('series');
+const allArticles = await getCollection('articles', ({ data }) => !data.draft);
+
+// Group articles by series
+const seriesWithArticles = seriesList.map(s => ({
+  ...s.data,
+  slug: s.slug,
+  articles: allArticles
+    .filter(a => a.data.seriesId === s.slug)
+    .sort((a, b) => (a.data.seriesPart || 0) - (b.data.seriesPart || 0))
+}));
+---
+
+<BaseLayout title="Series" description="Multi-part article series on zakitpro">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Series</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+      Multi-part article series diving deep into specific topics.
+    </p>
+    
+    <div class="space-y-8">
+      {seriesWithArticles.length > 0 ? (
+        seriesWithArticles.map(series => (
+          <div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-bold mb-2">{series.name}</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">{series.description}</p>
+            
+            <div class="flex items-center gap-2 mb-4">
+              <span class="text-sm text-gray-500">{series.articles.length} parts</span>
+            </div>
+            
+            <ol class="space-y-3">
+              {series.articles.map((article, index) => (
+                <li class="flex items-start gap-3">
+                  <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-accent text-white text-sm rounded-full">
+                    {index + 1}
+                  </span>
+                  <a 
+                    href={`/${article.data.pillar}/${article.slug}/`}
+                    class="text-gray-700 dark:text-gray-300 hover:text-accent"
+                  >
+                    {article.data.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))
+      ) : (
+        <p class="text-gray-500">No series yet. Coming soon!</p>
+      )}
+    </div>
+  </div>
+</BaseLayout>

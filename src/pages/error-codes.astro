@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allArticles = await getCollection('articles', ({ data }) => !data.draft && data.type === 'error-reference');
+
+// Extract error codes from articles
+const errorCodes = allArticles.map(article => {
+  const match = article.data.title.match(/0x[0-9A-Fa-f]+|ERROR_\w+|NTSTATUS_\w+/);
+  return {
+    code: match ? match[0] : article.data.title.split(' ')[0],
+    title: article.data.title,
+    description: article.data.description,
+    pillar: article.data.pillar,
+    slug: article.slug
+  };
+}).sort((a, b) => a.code.localeCompare(b.code));
+
+const pillarNames = {
+  troubleshooting: 'Windows Troubleshooting',
+  scripting: 'Scripting & Automation',
+  deployment: 'Deployment & Imaging',
+  security: 'Endpoint Security',
+  packaging: 'App Packaging',
+  career: 'Career & Craft',
+  ai: 'AI-Augmented Engineering'
+};
+---
+
+<BaseLayout title="Error Codes Index" description="Index of all Windows error codes covered on zakitpro">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Error Codes Index</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+      A comprehensive index of Windows error codes, their meanings, and how to fix them.
+    </p>
+    
+    <!-- Search/Filter -->
+    <div class="mb-8">
+      <input 
+        type="text" 
+        id="error-search"
+        placeholder="Filter by error code or keyword..."
+        class="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg"
+      />
+    </div>
+    
+    <!-- Error Codes List -->
+    <div class="space-y-4" id="error-codes-list">
+      {errorCodes.length > 0 ? (
+        errorCodes.map(error => (
+          <a 
+            href={`/${error.pillar}/${error.slug}/`}
+            class="error-item block p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-accent transition-colors"
+          >
+            <div class="flex items-center gap-4">
+              <code class="text-lg font-mono text-accent">{error.code}</code>
+              <div>
+                <h3 class="font-semibold">{error.title}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">{error.description}</p>
+              </div>
+            </div>
+          </a>
+        ))
+      ) : (
+        <p class="text-gray-500">No error code articles yet. Coming soon!</p>
+      )}
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  const searchInput = document.getElementById('error-search');
+  const items = document.querySelectorAll('.error-item');
+  
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.toLowerCase();
+    
+    items.forEach(item => {
+      const text = item.textContent?.toLowerCase() || '';
+      (item as HTMLElement).style.display = text.includes(query) ? 'block' : 'none';
+    });
+  });
+</script>

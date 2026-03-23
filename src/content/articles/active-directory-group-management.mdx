@@ -1,0 +1,182 @@
+---
+title: "Active Directory Group Management Scripts"
+slug: "active-directory-group-management"
+description: "PowerShell scripts for managing Active Directory groups. Add/remove members, create groups, and bulk operations."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: junior
+type: script-drop
+tags: ["powershell", "active-directory", "groups", "security-groups", "script"]
+draft: false
+---
+
+# Active Directory Group Management Scripts
+
+Managing AD groups is a daily task. These scripts make it fast and consistent.
+
+## Add User to Group
+
+```powershell
+<#
+.SYNOPSIS
+    Add user to security group
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$Username,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$GroupName
+)
+
+try {
+    Add-ADGroupMember -Identity $GroupName -Members $Username -ErrorAction Stop
+    Write-Host "Added $Username to $GroupName" -ForegroundColor Green
+}
+catch {
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+}
+```
+
+## Remove User from Group
+
+```powershell
+<#
+.SYNOPSIS
+    Remove user from group
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$Username,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$GroupName
+)
+
+Remove-ADGroupMember -Identity $GroupName -Members $Username -Confirm:$false
+Write-Host "Removed $Username from $GroupName"
+```
+
+## List Group Members
+
+```powershell
+<#
+.SYNOPSIS
+    Get all members of a group
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$GroupName
+)
+
+Get-ADGroupMember -Identity $GroupName | 
+    Select-Object Name, SamAccountName, objectClass |
+    Format-Table
+```
+
+## Create Group with Owners
+
+```powershell
+<#
+.SYNOPSIS
+    Create AD security group
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$GroupName,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$Description,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$OU = "CN=Users"
+)
+
+$Params = @{
+    Name = $GroupName
+    SamAccountName = $GroupName
+    GroupCategory = "Security"
+    GroupScope = "Global"
+    Description = $Description
+    Path = "OU=Groups,$((Get-ADDomain).DistinguishedName)"
+    DisplayName = $GroupName
+}
+
+New-ADGroup @Params
+Write-Host "Created group: $GroupName"
+```
+
+## Bulk Add Members from CSV
+
+```powershell
+<#
+.SYNOPSIS
+    Add multiple users to group from CSV
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$GroupName,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$CSVPath
+)
+
+$Members = Import-Csv $CSVPath
+
+foreach ($Member in $Members) {
+    try {
+        Add-ADGroupMember -Identity $GroupName -Members $Member.Username -ErrorAction Stop
+        Write-Host "Added: $($Member.Username)" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "Failed: $($Member.Username) - $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+```
+
+## Find Empty Groups
+
+```powershell
+<#
+.SYNOPSIS
+    Find groups with no members
+#>
+
+Get-ADGroup -Filter * | Where-Object {
+    (Get-ADGroupMember -Identity $_.SamAccountName -ErrorAction SilentlyContinue).Count -eq 0
+} | Select-Object Name, SamAccountName
+```
+
+## Group Membership Report
+
+```powershell
+<#
+.SYNOPSIS
+    Generate group membership report
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$OutputPath
+)
+
+$Groups = Get-ADGroup -Filter *
+
+$Report = foreach ($Group in $Groups) {
+    $Members = Get-ADGroupMember -Identity $Group.SamAccountName -ErrorAction SilentlyContinue
+    
+    [PSCustomObject]@{
+        GroupName = $Group.Name
+        MemberCount = $Members.Count
+        Members = ($Members.Name -join ", ")
+    }
+}
+
+$Report | Export-Csv -Path $OutputPath -NoTypeInformation
+Write-Host "Report saved to: $OutputPath"
+```
+
+## Wrap-Up
+
+These scripts cover the most common AD group operations. Save them to your toolkit.
+
+Questions? Drop them below!

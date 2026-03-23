@@ -1,0 +1,128 @@
+---
+title: "Setup Your Home Lab for IT Learning"
+slug: "setup-home-lab-it-learning"
+description: "Build a budget-friendly home lab for learning Windows administration, PowerShell, Intune, and more. Hardware recommendations and setup guide."
+publishedAt: "2026-02-27"
+pillar: career
+difficulty: junior
+type: how-to
+tags: ["lab", "homelab", "hyper-v", "virtualization", "learning", "career"]
+draft: false
+---
+
+# Setup Your Home Lab for IT Learning
+
+You want to learn Windows administration, Intune, PowerShell, but you need a lab. Here's how to build one on a budget.
+
+## The Minimal Lab ($0-50)
+
+### What You Need
+- Your current PC (8GB RAM minimum, 16GB recommended)
+- Free hypervisor: Hyper-V (Windows Pro) or VirtualBox (any Windows)
+
+### Setup
+
+```powershell
+# Check if Hyper-V is available (Windows Pro/Enterprise)
+Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
+
+# Enable Hyper-V
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart
+```
+
+### VMs to Create
+1. **DC01** — Windows Server 2022 (Domain Controller)
+2. **CLIENT01** — Windows 11 (joined to domain)
+3. **SRV01** — Windows Server 2022 (file/app server)
+
+## The Better Lab ($100-200)
+
+### Hardware Recommendations
+
+| Component | Budget Option | Better Option |
+|----------|--------------|--------------|
+| CPU | Intel i5-10400 | Intel i7-12700K |
+| RAM | 32GB | 64GB |
+| Storage | 500GB SSD | 1TB NVMe |
+| Network | Built-in | Dual NIC |
+
+### Pro Tips
+- Buy used enterprise hardware (Dell Optiplex, HP ProDesk)
+- Get machines with vPro/AmT for remote management
+
+## Essential VMs to Build
+
+### 1. Domain Controller
+```powershell
+# Install AD DS
+Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
+
+# Promote to DC
+Import-Module ADDSDeployment
+Install-ADDSForest -DomainName "lab.local" -SafeModeAdministratorPassword (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force)
+```
+
+### 2. Intune Connector Server
+- Windows Server 2022
+- Install Azure AD Connect
+- Install Intune Certificate Connector
+
+### 3. Clients
+- Windows 11 Enterprise (eval ISO)
+- Windows 10 Enterprise
+
+## Software to Install
+
+### Free Windows ISOs
+- [Windows Evaluation Center](https://www.microsoft.com/en-us/evalcenter/)
+- [Windows Server Evaluation](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)
+
+### Tools to Have
+- **VS Code** — Script editing
+- **Remote Server Administration Tools (RSAT)** — Management
+- **Hyper-V Manager** — VM management
+- **Pester** — Testing PowerShell
+
+## Network Setup
+
+### Recommended Network
+```
+[Router] 
+  |
+  +-- [Hyper-V Host]
+  |     +-- DC01 (Server 2022, 4GB RAM)
+  |     +-- CLIENT01 (Win11, 4GB RAM)  
+  |     +-- CLIENT02 (Win11, 4GB RAM)
+  |     +-- SRV01 (Server 2022, 4GB RAM)
+```
+
+### Switch to Use
+- **Physical**: Unmanaged gigabit switch ($20)
+- **Virtual**: Default Switch in Hyper-V
+
+## Learning Path
+
+### Week 1-2: Active Directory
+- Create users, groups, OUs
+- Group Policy basics
+- DNS, DHCP
+
+### Week 3-4: PowerShell
+- Script AD tasks
+- Build automation
+
+### Week 5-6: Intune
+- Enroll devices
+- Deploy policies
+- App packaging
+
+### Week 7-8: Security
+- BitLocker
+- Conditional Access
+- Endpoint Security
+
+## Wrap-Up
+
+You don't need expensive gear to learn. Start with what you have, add RAM, and build out incrementally.
+
+Questions? Drop them below!

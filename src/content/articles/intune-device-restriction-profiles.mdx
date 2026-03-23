@@ -1,0 +1,132 @@
+---
+title: "Intune Device Restriction Profiles Explained"
+slug: "intune-device-restriction-profiles"
+description: "Complete guide to Intune device restriction profiles. Configure Windows security settings, firewall, and more."
+publishedAt: "2026-02-27"
+pillar: security
+difficulty: junior
+type: how-to
+tags: ["intune", "device-restrictions", "endpoint-security", "configuration"]
+draft: false
+---
+
+# Intune Device Restriction Profiles Explained
+
+Device restriction profiles in Intune are one of the most powerful tools for securing your endpoints. This guide walks through each setting and when to use it.
+
+## What Are Device Restriction Profiles?
+
+They're Intune configuration profiles that control:
+- Device hardware
+- Windows features
+- Security settings
+- App installation
+- Network access
+
+## Creating a Profile
+
+1. Go to **Microsoft Endpoint Manager**
+2. **Devices** → **Configuration profiles**
+3. **Create profile** → **Windows 10 and later**
+4. Select **Device restrictions**
+
+## Settings Explained
+
+### 1. General
+
+| Setting | Options | Recommendation |
+|---------|---------|----------------|
+| Camera | Allow/Block | Allow (or block if sensitive) |
+| Removable storage | Allow/Block | Allow (audit) |
+| Wi-Fi | Allow/Block | Allow |
+| Bluetooth | Allow/Block | Allow (or disable if no BT needed) |
+
+### 2. Password
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| Password required | Enable | Required |
+| Minimum password length | 14+ | NIST recommendation |
+| Password type | Alphanumeric | Stronger |
+| Password age (days) | 60 | Rotate regularly |
+| Remember password history | 24 | Don't reuse |
+
+```powershell
+# Example: Force password complexity via Graph
+$Profile = @{
+    "@odata.type" = "#microsoft.graph.windows10DeviceGeneralConfiguration"
+    passwordRequired = $true
+    passwordMinimumLength = 14
+    passwordRequiredType = "alphanumeric"
+    passwordPreviousPasswordBlockCount = 24
+}
+```
+
+### 3. Account Protection
+
+- **Windows Hello for Business**: Enable
+- ** TPM**: Require TPM 2.0
+- **Anti-theft mode**: Enable
+
+### 4. Store
+
+- **Auto-update apps**: Enable
+- **Store**: Allow (or disable for locked-down)
+
+### 5. Windows Defender SmartScreen
+
+- **SmartScreen for Edge**: Require
+- **Warn about potentially dangerous apps**: Enable
+
+### 6. Network and Communications
+
+| Setting | Recommendation |
+|---------|----------------|
+| IPv6 forwarding | Disable |
+| Network bridge | Disable (unless needed) |
+| Wi-Fihotspot 2.0 | Enable |
+
+## Endpoint Security vs Device Configuration
+
+### Device Configuration
+- Day-to-day settings
+- User-facing controls
+- More granular
+
+### Endpoint Security
+- Security baselines
+- Hardening templates
+- Attack surface reduction
+
+## Example: High-Security Profile
+
+```json
+{
+  "passwordRequired": true,
+  "passwordMinimumLength": 16,
+  "passwordComplexity": "strong",
+  "cameraBlocked": true,
+  "storageBlockRemovableStorage": true,
+  "defenderSmartScreenEnabled": true,
+  "firewallEnabled": true,
+  "windowsHelloRequired": true,
+  "tpmRequired": true
+}
+```
+
+## Deployment
+
+1. Create profile
+2. Assign to groups
+3. Monitor compliance
+
+```powershell
+# Check compliance status
+Get-MgDeviceManagementDeviceConfiguration -Filter "displayName eq 'High Security'"
+```
+
+## Wrap-Up
+
+Device restriction profiles are your primary tool for securing Windows endpoints. Start with basics and harden over time.
+
+Questions? Drop them below!

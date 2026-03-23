@@ -1,0 +1,57 @@
+---
+name: Nextcloud
+description: Self-hosted productivity platform with file sync, calendar, contacts, and collaboration tools. Your own private cloud.
+category: storage
+website: https://nextcloud.com/
+github: https://github.com/nextcloud/server
+stars: '30K+'
+license: AGPL
+publishedAt: '2026-03-16'
+selfHosted: true
+draft: false
+---
+
+## Why Nextcloud?
+
+If you're tired of Google Drive and Microsoft 365 subscriptions, Nextcloud is the full-featured alternative you host yourself. We run it for our entire IT department.
+
+## Key Features
+
+- **File Sync & Share** — Full Dropbox replacement with desktop/mobile apps
+- **Office Collaboration** — Built-in Collabora/OnlyOffice integration
+- **Calendar & Contacts** — CalDAV/CardDAV with shared team calendars
+- **Talk** — Video conferencing and chat
+- **500+ Apps** — Extend with integrations for everything from LDAP to GitHub
+
+## Self-Hosted Setup
+
+The easiest way is with Docker:
+
+```bash
+docker run -d \
+  --name nextcloud \
+  -p 8080:80 \
+  -v nextcloud_data:/var/www/html \
+  nextcloud
+```
+
+For production, use their AIO (All-in-One) appliance or deploy on a Synology/QNAP NAS.
+
+## Who It's For
+
+- Teams replacing Google Workspace / Microsoft 365
+- IT departments needing on-prem file sharing
+- Privacy-conscious individuals
+- MSPs offering hosted collaboration to clients
+
+## Cost Comparison
+
+| Solution | Monthly Cost (10 users) | Data Control |
+|----------|------------------------|--------------|
+| Google Workspace | $120/mo | ❌ Google servers |
+| Microsoft 365 | $125/mo | ❌ Microsoft servers |
+| **Nextcloud** | $0 (hosting only) | ✅ Your servers |
+
+## Verdict
+
+**Rating: 8.5/10** — Requires more setup than cloud alternatives, but you own your data. Perfect for IT teams who value control.

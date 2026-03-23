@@ -1,0 +1,110 @@
+---
+title: "Getting Started with PowerShell"
+slug: "getting-started-with-powershell"
+description: "A comprehensive guide for IT professionals to get started with PowerShell scripting and automation."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: junior
+type: how-to
+tags: ["powershell", "basics", "automation", "beginner"]
+draft: false
+---
+
+# Getting Started with PowerShell
+
+PowerShell is an essential tool for any IT professional. Whether you're managing Windows endpoints, automating Active Directory tasks, or querying Microsoft Graph, PowerShell is the backbone of modern Windows administration.
+
+## Why PowerShell?
+
+As an IT desktop engineer, you'll encounter PowerShell in various scenarios:
+
+- **Intune/Endpoint Manager** — Device management via Microsoft Graph
+- **Active Directory** — User and group management
+- **Office 365** — Exchange, SharePoint, and Teams administration
+- **Automation** — Scheduled tasks and CI/CD pipelines
+
+## Prerequisites
+
+Before diving in, ensure you have:
+
+1. Windows 10/11 or Windows Server 2019+
+2. PowerShell 5.1 or higher (7.x recommended)
+3. VS Code with PowerShell extension
+
+## Your First Script
+
+Let's create a simple script to gather system information:
+
+```powershell
+# Get-SystemInfo.ps1
+# System Information Gatherer
+
+$ComputerInfo = @{
+    ComputerName = $env:COMPUTERNAME
+    OS = (Get-CimInstance -ClassName Win32_OperatingSystem).Caption
+    Version = (Get-CimInstance -ClassName Win32_OperatingSystem).Version
+    LastBoot = (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
+    Uptime = ((Get-Date) - (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime).ToString()
+}
+
+$ComputerInfo | ConvertTo-Json
+```
+
+### Running the Script
+
+Save the code above as `Get-SystemInfo.ps1` and run:
+
+```powershell
+.\Get-SystemInfo.ps1
+```
+
+## Understanding the Pipeline
+
+One of PowerShell's most powerful features is the pipeline:
+
+```powershell
+# Get all processes using more than 100MB of memory
+Get-Process | 
+    Where-Object { $_.WorkingSet64 -gt 100MB } | 
+    Sort-Object WorkingSet64 -Descending | 
+    Select-Object -First 10 Name, @{N='MemoryMB';E={[math]::Round($_.WorkingSet64/1MB,2)}}
+```
+
+## Working with Objects
+
+Everything in PowerShell is an object. This makes it incredibly powerful:
+
+```powershell
+# Get the current date as an object
+Get-Date
+
+# Access properties
+(Get-Date).DayOfWeek
+
+# Call methods
+(Get-Date).AddDays(7)
+```
+
+## Best Practices
+
+1. **Always use -WhatIf** for destructive operations
+2. **Use strict mode** with `Set-StrictMode -Version Latest`
+3. **Comment your code** — Future you will thank present you
+4. **Use verbs from the approved list** — Get, Set, New, Remove, etc.
+
+## Next Steps
+
+In future articles, we'll cover:
+
+- Working with APIs (REST endpoints)
+- Graph API authentication
+- Building modular scripts
+- Error handling
+- Creating scheduled tasks
+
+Stay tuned!
+
+```powershell
+# Quick test - run this to verify PowerShell is working
+Write-Host "PowerShell is working!" -ForegroundColor Green
+```

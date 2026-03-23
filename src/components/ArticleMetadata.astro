@@ -1,0 +1,72 @@
+---
+import { formatDate } from '../utils';
+
+interface Props {
+  pillar: string;
+  difficulty: string;
+  type: string;
+  publishedAt: string;
+  updatedAt?: string;
+}
+
+const { pillar, difficulty, publishedAt, updatedAt } = Astro.props;
+
+const pillarNames = {
+  troubleshooting: 'Windows Troubleshooting',
+  scripting: 'Scripting & Automation',
+  deployment: 'Deployment & Imaging',
+  security: 'Endpoint Security',
+  packaging: 'App Packaging',
+  career: 'Career & Craft',
+  ai: 'AI-Augmented Engineering'
+};
+
+const pillarDescriptions = {
+  troubleshooting: 'Boot failures, BSOD, event log forensics, profile corruption, error codes',
+  scripting: 'PowerShell, Graph API, task automation, scheduled jobs',
+  deployment: 'Autopilot, WinPE, MDT, driver injection, provisioning',
+  security: 'CIS benchmarks, LAPS, Defender for Endpoint, BitLocker, Conditional Access',
+  packaging: 'Win32/Intune packaging, PSADT, silent installs, detection rules',
+  career: 'Career progression, lab setup, cert roadmaps, documentation, tooling',
+  ai: 'AI workflows for endpoint engineering, prompt ops, AI-assisted troubleshooting, and governance'
+};
+
+const difficultyColors = {
+  junior: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  mid: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  senior: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+};
+
+const difficultyLabels = {
+  junior: 'Junior (1-3 years)',
+  mid: 'Mid-Level (3-5 years)',
+  senior: 'Senior (5+ years)'
+};
+---
+
+<div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4">
+  <div>
+    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Pillar</h4>
+    <a href={`/${pillar}/`} class="text-accent hover:underline font-medium">
+      {pillarNames[pillar]}
+    </a>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+      {pillarDescriptions[pillar]}
+    </p>
+  </div>
+  
+  <div>
+    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Difficulty</h4>
+    <span class={`inline-block px-2 py-1 text-xs font-medium rounded-full ${difficultyColors[difficulty]}`}>
+      {difficultyLabels[difficulty]}
+    </span>
+  </div>
+  
+  <div>
+    <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Published</h4>
+    <p class="text-sm text-gray-700 dark:text-gray-300">{formatDate(publishedAt)}</p>
+    {updatedAt && (
+      <p class="text-sm text-gray-500">Updated: {formatDate(updatedAt)}</p>
+    )}
+  </div>
+</div>

@@ -1,0 +1,55 @@
+---
+import { formatDate, calculateReadingTime } from '../utils';
+
+interface Props {
+  article: {
+    title: string;
+    slug: string;
+    description: string;
+    publishedAt: string;
+    difficulty: string;
+    type: string;
+    pillar: string;
+    tags?: string[];
+  };
+}
+
+const { article } = Astro.props;
+const readingTime = calculateReadingTime(article.description);
+
+const pillarNames = {
+  troubleshooting: 'Windows Troubleshooting',
+  scripting: 'Scripting & Automation',
+  deployment: 'Deployment & Imaging',
+  security: 'Endpoint Security',
+  packaging: 'App Packaging',
+  career: 'Career & Craft',
+  ai: 'AI-Augmented Engineering'
+};
+
+const difficultyColors = {
+  junior: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  mid: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  senior: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+};
+---
+
+<a 
+  href={`/${article.pillar}/${article.slug}/`}
+  class="block p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
+>
+  <div class="flex items-center gap-2 mb-2">
+    <span class={`text-xs px-2 py-0.5 rounded-full ${difficultyColors[article.difficulty]}`}>
+      {article.difficulty}
+    </span>
+    <span class="text-xs text-gray-500">{readingTime}</span>
+  </div>
+  
+  <h4 class="font-semibold text-gray-900 dark:text-white group-hover:text-accent transition-colors mb-2">
+    {article.title}
+  </h4>
+  
+  <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+    {article.description}
+  </p>
+</a>

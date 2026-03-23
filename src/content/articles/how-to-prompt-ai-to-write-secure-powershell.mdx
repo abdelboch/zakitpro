@@ -1,0 +1,282 @@
+---
+title: "How to prompt AI to write secure PowerShell"
+description: "A practical enterprise method for prompting AI to generate secure PowerShell scripts, with threat-aware prompts, review gates, and production-safe validation."
+publishedAt: "2026-03-05"
+pillar: ai
+difficulty: senior
+type: how-to
+tags: ["ai", "powershell", "security", "scripting", "desktop-engineering", "enterprise-it"]
+draft: false
+---
+
+# How to prompt AI to write secure PowerShell
+
+AI can produce PowerShell quickly. That is both useful and dangerous.
+
+The speed is great for boilerplate, input validation scaffolding, and logging structure. The danger is subtle insecurity: weak error handling, over-privileged actions, brittle assumptions, unsafe string handling, and scripts that work in test but create risk in production.
+
+This guide gives you a practical framework for prompting AI to write secure PowerShell in enterprise desktop environments.
+
+## URL, keyword, and intent
+
+- Suggested URL: `/ai/how-to-prompt-ai-to-write-secure-powershell`
+- Primary keyword: `how to prompt AI to write secure PowerShell`
+- Search intent: secure prompt and review workflow for enterprise scripting
+- Meta title suggestion: `How to Prompt AI to Write Secure PowerShell`
+- Meta description suggestion: `Use a threat-aware prompt framework to generate safer PowerShell scripts with AI, then validate and deploy with enterprise controls.`
+
+## Table of contents
+
+- [Why insecure AI-generated PowerShell slips through](#why-insecure-ai-generated-powershell-slips-through)
+- [The secure prompting model](#the-secure-prompting-model)
+- [Step 1: define script scope and blast radius](#step-1-define-script-scope-and-blast-radius)
+- [Step 2: force security constraints in the prompt](#step-2-force-security-constraints-in-the-prompt)
+- [Step 3: require explicit threat and failure analysis](#step-3-require-explicit-threat-and-failure-analysis)
+- [Step 4: request test cases and negative tests](#step-4-request-test-cases-and-negative-tests)
+- [Step 5: human review and static checks](#step-5-human-review-and-static-checks)
+- [Step 6: pilot rollout with rollback controls](#step-6-pilot-rollout-with-rollback-controls)
+- [Internal links](#internal-links)
+- [FAQ](#faq)
+- [CTA](#cta)
+
+## Why insecure AI-generated PowerShell slips through
+
+Most bad outcomes come from one of these:
+
+- prompts that focus on speed, not security constraints
+- missing context around execution privileges and environment
+- no requirement for safe defaults (`-WhatIf`, confirmation gates, dry runs)
+- no negative test requests
+- copy-paste deployment without peer review
+
+AI is not malicious. It is pattern-based. If your prompt is vague, you get plausible code, not safe code.
+
+![Insecure script path versus secure AI prompt workflow for PowerShell](/images/ai-secure-powershell-01-risk-map.png)
+
+## The secure prompting model
+
+Use a 5-part prompt structure every time:
+
+1. **Role + context**: enterprise desktop engineering environment
+2. **Security requirements**: explicit controls and forbidden behaviors
+3. **Operational constraints**: privileges, rollback, logging, idempotency
+4. **Output format**: script + threat notes + tests
+5. **Validation instructions**: static checks and manual review checklist
+
+This sounds formal, but it prevents almost every common scripting mistake.
+
+## Step 1: define script scope and blast radius
+
+Before asking AI for code, answer these:
+
+- What exactly should the script do?
+- Where will it run (user/system, local/remote)?
+- Which resources can it touch?
+- What failure impact is acceptable?
+- How will we roll back?
+
+Practical example:
+
+Task: remove stale local profiles older than 90 days on shared devices.
+
+Blast radius considerations:
+
+- accidental profile removal for active contractors
+- deletion on executive endpoints
+- mismatch in date parsing across locales
+
+If you do this analysis first, your prompt becomes precise and safer.
+
+![Scope and blast radius worksheet before generating PowerShell](/images/ai-secure-powershell-02-scope-sheet.png)
+
+## Step 2: force security constraints in the prompt
+
+Here is a template that works in enterprise teams.
+
+```text
+You are writing production-grade PowerShell for enterprise desktop operations.
+
+Objective:
+<describe exact task>
+
+Environment:
+- OS: Windows 10/11 enterprise
+- Execution context: <user/system>
+- Management stack: Intune + standard SOC logging
+
+Security requirements:
+- Validate all input parameters with strict types and allowed values.
+- Use least privilege assumptions.
+- Include -WhatIf support for actions that change state.
+- Do not use Invoke-Expression.
+- Do not disable security controls.
+- Avoid hard-coded secrets, tokens, or tenant identifiers.
+- Use explicit try/catch with actionable errors.
+- Log actions and errors in structured form.
+- Ensure idempotent behavior.
+
+Output requirements:
+1) Full script
+2) Security rationale for key design decisions
+3) Failure modes and mitigations
+4) Pester-style test ideas including negative tests
+5) Reviewer checklist
+
+Constraints:
+- No destructive defaults.
+- Clearly label assumptions.
+- If required information is missing, ask for it in a separate section.
+```
+
+The point is not to make the prompt longer. The point is to remove ambiguity around security.
+
+![Prompt template with mandatory PowerShell security constraints](/images/ai-secure-powershell-03-prompt-template.png)
+
+## Step 3: require explicit threat and failure analysis
+
+If the model outputs code only, you are missing half the value. Require a small threat model in the response.
+
+Ask for:
+
+- abuse paths (how could this be misused?)
+- accidental failure paths
+- privilege assumptions
+- data exposure risks
+- auditability gaps
+
+Example output you want:
+
+- risk: unbounded path input could delete unintended directories
+- mitigation: path allowlist + `Test-Path` + explicit root constraint
+
+This catches dangerous logic early.
+
+![Threat and failure analysis section paired with generated script](/images/ai-secure-powershell-04-threat-analysis.png)
+
+## Step 4: request test cases and negative tests
+
+Most AI script prompts ask for "example usage" and stop there. Ask for tests that prove safety.
+
+Minimum test set:
+
+- valid input success case
+- invalid input rejection case
+- missing dependency behavior
+- insufficient privilege behavior
+- dry-run (`-WhatIf`) behavior
+- idempotent rerun behavior
+
+Negative tests are where weak scripts fail fast, which is exactly what you want before production.
+
+![Test matrix for secure PowerShell generation including negative cases](/images/ai-secure-powershell-05-test-matrix.png)
+
+## Step 5: human review and static checks
+
+Mandatory review gate before deployment:
+
+### Code review checklist
+
+- [ ] Uses `Set-StrictMode -Version Latest` where appropriate
+- [ ] Input validation exists and is strict
+- [ ] No dynamic execution (`Invoke-Expression`)
+- [ ] Errors are handled and logged with context
+- [ ] Script is idempotent or explicitly scoped as one-time
+- [ ] Supports dry-run/confirm path
+- [ ] No secrets in source
+- [ ] Verbose logging does not leak sensitive data
+
+### Static checks and linting
+
+- Run PSScriptAnalyzer with policy profile
+- run unit tests or smoke checks
+- run on lab endpoint baseline images
+
+![Peer review and analyzer checks for AI generated PowerShell](/images/ai-secure-powershell-06-review-gate.png)
+
+## Step 6: pilot rollout with rollback controls
+
+Deployment strategy:
+
+1. pilot to non-critical endpoint ring
+2. monitor success/error telemetry
+3. review SOC and endpoint logs for anomalies
+4. validate idempotent reruns
+5. scale gradually with change window
+
+Rollback essentials:
+
+- pre-change snapshot/log export
+- clear revert command path
+- owner + escalation contact in runbook
+
+A secure script is not just code quality. It is rollout discipline.
+
+![Pilot ring deployment and rollback control checklist](/images/ai-secure-powershell-07-pilot-rollout.png)
+
+## Practical enterprise examples
+
+### Example A: safe local group audit script
+
+Prompt asks AI to generate read-only audit script for local administrators, outputting CSV and event log summary. Security wins:
+
+- no state-changing actions
+- parameter validation for output location
+- explicit handling for inaccessible endpoints
+
+### Example B: profile cleanup with dry-run
+
+Prompt requires `-WhatIf`, minimum age threshold, and explicit exclusions. Security wins:
+
+- no default destructive execution
+- guardrails for system and service profiles
+- rollback evidence via logs
+
+### Example C: service restart remediation helper
+
+Prompt requires service allowlist and max restart attempts. Security wins:
+
+- prevents arbitrary service control
+- reduces accidental outage loops
+- logs all actions for audit
+
+## Internal links
+
+- [AI Prompt to PowerShell Workflow for Desktop Engineers](/ai/ai-prompt-to-powershell-workflow-desktop-engineers)
+- [PowerShell Error Handling](/scripting/powershell-error-handling)
+- [PowerShell Modules Guide](/scripting/powershell-modules-guide)
+- [Password Reset Scripts for IT](/scripting/password-reset-scripts-it)
+- [AI for desktop engineers: practical enterprise guide](/ai/ai-for-desktop-engineers-practical-enterprise-guide)
+- [CIS Benchmark Hardening for Windows](/security/cis-benchmark-hardening-windows)
+
+## FAQ
+
+### Can AI-generated PowerShell be production-safe?
+
+Yes, if you enforce strict prompt constraints, require threat analysis, and keep a mandatory review + pilot gate.
+
+### What is the biggest security mistake with AI scripting?
+
+Running generated scripts without review, especially with elevated privileges.
+
+### Should I always require `-WhatIf`?
+
+For state-changing actions, yes whenever practical. It gives you a safer preview path.
+
+### Is PSScriptAnalyzer enough?
+
+No. It is useful but not sufficient. You still need human review, context checks, and rollout controls.
+
+### How do I train juniors to use AI safely for PowerShell?
+
+Give them one approved prompt template, one review checklist, and require peer signoff before pilot deployment.
+
+## CTA
+
+Take one recurring desktop script this week and run this process:
+
+1. rewrite prompt using the secure template
+2. require threat + failure analysis
+3. run static checks and negative tests
+4. deploy to pilot ring only
+
+That single change usually improves script safety more than any new tool purchase.

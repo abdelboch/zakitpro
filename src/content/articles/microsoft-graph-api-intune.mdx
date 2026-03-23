@@ -1,0 +1,169 @@
+---
+title: "Microsoft Graph API for Intune"
+slug: "microsoft-graph-api-intune"
+description: "Automate Intune with Microsoft Graph API. PowerShell scripts for device management, policy deployment, and reporting."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: senior
+type: how-to
+tags: ["microsoft-graph", "intune", "api", "automation", "powershell"]
+draft: false
+---
+
+# Microsoft Graph API for Intune
+
+The Microsoft Graph API is the modern way to automate Intune. If you're still using legacy MSOnline or AzureADPreview modules, it's time to migrate. Here's how.
+
+## Authentication
+
+### App Registration Setup
+
+1. Go to **Azure Portal** → **App registrations**
+2. Create new registration
+3. Add API permissions:
+   - `DeviceManagementManagedDevices.Read.All`
+   - `DeviceManagementConfiguration.ReadWrite.All`
+   - `DeviceManagementServiceConfiguration.ReadWrite.All`
+4. Grant admin consent
+5. Create client secret
+
+### Connect via PowerShell
+
+```powershell
+# Install Graph module
+Install-Module Microsoft.Graph -Scope CurrentUser
+
+# Connect with app
+$ClientId = "your-app-id"
+$TenantId = "your-tenant-id"
+$ClientSecret = "your-secret"
+
+$Body = @{
+    Grant_Type    = "client_credentials"
+    Scope        = "https://graph.microsoft.com/.default"
+    Client_Id     = $ClientId
+    Client_Secret = $ClientSecret
+}
+
+$TokenResponse = Invoke-RestMethod -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -Method POST -Body $Body
+
+# Connect to Graph
+Connect-MgGraph -AccessToken $TokenResponse.access_token
+```
+
+## Common Intune Operations
+
+### Get All Devices
+
+```powershell
+# Get all managed devices
+Get-MgDeviceManagementManagedDevice -All | 
+    Select-Object DeviceName, DeviceType, OperatingSystem, LastSyncDateTime
+```
+
+### Get Specific Device
+
+```powershell
+# Find by name
+Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'LAPTOP-001'"
+```
+
+### Sync a Device
+
+```powershell
+# Trigger sync
+$DeviceId = (Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'LAPTOP-001'").Id
+
+Invoke-MgDeviceManagementManagedDeviceSyncDevice -ManagedDeviceId $DeviceId
+```
+
+### Get Device Compliance
+
+```powershell
+# Get compliance states
+Get-MgDeviceManagementDeviceCompliancePolicy -All |
+    Select-Object DisplayName, Id
+```
+
+### Assign Policy to Group
+
+```powershell
+# Get group ID
+$GroupId = (Get-MgGroup -Filter "displayName eq 'IT Devices'").Id
+
+# Get policy ID
+$PolicyId = (Get-MgDeviceManagementDeviceConfiguration -Filter "displayName eq 'Security Policy'").Id
+
+# Assign
+$Params = @{
+    "@odata.id" = "https://graph.microsoft.com/v1.0/groups('$GroupId')"
+}
+
+Invoke-MgDeviceManagementDeviceConfigurationAssign -DeviceConfigurationId $PolicyId -BodyParameter $Params
+```
+
+## Creating Objects
+
+### Create Configuration Profile
+
+```powershell
+$ProfileParams = @{
+    "@odata.type" = "#microsoft.graph.windows10CustomConfiguration"
+    DisplayName = "Custom Settings Profile"
+    Description = "Created via Graph API"
+    OmaSettings = @(
+        @{
+            "@odata.type" = "#microsoft.graph.omaSettingString"
+            DisplayName = "Device Name"
+            OmaUri = "./Vendor/MSFT/Device/Virtualization/WSName"
+            Value = "CORP-{SERIAL}"
+        }
+    )
+}
+
+New-MgDeviceManagementDeviceConfiguration -BodyParameter $ProfileParams
+```
+
+### Create Device Group
+
+```powershell
+$GroupParams = @{
+    DisplayName = "Windows 11 Devices"
+    Description = "Devices running Windows 11"
+    MailEnabled = $false
+    MailNickname = "Win11Devices"
+    SecurityEnabled = $true
+}
+
+New-MgGroup -BodyParameter $GroupParams
+```
+
+## Error Handling
+
+```powershell
+try {
+    $Device = Get-MgDeviceManagementManagedDevice -DeviceId $DeviceId -ErrorAction Stop
+}
+catch {
+    if ($_.Exception.Message -match "404") {
+        Write-Host "Device not found"
+    }
+    else {
+        throw $_
+    }
+}
+```
+
+## Pagination
+
+```powershell
+# Graph returns max 100 by default
+# Use -Top for more
+Get-MgDeviceManagementManagedDevice -Top 999 -All
+```
+
+## Wrap-Up
+
+Graph API is powerful but requires setup. Create an app registration, get permissions, and automate everything.
+
+Questions? Drop them below!

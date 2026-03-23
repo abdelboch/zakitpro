@@ -1,0 +1,117 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const tools = await getCollection('tools', ({ data }) => !data.draft);
+  return tools.map(tool => ({
+    params: { slug: tool.slug },
+    props: { tool }
+  }));
+}
+
+const { tool } = Astro.props;
+const { name, description, category, website, github, stars, license, affiliateUrl, affiliateProgram, commission, selfHosted } = tool.data;
+
+const categoryNames = {
+  docker: '🐳 Docker & Containers',
+  storage: '💾 Storage & NAS',
+  monitoring: '📊 Monitoring',
+  automation: '🤖 Home Automation',
+  media: '🎬 Media Servers',
+  backup: '🔒 Backup Solutions',
+  passwords: '🔑 Password Management',
+  vpn: '🌐 VPN & Networking',
+  logging: '📝 Logging & Alerting',
+  documentation: '📚 Wiki & Documentation'
+};
+---
+
+<Layout title={`${name} - Self-Hosted IT Tools | ZakitPro`}>
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-500 mb-6">
+      <a href="/tools" class="hover:text-blue-400">Tools Directory</a>
+      <span class="mx-2">›</span>
+      <span class="capitalize">{category}</span>
+      <span class="mx-2">›</span>
+      <span class="text-gray-300">{name}</span>
+    </nav>
+
+    <article class="bg-gray-800 rounded-xl p-8 border border-gray-700">
+      <header class="mb-8">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 class="text-3xl font-bold text-white mb-2">{name}</h1>
+            <p class="text-xl text-gray-400">{description}</p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <a href={website} target="_blank" rel="noopener" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors">
+              Visit Website →
+            </a>
+            {affiliateUrl && (
+              <a href={affiliateUrl} target="_blank" rel="noopener sponsored" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors">
+                Get {name} ({commission || 'Affiliate'}) →
+              </a>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <!-- Meta Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-900 rounded-lg p-4 text-center">
+          <div class="text-2xl mb-1">{categoryNames[category]?.split(' ')[0] || '🔧'}</div>
+          <div class="text-xs text-gray-500">Category</div>
+          <div class="text-sm text-gray-300 capitalize">{category}</div>
+        </div>
+        {stars && (
+          <div class="bg-gray-900 rounded-lg p-4 text-center">
+            <div class="text-2xl mb-1">⭐</div>
+            <div class="text-xs text-gray-500">GitHub Stars</div>
+            <div class="text-sm text-gray-300">{stars}</div>
+          </div>
+        )}
+        {license && (
+          <div class="bg-gray-900 rounded-lg p-4 text-center">
+            <div class="text-2xl mb-1">📜</div>
+            <div class="text-xs text-gray-500">License</div>
+            <div class="text-sm text-gray-300">{license}</div>
+          </div>
+        )}
+        <div class="bg-gray-900 rounded-lg p-4 text-center">
+          <div class="text-2xl mb-1">🏠</div>
+          <div class="text-xs text-gray-500">Deployment</div>
+          <div class="text-sm text-gray-300">{selfHosted ? 'Self-hosted' : 'Cloud'}</div>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="flex flex-wrap gap-3 mb-8">
+        <a href={website} target="_blank" rel="noopener" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+          🌐 Official Website
+        </a>
+        {github && (
+          <a href={github} target="_blank" rel="noopener" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+            📦 GitHub Repository
+          </a>
+        )}
+        {affiliateProgram && (
+          <span class="bg-green-900/50 text-green-400 px-4 py-2 rounded-lg text-sm">
+            💰 {affiliateProgram} — {commission}
+          </span>
+        )}
+      </div>
+
+      <!-- Content -->
+      <div class="prose prose-invert prose-blue max-w-none">
+        <slot />
+      </div>
+    </article>
+
+    <!-- Affiliate Disclosure -->
+    <div class="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-700 text-sm text-gray-500">
+      📋 Affiliate Disclosure: Some links on this page are affiliate links. We may earn a commission at no extra cost to you.
+    </div>
+  </div>
+</Layout>

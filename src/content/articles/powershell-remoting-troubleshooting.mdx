@@ -1,0 +1,168 @@
+---
+title: "PowerShell Remoting Troubleshooting Guide"
+slug: "powershell-remoting-troubleshooting"
+description: "Fix PowerShell Remoting (WinRM) connection issues. Get remote PS sessions working across your network."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: mid
+type: how-to
+tags: ["powershell", "winrm", "remote", "troubleshooting", "pssession"]
+draft: false
+---
+
+# PowerShell Remoting Troubleshooting Guide
+
+PowerShell Remoting is essential for remote management, but getting it working can be painful. This guide fixes the most common issues.
+
+## The Problem
+
+You try:
+```powershell
+Enter-PSSession -ComputerName SERVER01
+```
+
+And get one of these errors:
+- "WinRM cannot process the request"
+- "Access is denied"
+- "The client cannot connect to the destination"
+- "The remote server returned an error"
+
+## Fix #1: Enable WinRM Service
+
+```powershell
+# On the REMOTE computer, run as Admin:
+Start-Service WinRM
+Set-Service -Name WinRM -StartupType Automatic
+
+# Or via registry (if service is blocked)
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\WinRM" -Name "Start" -Value 3
+```
+
+## Fix #2: Quick Config Script
+
+Microsoft provides a one-liner:
+
+```powershell
+# Run on remote computer as Admin
+Enable-PSRemoting -Force
+```
+
+This:
+- Starts WinRM service
+- Creates firewall rules
+- Enables HTTP listener
+
+## Fix #3: Check WinRM Service Status
+
+```powershell
+# On remote computer
+Get-Service WinRM
+WinRM enumerate winrm/config/listener
+```
+
+Should show a listener on port 5985 (HTTP) or 5986 (HTTPS).
+
+## Fix #4: Firewall Rules
+
+```powershell
+# Check firewall
+Get-NetFirewallRule -Name "*WinRM*" | Select-Object Name, Enabled
+
+# Enable via PowerShell
+Enable-NetFirewallRule -Name "Windows Remote Management (HTTP-In)"
+```
+
+## Fix #5: Certificate Issues (HTTPS)
+
+If using HTTPS (recommended):
+
+```powershell
+# Check existing certificate
+Get-ChildItem Cert:\LocalMachine\My | Where-Object { $_.Subject -like "*$env:COMPUTERNAME*" }
+
+# Create self-signed for testing
+$Cert = New-SelfSignedCertificate -DnsName $env:COMPUTERNAME -CertStoreLocation Cert:\LocalMachine\My
+
+# Add HTTPS listener
+New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbprint $Cert.Thumbprint -Force
+```
+
+## Fix #6: Permission Issues
+
+```powershell
+# Check user is in Remote Management Users
+Get-LocalGroupMember -Group "Remote Management Users"
+
+# Add user if missing
+Add-LocalGroupMember -Group "Remote Management Users" -Member "DOMAIN\User"
+```
+
+## Fix #7: TrustedHosts (For Non-Domain)
+
+If not using Kerberos:
+
+```powershell
+# On CLIENT computer
+# Add target to trusted hosts
+Set-Item -Path WSMan:\localhost\TrustedHosts -Value "SERVER01,192.168.1.100" -Force
+
+# Or allow all (less secure)
+Set-Item -Path WSMan:\localhost\TrustedHosts -Value "*" -Force
+```
+
+## Fix #8: Check Network Connectivity
+
+```powershell
+# Test basic connectivity
+Test-NetConnection -ComputerName SERVER01 -Port 5985
+Test-NetConnection -ComputerName SERVER01 -Port 5986
+
+# Test with specific auth
+Test-WSMan -ComputerName SERVER01
+```
+
+## Fix #9: Credential Issues
+
+```powershell
+# Use explicit credentials
+$Cred = Get-Credential
+Enter-PSSession -ComputerName SERVER01 -Credential $Cred
+
+# Or use CredSSP for double-hop
+Enable-WSManCredSSP -Role Client -DelegateComputer "*.domain.com"
+```
+
+## Fix #10: Group Policy Block
+
+Check if GPO blocks WinRM:
+
+```powershell
+# Check local policy
+gpedit.msc → Computer Configuration → Administrative Templates → Windows Components → Windows Remote Management
+
+# Check domain policy
+gpresult /r | Select-String "WinRM"
+```
+
+## Quick Diagnostic Script
+
+```powershell
+# Run on the PROBLEM computer
+Write-Host "=== WinRM Status ==="
+Get-Service WinRM | Select-Object Name, Status, StartType
+
+Write-Host "`n=== Listeners ==="
+Get-ChildItem WSMan:\localhost\Listener | Select-Object Name, Value
+
+Write-Host "`n=== Firewall ==="
+Get-NetFirewallRule -Name "*WinRM*" | Where-Object { $_.Enabled } | Select-Object Name
+
+Write-Host "`n=== TrustedHosts ==="
+Get-Item WSMan:\localhost\TrustedHosts
+```
+
+## Wrap-Up
+
+Most WinRM issues come down to: service not running, firewall blocking, or permissions. Start with the basics and work up.
+
+Need help? Leave a comment!

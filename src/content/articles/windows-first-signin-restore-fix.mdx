@@ -1,0 +1,161 @@
+---
+title: "Fix Windows First Sign-In After Sysprep"
+slug: "windows-first-signin-restore-fix"
+description: "Troubleshooting Windows first-sign-in experience after Sysprep or imaging. Fix OOBE issues and profile creation errors."
+publishedAt: "2026-02-27"
+pillar: troubleshooting
+difficulty: mid
+type: how-to
+tags: ["windows", "sysprep", "oobe", "imaging", "profile", "first-signin"]
+draft: false
+---
+
+# Fix Windows First Sign-In After Sysprep
+
+You image a machine, boot it up, and instead of getting to the desktop, you're stuck in the first-sign-in (OOBE) loop. Or maybe you get past OOBE but the profile doesn't create properly. This is a classic imaging problem — and it has some classic fixes.
+
+## The Symptoms
+
+- Windows boots to "Let's connect you to a network" screen repeatedly
+- Stuck on "Just a moment..." for hours
+- Profile doesn't create — you get a temp profile
+- "The user profile service failed the logon"
+- OOBE crashes or hangs
+
+## Fix #1: Clear Previous Provisioning Data
+
+The most common cause — Windows thinks it's already been set up.
+
+```powershell
+# From WinPE or recovery
+# Mount the image and run:
+dism /Image:C:\ /Cleanup-Image /ScanHealth
+dism /Image:C:\ /Cleanup-Image /RestoreHealth
+
+# Or on the local machine (run as admin)
+Get-AppxProvisionedPackage -Online | Remove-AppxProvisionedPackage -AllUsers
+```
+
+## Fix #2: Delete SID and Provisioning Files
+
+```powershell
+# Navigate to:
+C:\Users\Default\AppData\Local\Microsoft\Windows
+
+# Delete these folders if they exist:
+# - ShellExperienceHost
+# - TileStore
+# - WebView2
+
+# Also delete:
+C:\Windows\System32\Sysprep\Panther\*
+```
+
+## Fix #3: Reset OOBE
+
+```powershell
+# From WinPE or recovery environment
+# Run:
+systemreset -cleanboot
+
+# Or:
+mdmdiagnostics.exe -o C:\Logs
+```
+
+## Fix #4: Network Profile Reset
+
+Sometimes stuck on network screen due to cached profiles:
+
+```powershell
+# Boot to WinPE, mount the image:
+dism /mount-image /imagefile:C:\mount\winpe.wim /index:1 /mountdir:C:\mount
+
+# Delete network profiles:
+del C:\mount\Windows\System32\config\systemprofile\AppData\Local\Microsoft\Windows\NlaCache\*
+
+# Unmount and commit:
+dism /unmount-image /mountdir:C:\mount /commit
+```
+
+## Fix #5: Fix User Profile Corruption
+
+If the profile fails to create:
+
+```powershell
+# Delete corrupted profile data
+Remove-Item -Path "C:\Users\Default" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Rebuild default profile
+# Copy from:
+$env:SystemRoot\System32\Config\SystemProfile
+# To:
+$env:SystemRoot\Users\Default
+
+# Fix permissions
+icacls C:\Users\Default /reset /T
+```
+
+## Fix #6: Check Unattend.xml
+
+If you're using an answer file, it might be malformed:
+
+```powershell
+# Validate unattend.xml
+# Location: C:\Windows\Panther\unattend.xml
+
+# Check for:
+# - EnableNetworkProvisioning = true
+# - HideEULAPage = true
+# - HideWirelessSetupInOOBE = true
+# - NetworkLocation = Work
+# - ProtectYourPC = 1
+```
+
+## Fix #7: General Sysprep Best Practice
+
+Here's the proper sysprep sequence:
+
+```powershell
+# 1. Run Sysprep with generalize and shutdown
+sysprep /generalize /oobe /shutdown /quiet
+
+# 2. Capture with DISM
+dism /capture-image /imagefile:C:\captures\myimage.wim /capture:C:\ /name:"Windows 11" /compress:fast
+
+# 3. Deploy
+dism /apply-image /imagefile:C:\captures\myimage.wim /index:1 /applydir:C:\
+bcdboot C:\Windows /s C:
+```
+
+## Fix #8: VM-Specific Issues
+
+If imaging a VM (Hyper-V, VMware):
+
+```powershell
+# Disable Network Adapter teaming/hypervisor features
+# In the VM, run:
+bcdedit /set hypervisorlaunchtype off
+
+# Or add to answer file:
+<NetworkAdapter>
+    <MetaData>
+        <Key>Sysprep.HyperV.Deploy</Key>
+        <Value>False</Value>
+    </MetaData>
+</NetworkAdapter>
+```
+
+## Quick Checklist
+
+- [ ] Clear provisioning data
+- [ ] Delete Panther folder
+- [ ] Validate unattend.xml
+- [ ] Check network drivers
+- [ ] Verify disk space
+- [ ] Reset OOBE
+
+## Wrap-Up
+
+First-sign-in issues are almost always related to Sysprep not running correctly or cached data from the source machine. Follow the fixes above systematically.
+
+Need help? Leave a comment!

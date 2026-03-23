@@ -1,0 +1,54 @@
+---
+title: "How Desktop Engineers Can Safely Use AI for Intune Detection Rules"
+description: "AI can write your Intune detection scripts in seconds, but one hallucination can brick 10,000 devices. Here's how to use it safely."
+publishedAt: "2026-03-22"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["Intune", "AI", "PowerShell", "Detection Rules", "Automation"]
+---
+
+# How Desktop Engineers Can Safely Use AI for Intune Detection Rules
+
+Artificial Intelligence has fundamentally changed the way we write automation. You can now generate a 50-line PowerShell script for a custom Intune detection rule in the time it takes to sip your coffee.
+
+But there's a catch. AI is confident, fast, and occasionally completely wrong.
+
+If you blindly copy-paste AI-generated code into your production Intune tenant, you aren't an engineer—you're a gambler. Here is how to harness the speed of AI while maintaining the rigor of a senior desktop engineer.
+
+## The Real-World Enterprise Failure Scenario
+
+Let's look at a disaster that actually happened when an engineer trusted an LLM too much.
+
+**The Goal:** Deploy a critical VPN client update via Intune to 5,000 remote Windows devices.
+**The Prompt:** *"Write a PowerShell detection script for Intune to check if the VPN client version is greater than 5.2."*
+
+The AI confidently spit out a script that used `Get-WmiObject` to query the `Win32_Product` class, checked the version, and returned an exit code. The engineer copied it, pasted it into the Intune portal, and assigned it to the `All Corporate Devices` group.
+
+**The Failure:** 
+1. `Win32_Product` is notoriously slow and triggers a Windows Installer reconfiguration for every MSI package on the system. This caused CPU spikes and massive performance degradation on all 5,000 machines.
+2. The AI's script logic returned `Exit 0` (success) when the version was *less* than 5.2 because of a flipped comparison operator (`-lt` instead of `-gt`), but printed "Installed" to standard output. Intune reads both STDOUT and exit codes for PowerShell detection rules. The conflicting logic caused Intune to enter an endless retry loop.
+
+The result? 5,000 machines grinding to a halt, a flooded helpdesk, and a very uncomfortable meeting with the CIO.
+
+## ⚠️ The Hallucination Warning: Where AI Lies
+
+When it comes to Intune detection rules, AI models consistently hallucinate in three specific areas:
+
+1. **Context Confusion (System vs. User):** AI often forgets that Intune Win32 apps typically run in the `SYSTEM` context. It will happily give you a script that checks `HKCU` (HKEY_CURRENT_USER) or `$env:APPDATA`. Under the `SYSTEM` context, these point to the hidden system profile, not the logged-in user. Your detection will fail 100% of the time.
+2. **Fake Cmdlets and Registry Keys:** LLMs will invent PowerShell cmdlets that sound completely real (e.g., `Get-IntuneAppStatus`) or guess registry paths based on standard naming conventions rather than reality.
+3. **Misunderstanding Intune's Output Requirements:** Intune requires a specific output format for PowerShell detection rules. The script must write a string to `STDOUT` (like "Installed") AND exit with code `0`. AI often writes scripts that just return a boolean (`$true` or `$false`) without the proper `Write-Host` and `Exit 0` formatting Intune expects.
+
+## The Practical Operator Checklist
+
+Before you upload any AI-generated detection script to Intune, run it through this mandatory checklist:
+
+- [ ] **Verify the Execution Context:** If the app installs as System, ensure the script is querying `HKLM`, `C:\Program Files`, or `C:\ProgramData`. No `HKCU` or `$env:UserProfile`.
+- [ ] **Confirm Intune Output Requirements:** Does the script explicitly write to standard output (`Write-Host "Found"`) when the app is detected, and exit with `0`? Does it exit silently with a non-zero code when not detected?
+- [ ] **Check for Deprecated/Dangerous Cmdlets:** Replace any instance of `Get-WmiObject` with `Get-CimInstance`. Absolutely NEVER use `Win32_Product`.
+- [ ] **Test Locally as SYSTEM:** Use `psexec -s -i powershell.exe` to open a command prompt as the SYSTEM account on a test machine. Run the AI-generated script there first. Does it work?
+- [ ] **Review Comparison Operators:** Double-check version comparisons. Ensure the script casts strings to `[version]` types before comparing (e.g., `[version]$currentVersion -ge [version]"5.2.0"`). AI often does simple string comparisons, which will evaluate "10.0" as less than "9.0".
+
+## The Bottom Line
+
+AI won't replace desktop engineers, but desktop engineers who use AI effectively—and safely—will replace those who don't. Use LLMs as your high-speed drafting tool, but never forget that *you* are the editor, the QA tester, and the gatekeeper to your production environment.

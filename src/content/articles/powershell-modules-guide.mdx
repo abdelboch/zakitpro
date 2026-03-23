@@ -1,0 +1,113 @@
+---
+title: "PowerShell Modules: Install, Update, Use"
+slug: "powershell-modules-guide"
+description: "Working with PowerShell modules. Install from PSGallery, update, and manage modules properly."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: junior
+type: how-to
+tags: ["powershell", "modules", "psgallery", "install"]
+draft: false
+---
+
+# PowerShell Modules: Install, Update, Use
+
+PowerShell's power comes from modules. Here's how to find, install, and manage them properly.
+
+## Finding Modules
+
+```powershell
+# Search PowerShell Gallery
+Find-Module -Name "*Intune*"
+Find-Module -Name "*AzureAD*"
+Find-Module -Name "*PnP*"
+
+# Search by tag
+Find-Module -Tag "Azure"
+```
+
+## Installing Modules
+
+```powershell
+# Install for current user (recommended)
+Install-Module -Name "Microsoft.Graph" -Scope CurrentUser
+
+# Install for all users (requires admin)
+Install-Module -Name "Microsoft.Graph" -Scope AllUsers
+
+# Install specific version
+Install-Module -Name "Microsoft.Graph" -MinimumVersion "2.0.0" -MaximumVersion "2.9.0"
+```
+
+## Update Modules
+
+```powershell
+# Check for updates
+Get-Module -ListAvailable | Where-Object { $_.UpdateAvailable }
+
+# Update single module
+Update-Module -Name "Microsoft.Graph"
+
+# Update all
+Update-Module -Name "*"
+```
+
+## Trusted Repositories
+
+```powershell
+# Add trusted repository
+Register-PSRepository -Name "MyRepo" -SourceLocation "https://myrepo.com/nuget" -InstallationPolicy Trusted
+
+# Set PSGallery to trusted (careful!)
+Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+```
+
+## Managing Modules
+
+```powershell
+# List installed modules
+Get-Module -ListAvailable
+
+# List imported modules in current session
+Get-Module
+
+# Import a module
+Import-Module "Microsoft.Graph"
+
+# Remove module from session
+Remove-Module "Microsoft.Graph"
+```
+
+## Common Modules You'll Need
+
+| Module | Purpose |
+|--------|---------|
+| Microsoft.Graph | Intune, Azure AD, M365 |
+| AzureAD | Legacy Azure AD |
+| PnP.PowerShell | SharePoint/Teams |
+| ImportExcel | Excel manipulation |
+| PSWriteHTML | HTML reports |
+| Pester | Testing |
+
+## Uninstall Old Versions
+
+```powershell
+# List all versions
+Get-InstalledModule -Name "Microsoft.Graph" -AllVersions
+
+# Remove old version
+Uninstall-Module -Name "Microsoft.Graph" -RequiredVersion "1.9.2" -Force
+```
+
+## Module Best Practices
+
+1. **Scope CurrentUser** — Don't pollute system
+2. **Check signatures** — Only install signed modules
+3. **Pin versions** — Production scripts need stable versions
+4. **Document dependencies** — Note module versions in scripts
+
+## Wrap-Up
+
+Modules extend PowerShell's capabilities. Install what you need, keep them updated, and be careful with repository trust settings.
+
+Questions? Drop them below!

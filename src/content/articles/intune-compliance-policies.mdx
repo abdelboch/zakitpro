@@ -1,0 +1,110 @@
+---
+title: "Intune Compliance Policies Explained"
+slug: "intune-compliance-policies"
+description: "Configure Intune device compliance policies. Set up conditions for access, conditional access, and device health."
+publishedAt: "2026-02-27"
+pillar: security
+difficulty: mid
+type: how-to
+tags: ["intune", "compliance", "conditional-access", "security"]
+draft: false
+---
+
+# Intune Compliance Policies Explained
+
+Compliance policies in Intune define what makes a device "healthy" and secure. Combined with Conditional Access, they control device access to resources.
+
+## What Are Compliance Policies?
+
+Rules that devices must meet to:
+- Access corporate resources
+- Use conditional access
+- Be considered "managed"
+
+## Creating a Policy
+
+1. **Microsoft Endpoint Manager** → **Devices** → **Compliance policies**
+2. **Create policy** → **Windows 10 and later**
+3. Set conditions and actions
+
+## Key Settings
+
+### Device Health
+
+| Setting | Options | Recommended |
+|---------|---------|-------------|
+| BitLocker | Require | Yes |
+| Secure Boot | Require | Yes |
+| Code Integrity | Require | Yes |
+| Device Health Attestation | Require | Yes |
+
+### Device Properties
+
+```powershell
+# Via Graph
+$Policy = @{
+    "@odata.type" = "#microsoft.graph.windows10CompliancePolicy"
+    deviceThreatProtectionRequiredSecurityLevel = " Secured"
+    bitLockerEnabled = $true
+    secureBootEnabled = $true
+    codeIntegrityEnabled = $true
+}
+```
+
+### System Security
+
+| Setting | Value |
+|---------|-------|
+| Password type | Alphanumeric |
+| Minimum password length | 14 |
+| Password age (days) | 60 |
+| Device password | Required |
+
+### Microsoft Defender
+
+```powershell
+# Require Defender
+defenderEnabled = $true
+defenderVersion = "latest"
+```
+
+## Compliance Actions
+
+When device is non-compliant:
+
+| Action | What Happens |
+|--------|--------------|
+| Mark as non-compliant | Visual indicator |
+| Send email to user | Notification |
+| Wipe device | Full reset |
+| Retire device | Remove from Intune |
+
+## Conditional Access Integration
+
+Compliance + Conditional Access = Access Control
+
+```powershell
+# Example: Require compliant device for Exchange
+# 1. Create compliance policy (above)
+# 2. Create conditional access policy in Azure AD:
+#   - Grant: Require device to be marked as compliant
+#   - Apps: Exchange Online
+#   - Users: All users
+```
+
+## Monitoring Compliance
+
+```powershell
+# Check compliance status
+Get-MgDeviceManagementDeviceCompliancePolicyState -DeviceId $DeviceId
+
+# Get all compliant/non-compliant
+Get-MgDeviceManagementDeviceCompliancePolicyState -All | 
+    Where-Object { $_.ComplianceState -eq "noncompliant" }
+```
+
+## Wrap-Up
+
+Compliance policies are your first line of defense. Define healthy, require it with Conditional Access, and monitor compliance.
+
+Questions? Drop them below!

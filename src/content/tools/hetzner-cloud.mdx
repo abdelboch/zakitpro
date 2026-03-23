@@ -1,0 +1,59 @@
+---
+name: Hetzner Cloud
+description: German cloud VPS with unbeatable price-to-performance. Starts at €3.79/mo for 2 vCPUs, 4GB RAM. Perfect for self-hosting.
+category: storage
+website: 'https://www.hetzner.com/cloud'
+affiliateUrl: 'https://hetzner.com/cloud/?ref=YOUR_CODE'
+affiliateProgram: Hetzner Partner
+commission: '€25 credit per signup'
+publishedAt: '2026-03-16'
+selfHosted: true
+draft: false
+---
+
+## Why Hetzner?
+
+When DigitalOcean and AWS charges become ridiculous, Hetzner is where smart IT pros go. Same performance, half the price, GDPR-compliant data centers in Germany/Finnland/USA.
+
+## Price Comparison (2 vCPU, 4GB RAM)
+
+| Provider | Monthly Cost | Bandwidth |
+|----------|-------------|-----------|
+| **Hetzner** | **€3.79 (~$4)** | 20TB included |
+| DigitalOcean | $24/mo | 4TB included |
+| AWS Lightsail | $24/mo | 3TB included |
+| Linode | $24/mo | 4TB included |
+| Vultr | $24/mo | 4TB included |
+
+**That's 6x cheaper than competitors.**
+
+## Best For
+
+- **Self-hosting Nextcloud, Vaultwarden, Uptime Kuma**
+- **Running Docker containers** (portainer on cloud)
+- **VPN endpoints** (WireGuard/Tailscale)
+- **CI/CD runners** for development
+- **Backup targets** for Synology/QNAP offsite backup
+
+## Quick Deploy
+
+```bash
+# Spin up a CX22 (2 vCPU, 4GB) with Ubuntu
+# Via hcloud CLI:
+hcloud server create --name selfhosted --type cx22 --image ubuntu-22.04 --location ash
+```
+
+## Who Should Use This
+
+- IT teams running self-hosted services in the cloud
+- Homelabbers who want cloud backups
+- DevOps engineers needing cheap staging environments
+- Anyone tired of overpriced AWS/Azure bills
+
+## Verdict
+
+**Rating: 9.5/10** — If you're self-hosting anything in the cloud, Hetzner should be your first choice. The price-performance ratio is unmatched.
+
+<affiliate-disclosure>
+This page contains affiliate links. Hetzner partner credits support ZakitPro at no extra cost to you.
+</affiliate-disclosure>

@@ -1,0 +1,107 @@
+---
+title: "Fix User Profile Corruption in Windows"
+slug: "fix-user-profile-corruption"
+description: "Diagnose and fix corrupted Windows user profiles. Get users back to a working state quickly."
+publishedAt: "2026-02-27"
+pillar: troubleshooting
+difficulty: junior
+type: how-to
+tags: ["windows", "profile", "corruption", "fix", "user-profile"]
+draft: false
+---
+
+# Fix User Profile Corruption in Windows
+
+User profile corruption causes login issues, missing settings, and temp profile loads. Here's how to diagnose and fix it.
+
+## Symptoms
+
+- User gets "The user profile service failed the logon"
+- Profile loads as "Temp" profile
+- Desktop icons, settings, documents missing
+- "User profile cannot be loaded"
+
+## Quick Fix: Delete Corrupted Profile
+
+```powershell
+# Run as Admin
+# 1. Check current profiles
+Get-CimInstance Win32_UserProfile | Select-Object LocalPath, LastUseTime, Status
+
+# 2. Find the corrupted profile SID
+# Look in:
+C:\Users\
+
+# 3. Delete the folder
+# Navigate to:
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
+
+# 4. Delete the SID key for corrupted profile
+
+# 5. Delete the folder in C:\Users\
+```
+
+## Fix #2: System File Checker
+
+```powershell
+# Run in Admin PowerShell
+sfc /scannow
+
+# If that fails
+DISM /Online /Cleanup-Image /ScanHealth
+DISM /Online /Cleanup-Image /RestoreHealth
+```
+
+## Fix #3: Rebuild Default Profile
+
+```powershell
+# 1. Boot to WinPE or another admin account
+# 2. Delete the user folder
+Remove-Item -Path "C:\Users\Username" -Recurse -Force
+
+# 3. Create new profile from default
+# Copy default profile:
+$Default = "$env:SystemDrive\Users\Default"
+$NewProfile = "C:\Users\NewUsername"
+Copy-Item -Path $Default -Destination $NewProfile -Recurse
+
+# 4. Fix permissions
+icacls $NewProfile /reset /T
+icacls $NewProfile /grant "DOMAIN\NewUsername:(OI)(CI)F"
+```
+
+## Fix #4: Registry Permissions
+
+```powershell
+# Profile list registry key permissions
+# 1. Go to:
+HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList
+
+# 2. Right-click → Permissions
+# 3. Take ownership
+# 4. Grant SYSTEM Full Control
+# 5. Grant Administrators Full Control
+```
+
+## Fix #5: Disk Check
+
+```powershell
+# Check for disk errors
+chkdsk C: /f /r
+
+# Schedule for next reboot
+# Say Y to schedule
+```
+
+## Prevention
+
+1. **Don't delete profiles while user logged in**
+2. **Use proper shutdown, not强制关机**
+3. **Keep disk healthy**
+4. **Monitor disk space**
+
+## Wrap-Up
+
+Corrupted profiles are common but fixable. Delete, rebuild, or fix permissions — choose based on severity.
+
+Questions? Drop them below!

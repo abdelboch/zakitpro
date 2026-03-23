@@ -1,0 +1,133 @@
+---
+title: "Deploy Apps with Intune Win32"
+slug: "deploy-apps-intune-win32"
+description: "Complete guide to deploying Win32 applications in Microsoft Intune. From packaging to deployment, covered."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["intune", "win32", "app-deployment", "microsoft-endpoint-manager"]
+draft: false
+---
+
+# Deploy Apps with Intune Win32
+
+Win32 apps are the workhorse of Intune deployments. Unlike MSI or Store apps, Win32 gives you full control over installation, detection, and requirements. Here's the complete guide.
+
+## Why Win32?
+
+- **Bigger apps** — Up to 8GB per app
+- **Custom installs** — Any installer type
+- **Requirements** — Check prerequisites before install
+- **Detection** — Multiple ways to verify install
+
+## The Two Tools You Need
+
+### 1. Microsoft Win32 Content Prep Tool
+Download from: https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool
+
+### 2. IntuneWinAppUtil.exe
+```powershell
+# Convert installer to .intunewin
+.\IntuneWinAppUtil.exe -c C:\Apps\7zip -s 7zip-x64.exe -o C:\Apps\Output
+```
+
+## Step-by-Step Deployment
+
+### Step 1: Prepare the App
+
+```powershell
+# Create output folder
+New-Item -ItemType Directory -Path C:\Apps\Output -Force
+
+# Run the prep tool
+# This creates a .intunewin file with detection logic
+```
+
+### Step 2: Upload to Intune
+
+1. Go to **Apps** → **Windows** → **Add**
+2. Select **Windows app (win32)**
+3. Upload your `.intunewin` file
+
+### Step 3: Configure Install/Uninstall
+
+```powershell
+# Install command
+# Example for 7-Zip:
+"7zip-x64.exe /S"
+
+# Uninstall command
+# Check in registry:
+HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\7-Zip
+```
+
+### Step 4: Set Requirements
+
+| Requirement | Use When |
+|-------------|----------|
+| OS version | App requires specific Windows version |
+| Architecture | x86 vs x64 apps |
+| RAM | Minimum memory needed |
+| Disk space | Required free space |
+| File/Folder exists | Prerequisite app installed |
+| Registry value | Previous app version |
+
+### Step 5: Detection Rules
+
+Choose how Intune knows the app is installed:
+
+| Method | Best For |
+|--------|----------|
+| MSI product code | MSI installers |
+| File exists | EXE-based apps |
+| Registry key | Apps with registry entries |
+| Script | Complex detection |
+
+```powershell
+# Example: File detection
+Path: C:\Program Files\7-Zip\7zFM.exe
+Detection method: File or folder exists
+```
+
+### Step 6: Assign to Users/Devices
+
+- **Required** — Auto-install
+- **Available** — User self-service
+- **Uninstall** — Remove from devices
+
+## Troubleshooting
+
+### App Not Installing
+
+```powershell
+# Check Intune logs
+$LogPath = "$env:ProgramData\Microsoft\Intune\Logs\MDMMgmt.log"
+Get-Content $LogPath -Tail 100
+
+# Check Win32 app logs
+$IntuneLog = "$env:TEMP\IntuneApps.log"
+```
+
+### Detection Rule Not Working
+
+```powershell
+# Test detection manually
+Test-Path "C:\Program Files\AppName\app.exe"
+
+# Check registry
+Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\AppName"
+```
+
+## Pro Tips
+
+1. **Always test in audit mode first**
+2. **Use requirements to prevent failures**
+3. **Create detection rules from uninstall strings**
+4. **Document install/uninstall commands**
+
+## Wrap-Up
+
+Win32 apps give you the most control in Intune. Master this and you can deploy anything.
+
+Questions? Drop them below!

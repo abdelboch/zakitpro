@@ -1,0 +1,293 @@
+---
+title: "PowerShell Win32 App Installer Scripts"
+slug: "powershell-win32-app-installers"
+description: "Essential PowerShell scripts for installing and managing Win32 apps in Intune. Automate your app deployment workflow."
+publishedAt: "2026-02-27"
+pillar: scripting
+difficulty: mid
+type: script-drop
+tags: ["powershell", "intune", "win32", "app-deployment", "automation"]
+draft: false
+---
+
+# PowerShell Win32 App Installer Scripts
+
+Deploying Win32 apps in Intune is powerful but can be tricky. These scripts will help you package, install, and troubleshoot Win32 applications like a pro.
+
+## Script 1: Silent Install Wrapper
+
+Every Win32 app needs a silent install. This wrapper handles the most common scenarios:
+
+```powershell
+<#
+.SYNOPSIS
+    Universal silent installer wrapper for Win32 apps
+    
+.PARAMETER InstallerPath
+    Full path to the installer file
+    
+.PARAMETER Arguments
+    Silent install arguments
+    
+.PARAMETER ExpectedExitCode
+    Expected exit code on success (default: 0)
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$InstallerPath,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$Arguments = "/S",
+    
+    [Parameter(Mandatory=$false)]
+    [int]$ExpectedExitCode = 0
+)
+
+$ErrorActionPreference = "Stop"
+$LogFile = "$env:TEMP\Win32Install_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+
+function Write-Log {
+    param([string]$Message)
+    $Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $LogMessage = "[$Timestamp] $Message"
+    Write-Host $LogMessage
+    Add-Content -Path $LogFile -Value $LogMessage
+}
+
+Write-Log "Starting installation: $InstallerPath"
+Write-Log "Arguments: $Arguments"
+
+try {
+    $Process = Start-Process -FilePath $InstallerPath -ArgumentList $Arguments -Wait -PassThru -NoNewWindow
+    
+    if ($Process.ExitCode -eq $ExpectedExitCode) {
+        Write-Log "SUCCESS: Installation completed with exit code $($Process.ExitCode)"
+        exit 0
+    } else {
+        Write-Log "WARNING: Installation completed with unexpected exit code $($Process.ExitCode)"
+        exit $Process.ExitCode
+    }
+}
+catch {
+    Write-Log "ERROR: $($_.Exception.Message)"
+    exit 1
+}
+```
+
+**Usage:**
+```powershell
+.\Install-App.ps1 -InstallerPath "C:\Apps\7zip\7zip-x64.msi" -Arguments "/quiet /norestart"
+```
+
+## Script 2: Detection Rule Generator
+
+Create detection rules for your Win32 apps automatically:
+
+```powershell
+<#
+.SYNOPSIS
+    Generate Intune detection rules for Win32 apps
+#>
+
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$AppName,
+    
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("File", "Registry", "MSI")]
+    [string]$DetectionType = "File",
+    
+    [Parameter(Mandatory=$true)]
+    [string]$DetectionPath,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$DetectionVersion
+)
+
+$Rule = @{
+    "@odata.type" = "#microsoft.graph.win32LobAppDetectionRule"
+    ruleType = switch ($DetectionType) {
+        "File" { "file" }
+        "Registry" { "registry" }
+        "MSI" { "productVersion" }
+    }
+    path = $DetectionPath
+    fileOrFolderName = Split-Path $DetectionPath -Leaf
+}
+
+if ($DetectionVersion) {
+    $Rule["version"] = $DetectionVersion
+    $Rule["operator"] = "greaterThanOrEqual"
+}
+
+$DetectionRule = @{
+    rules = @($Rule)
+} | ConvertTo-Json -Depth 5
+
+Write-Output $DetectionRule
+
+# Save to file for Intune Win32 import
+$DetectionRule | Out-File -FilePath ".\$AppName-detection-rule.json"
+Write-Host "Detection rule saved to .\$AppName-detection-rule.json"
+```
+
+## Script 3: Pre-Install System Check
+
+Check prerequisites before installing:
+
+```powershell
+<#
+.SYNOPSIS
+    Pre-installation system checks for Win32 apps
+#>
+
+$ErrorActionPreference = "Continue"
+
+Write-Host "=== System Prerequisites Check ===" -ForegroundColor Cyan
+
+$Checks = @{
+    "Disk Space (C:)" = {
+        $Drive = Get-PSDrive -Name C
+        [math]::Round($Drive.Free / 1GB, 2)
+    }
+    "OS Version" = {
+        (Get-CimInstance Win32_OperatingSystem).Caption
+    }
+    "Architecture" = {
+        $env:PROCESSOR_ARCHITECTURE
+    }
+    "Intune Agent Version" = {
+        (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\IntuneAgent" -ErrorAction SilentlyContinue).Version
+    }
+    "PowerShell Version" = {
+        $PSVersionTable.PSVersion.ToString()
+    }
+    "Free RAM (GB)" = {
+        [math]::Round((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory / 1MB, 2)
+    }
+}
+
+$AllPassed = $true
+
+foreach ($Check in $Checks.GetEnumerator()) {
+    $Result = & $Check.Value
+    $Status = if ($Result) { "✓ PASS" } else { "✗ FAIL" }
+    $Color = if ($Result) { "Green" } else { "Red" }
+    
+    Write-Host "$($Check.Key): $Result - $Status" -ForegroundColor $Color
+    
+    if (-not $Result -and $Check.Key -ne "Free RAM (GB)") {
+        $AllPassed = $false
+    }
+}
+
+if ($AllPassed) {
+    Write-Host "`nAll checks passed!" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "`nSome checks failed!" -ForegroundColor Red
+    exit 1
+}
+```
+
+## Script 4: Uninstall Legacy App
+
+Clean up old versions before installing new:
+
+```powershell
+<#
+.SYNOPSIS
+    Uninstall existing versions of an application
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$AppName,
+    
+    [Parameter(Mandatory=$false)]
+    [string[]]$UninstallStrings
+)
+
+$ErrorActionPreference = "Continue"
+
+Write-Host "Searching for existing $AppName installations..." -ForegroundColor Yellow
+
+$InstalledApps = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*,
+    HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* -ErrorAction SilentlyContinue
+
+$FoundApps = $InstalledApps | Where-Object { $_.DisplayName -like "*$AppName*" }
+
+if ($FoundApps) {
+    foreach ($App in $FoundApps) {
+        Write-Host "Found: $($App.DisplayName) - $($App.Version)"
+        
+        if ($App.UninstallString) {
+            Write-Host "Uninstalling..."
+            
+            $UninstallString = $App.UninstallString
+            
+            # Handle different uninstall formats
+            if ($UninstallString -match "msiexec") {
+                $UninstallString += " /qn /norestart"
+            }
+            
+            Start-Process -FilePath "cmd.exe" -ArgumentList "/c $($UninstallString)" -Wait -NoNewWindow
+            Write-Host "Uninstalled successfully"
+        }
+    }
+} else {
+    Write-Host "No existing installations found" -ForegroundColor Green
+}
+```
+
+## Script 5: Post-Install Validation
+
+Verify the app installed correctly:
+
+```powershell
+<#
+.SYNOPSIS
+    Post-installation validation
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$AppName,
+    
+    [Parameter(Mandatory=$false)]
+    [string[]]$VerificationPaths
+)
+
+Write-Host "Validating $AppName installation..." -ForegroundColor Cyan
+
+$ValidationPassed = $true
+
+foreach ($Path in $VerificationPaths) {
+    if (Test-Path $Path) {
+        Write-Host "✓ Found: $Path" -ForegroundColor Green
+    } else {
+        Write-Host "✗ Missing: $Path" -ForegroundColor Red
+        $ValidationPassed = $false
+    }
+}
+
+# Check registry
+$RegPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\*"
+$RegApps = Get-ItemProperty $RegPath -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "*$AppName*" }
+
+if ($RegApps) {
+    Write-Host "✓ Registry entry found" -ForegroundColor Green
+} else {
+    Write-Host "⚠ No registry entry (may be normal)" -ForegroundColor Yellow
+}
+
+if ($ValidationPassed) {
+    Write-Host "`n✓ Validation PASSED" -ForegroundColor Green
+    exit 0
+} else {
+    Write-Host "`n✗ Validation FAILED" -ForegroundColor Red
+    exit 1
+}
+```
+
+## Wrap-Up
+
+These scripts cover the full Win32 app lifecycle in Intune. Save them to your toolkit and customize for each app deployment.

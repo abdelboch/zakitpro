@@ -1,0 +1,136 @@
+---
+title: "Intune Device Wipe and Retire"
+slug: "intune-device-wipe-retire"
+description: "How to wipe, retire, or factory reset devices in Microsoft Intune. Complete guide for device lifecycle management."
+publishedAt: "2026-02-27"
+pillar: deployment
+difficulty: junior
+type: how-to
+tags: ["intune", "wipe", "retire", "factory-reset", "device-management"]
+draft: false
+---
+
+# Intune Device Wipe and Retire
+
+When a device needs to be reset or removed, Intune gives you options. Here's when to use each.
+
+## Wipe vs Retire
+
+| Action | What Happens | Use When |
+|--------|--------------|----------|
+| **Retire** | Remove managed apps/data, keep device | User leaves, device reassigned |
+| **Wipe** | Factory reset, delete everything | Device being sold, serious issues |
+| **Autopilot Reset** | Clean but keep enrollment | Refresh device, keep Intune |
+
+## Retire a Device
+
+```powershell
+# Via Graph API
+$DeviceId = (Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'LAPTOP-001'").Id
+
+Invoke-MgDeviceManagementManagedDeviceRetireManagedDevice -ManagedDeviceId $DeviceId
+```
+
+### What Happens
+- Company data removed
+- Apps uninstalled
+- Settings reverted
+- Device remains in Intune (unmanaged)
+
+## Wipe a Device
+
+```powershell
+# Full wipe
+$DeviceId = (Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'LAPTOP-001'").Id
+
+Invoke-MgDeviceManagementManagedDeviceWipeManagedDevice -ManagedDeviceId $DeviceId -KeepUserData $false
+```
+
+### Options
+- **Keep user data**: Yes/No
+- **Persist enrolled apps**: Yes/No (Windows)
+
+## Autopilot Reset
+
+```powershell
+# Trigger Autopilot reset
+$DeviceId = (Get-MgDeviceManagementManagedDevice -Filter "deviceName eq 'LAPTOP-001'").Id
+
+Invoke-MgDeviceManagementManagedDevice windowsAutopilotDeviceIdentity -ManagedDeviceId $DeviceId -ResetAccount
+```
+
+### What It Does
+- Removes user accounts
+- Re-enrolls in Intune
+- Like fresh OOBE
+- Keeps Autopilot enrollment
+
+## Confirmation Required
+
+```powershell
+# Devices in user-driven enrollment require:
+# - User confirmation on device
+# OR
+# - Recovery key provided first
+
+# Check if device requires recovery key
+Get-MgDeviceManagementManagedDevice -DeviceId $DeviceId |
+    Select-Object recoveryKeyIdentifier
+```
+
+## Pre-Wipe Checklist
+
+- [ ] Backup user data (if keeping)
+- [ ] Export BitLocker keys
+- [ ] Document serial number
+- [ ] Check device ownership
+
+```powershell
+# Export BitLocker keys before wipe
+Get-MgDeviceManagementManagedDeviceBitLockerRecoveryKey -ManagedDeviceId $DeviceId
+```
+
+## Automation Script
+
+```powershell
+<#
+.SYNOPSIS
+    Safely wipe a device
+#>
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$DeviceName,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$KeepUserData
+)
+
+$Device = Get-MgDeviceManagementManagedDevice -Filter "deviceName eq '$DeviceName'"
+
+if (-not $Device) {
+    Write-Host "Device not found: $DeviceName"
+    exit 1
+}
+
+# Export recovery keys first
+$Keys = Get-MgDeviceManagementManagedDeviceBitLockerRecoveryKey -ManagedDeviceId $Device.Id
+
+# Backup keys
+$Keys | Export-Csv -Path ".\$DeviceName-BitLockerKeys.csv"
+
+# Confirm wipe
+Write-Host "About to WIPE device: $DeviceName"
+Write-Host "This cannot be undone!"
+$Confirm = Read-Host "Type 'YES' to confirm"
+
+if ($Confirm -eq "YES") {
+    Invoke-MgDeviceManagementManagedDeviceWipeManagedDevice -ManagedDeviceId $Device.Id -KeepUserData:$KeepUserData
+    Write-Host "Wipe initiated"
+}
+```
+
+## Wrap-Up
+
+Use Retire for reassignment, Wipe for disposal, Autopilot Reset for refresh. Always backup keys first.
+
+Questions? Drop them below!

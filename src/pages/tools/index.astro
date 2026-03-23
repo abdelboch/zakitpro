@@ -1,0 +1,118 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const tools = await getCollection('tools', ({ data }) => !data.draft);
+const categories = [...new Set(tools.map(t => t.data.category))].sort();
+
+const categoryNames = {
+  docker: '🐳 Docker & Containers',
+  storage: '💾 Storage & NAS',
+  monitoring: '📊 Monitoring',
+  automation: '🤖 Home Automation',
+  media: '🎬 Media Servers',
+  backup: '🔒 Backup Solutions',
+  passwords: '🔑 Password Management',
+  vpn: '🌐 VPN & Networking',
+  logging: '📝 Logging & Alerting',
+  documentation: '📚 Wiki & Documentation'
+};
+---
+
+<Layout title="Self-Hosted IT Tools Directory | ZakitPro">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-white mb-4">
+        🛠️ Self-Hosted IT Tools Directory
+      </h1>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+        Curated collection of the best self-hosted infrastructure tools, 
+        vetted by a 20+ year IT architect. No sponsored placements — just tools that work.
+      </p>
+    </header>
+
+    <!-- Category Filter -->
+    <div class="flex flex-wrap gap-2 mb-8 justify-center">
+      <button onclick="filterTools('all')" class="filter-btn active px-4 py-2 rounded-lg bg-blue-600 text-white text-sm">
+        All Tools
+      </button>
+      {categories.map(cat => (
+        <button onclick={`filterTools('${cat}')`} class="filter-btn px-4 py-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 text-sm">
+          {categoryNames[cat] || cat}
+        </button>
+      ))}
+    </div>
+
+    <!-- Tools Grid -->
+    <div id="tools-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {tools.map(tool => (
+        <div class={`tool-card bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all`} data-category={tool.data.category}>
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="text-lg font-bold text-white">{tool.data.name}</h3>
+            {tool.data.stars && (
+              <span class="text-xs bg-yellow-900/50 text-yellow-400 px-2 py-1 rounded">⭐ {tool.data.stars}</span>
+            )}
+          </div>
+          
+          <p class="text-gray-400 text-sm mb-4">{tool.data.description}</p>
+          
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
+              {categoryNames[tool.data.category]?.split(' ')[0]} {tool.data.category}
+            </span>
+            {tool.data.license && (
+              <span class="text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded">{tool.data.license}</span>
+            )}
+            {tool.data.selfHosted && (
+              <span class="text-xs bg-blue-900/50 text-blue-400 px-2 py-1 rounded">Self-hosted</span>
+            )}
+          </div>
+          
+          <div class="flex gap-2">
+            <a href={tool.data.website} target="_blank" rel="noopener" class="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 rounded-lg transition-colors">
+              Website →
+            </a>
+            {tool.data.github && (
+              <a href={tool.data.github} target="_blank" rel="noopener" class="px-3 bg-gray-700 hover:bg-gray-600 text-white text-sm py-2 rounded-lg transition-colors">
+                GH
+              </a>
+            )}
+            {tool.data.affiliateUrl && (
+              <a href={tool.data.affiliateUrl} target="_blank" rel="noopener sponsored" class="px-3 bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-lg transition-colors">
+                Buy →
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <script>
+      function filterTools(category: string) {
+        document.querySelectorAll('.tool-card').forEach(card => {
+          const el = card as HTMLElement;
+          if (category === 'all' || el.dataset.category === category) {
+            el.style.display = '';
+          } else {
+            el.style.display = 'none';
+          }
+        });
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.classList.remove('active', 'bg-blue-600', 'text-white');
+          btn.classList.add('bg-gray-700', 'text-gray-300');
+        });
+        (event?.target as HTMLElement)?.classList.add('active', 'bg-blue-600', 'text-white');
+        (event?.target as HTMLElement)?.classList.remove('bg-gray-700', 'text-gray-300');
+      }
+    </script>
+
+    <!-- Affiliate Disclosure -->
+    <div class="mt-12 p-4 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
+      <p class="text-gray-500 text-sm">
+        📋 <strong>Affiliate Disclosure:</strong> Some links are affiliate links. 
+        We earn a small commission at no extra cost to you. Only tools we'd actually recommend are listed.
+      </p>
+    </div>
+  </div>
+</Layout>

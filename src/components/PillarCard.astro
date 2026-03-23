@@ -1,0 +1,50 @@
+---
+import ArticleCard from './ArticleCard.astro';
+
+interface PillarData {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  articles: any[];
+}
+
+interface Props {
+  pillar: PillarData;
+}
+
+const { pillar } = Astro.props;
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-accent dark:hover:border-accent transition-colors group">
+  <div class="flex items-start gap-4 mb-4">
+    <span class="text-3xl">{pillar.icon}</span>
+    <div>
+      <h3 class="text-lg font-bold group-hover:text-accent transition-colors">
+        <a href={`/${pillar.id}/`}>{pillar.name}</a>
+      </h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400">{pillar.description}</p>
+    </div>
+  </div>
+  
+  {pillar.articles.length > 0 ? (
+    <div class="space-y-3">
+      {pillar.articles.map(article => (
+        <a 
+          href={`/${pillar.id}/${article.slug}/`}
+          class="block text-sm text-gray-700 dark:text-gray-300 hover:text-accent transition-colors"
+        >
+          {article.data.title}
+        </a>
+      ))}
+      <a href={`/${pillar.id}/`} class="inline-flex items-center text-sm text-accent hover:underline mt-2">
+        View all
+        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  ) : (
+    <p class="text-sm text-gray-500 italic">Coming soon...</p>
+  )}
+</div>

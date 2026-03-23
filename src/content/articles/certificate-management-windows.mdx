@@ -1,0 +1,114 @@
+---
+title: "Certificate Management in Windows"
+slug: "certificate-management-windows"
+description: "Managing certificates in Windows. SSL, code signing, and enterprise PKI. PowerShell certificate operations."
+publishedAt: "2026-02-27"
+pillar: security
+difficulty: mid
+type: how-to
+tags: ["certificates", "pki", "ssl", "windows", "security"]
+draft: false
+---
+
+# Certificate Management in Windows
+
+Certificates are everywhere in enterprise IT. Here's how to manage them in Windows.
+
+## Certificate Stores
+
+```powershell
+# View certificate stores
+Get-ChildItem Cert:
+
+# Local Machine stores
+Cert:\LocalMachine\My        # Personal
+Cert:\LocalMachine\Root       # Trusted Root
+Cert:\LocalMachine\CA         # Intermediate CA
+Cert:\LocalMachine\TrustedPeople
+
+# Current User stores
+Cert:\CurrentUser\My
+Cert:\CurrentUser\Root
+```
+
+## View Certificates
+
+```powershell
+# List certificates in store
+Get-ChildItem -Path Cert:\LocalMachine\My
+
+# Find expiring certificates
+Get-ChildItem -Path Cert:\LocalMachine\My | 
+    Where-Object { $_.NotAfter -lt (Get-Date).AddDays(30) } |
+    Select-Object Subject, NotAfter, Thumbprint
+```
+
+## Install Certificate
+
+```powershell
+# From file
+$Cert = Import-Certificate -FilePath "C:\certs\mycert.cer" -CertStoreLocation Cert:\LocalMachine\My
+
+# From PFX (with private key)
+$Cert = Import-PfxCertificate -FilePath "C:\certs\mycert.pfx" -CertStoreLocation Cert:\LocalMachine\My -Password (ConvertTo-SecureString "password" -AsPlainText -Force)
+```
+
+## Request Certificate from CA
+
+```powershell
+# Create request
+$CSR = New-CertificateRequest -Subject "CN=webserver.domain.com" -KeyAlgorithm RSA -KeyLength 2048
+
+# Submit to CA
+Submit-CertificateRequest -CertificateRequest $CSR -CertificationAuthority "corp-ca.domain.com"
+
+# Install response
+Install-Certificate -Cert (Get-IssuedCertificate)
+```
+
+## Export Certificates
+
+```powershell
+# Export without private key
+Export-Certificate -Cert Cert:\LocalMachine\My\Thumbprint -FilePath "C:\certs\export.cer"
+
+# Export with private key (PFX)
+$Cert = Get-ChildItem -Path Cert:\LocalMachine\My | Select-Object -First 1
+Export-PfxCertificate -Cert $Cert -FilePath "C:\certs\backup.pfx" -Password (ConvertTo-SecureString "password" -AsPlainText -Force)
+```
+
+## Remove Expired Certificates
+
+```powershell
+# Find and remove expired
+Get-ChildItem -Path Cert:\LocalMachine\My | 
+    Where-Object { $_.NotAfter -lt (Get-Date) } |
+    Remove-Item
+
+# Remove specific certificate
+Get-ChildItem -Path Cert:\LocalMachine\My -Thumbprint "thumbprinthere" | Remove-Item
+```
+
+## SSL Certificate Binding
+
+```powershell
+# Bind certificate to IIS
+New-WebBinding -Name "Default Web Site" -Protocol https -Port 443 -SslCertificateThumbprint "thumbprint"
+
+# Or use netsh
+netsh http add sslcert ipport=0.0.0.0:443 certhash=thumbprint appid="{guid}"
+```
+
+## Check Certificate Chain
+
+```powershell
+# Verify chain
+$Cert = Get-ChildItem -Path Cert:\LocalMachine\My | Select-Object -First 1
+[System.Security.Cryptography.X509Certificates.X509Chain]::Create().Chain.Build($Cert)
+```
+
+## Wrap-Up
+
+Certificates are essential. Automate expiration checks and always have a renewal process.
+
+Questions? Drop them below!

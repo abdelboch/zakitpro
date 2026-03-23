@@ -1,0 +1,257 @@
+---
+title: "Using AI to generate Intune detection rules"
+description: "A practical enterprise workflow for generating and validating Intune Win32 detection rules with AI, including prompts, testing matrix, and rollback-safe deployment patterns."
+publishedAt: "2026-03-05"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["ai", "intune", "detection-rules", "win32", "endpoint-management", "desktop-engineering"]
+draft: false
+---
+
+# Using AI to generate Intune detection rules
+
+Intune app deployments fail for many reasons, but detection logic is one of the most common pain points. A package installs fine in testing, then production reports "not installed" because detection is fragile.
+
+AI helps here if you use it for what it is good at: generating structured candidate rules quickly so engineers can validate and choose the safest option.
+
+This guide gives you a production-safe workflow for using AI to generate Intune detection rules that survive real enterprise conditions.
+
+## URL, keyword, and intent
+
+- Suggested URL: `/ai/using-ai-to-generate-intune-detection-rules`
+- Primary keyword: `using AI to generate Intune detection rules`
+- Search intent: practical, enterprise-safe how-to for Win32 app detection logic
+- Meta title suggestion: `Using AI to Generate Intune Detection Rules (Enterprise Workflow)`
+- Meta description suggestion: `Generate stronger Intune Win32 detection rules with AI, then validate with deterministic testing before deployment.`
+
+## Table of contents
+
+- [Why detection rules fail in enterprise environments](#why-detection-rules-fail-in-enterprise-environments)
+- [Where AI helps and where it does not](#where-ai-helps-and-where-it-does-not)
+- [Step 1: collect installer intelligence first](#step-1-collect-installer-intelligence-first)
+- [Step 2: prompt AI for candidate detection strategies](#step-2-prompt-ai-for-candidate-detection-strategies)
+- [Step 3: rank rule options by reliability](#step-3-rank-rule-options-by-reliability)
+- [Step 4: validate in a deterministic matrix](#step-4-validate-in-a-deterministic-matrix)
+- [Step 5: implement in Intune and pilot safely](#step-5-implement-in-intune-and-pilot-safely)
+- [Step 6: build reusable rule patterns](#step-6-build-reusable-rule-patterns)
+- [Internal links](#internal-links)
+- [FAQ](#faq)
+- [CTA](#cta)
+
+## Why detection rules fail in enterprise environments
+
+Detection logic often breaks because teams choose signals that look stable but are not.
+
+Common examples:
+
+- version value exists in lab but changes format in production
+- install path differs between device architecture/user context
+- MSI product code changes between minor vendor releases
+- file existence check passes on a stale leftover from old installs
+
+AI can help you generate better candidates faster, but only if your input evidence is solid.
+
+![Intune Win32 app detection flow showing common failure points](/images/ai-intune-detection-rules-01-failure-map.png)
+
+## Where AI helps and where it does not
+
+AI helps with:
+
+- translating installer artifacts into rule candidates
+- proposing fallback logic
+- generating test scenarios you might miss
+
+AI does not help with:
+
+- deciding business risk tolerance
+- confirming real endpoint behavior without tests
+- magically fixing bad packaging
+
+Treat AI as a fast assistant, not a source of truth.
+
+## Step 1: collect installer intelligence first
+
+Before prompting AI, build a structured artifact pack:
+
+- installer type (MSI/EXE/script wrapper)
+- silent install command used
+- uninstall command
+- install path and file set
+- registry keys/values created
+- service/process indicators
+- app versioning behavior across updates
+
+For MSI apps, include:
+
+- ProductCode
+- UpgradeCode
+- Publisher and version examples
+
+For EXE/wrapped apps, include:
+
+- deterministic file/hash candidates
+- registry footprints with expected value patterns
+
+This prep step is what separates good AI outputs from generic noise.
+
+![Installer intelligence worksheet for detection rule design](/images/ai-intune-detection-rules-02-installer-intel.png)
+
+## Step 2: prompt AI for candidate detection strategies
+
+Use a prompt that asks for options and trade-offs, not one final rule.
+
+```text
+You are assisting with Intune Win32 app detection rule design.
+
+Context:
+- Installer type: <MSI/EXE>
+- Install context: <system/user>
+- Evidence: <files, paths, registry, product codes, services>
+- Update behavior: <minor/major version pattern>
+
+Task:
+1) Propose 3 detection rule strategies.
+2) For each strategy, explain strengths, failure modes, and maintenance risk.
+3) Recommend one primary and one fallback strategy.
+4) Provide exact Intune rule implementation details.
+5) List test cases required to validate reliability.
+
+Constraints:
+- Prefer deterministic signals over brittle ones.
+- Avoid assumptions not supported by evidence.
+- No fabricated paths or registry keys.
+```
+
+Expected output structure:
+
+- Strategy A: MSI product code
+- Strategy B: registry value with version regex
+- Strategy C: file path + version check
+
+![AI prompt and response structure for Intune detection strategies](/images/ai-intune-detection-rules-03-prompt-output.png)
+
+## Step 3: rank rule options by reliability
+
+Use this reliability lens before implementation:
+
+1. **High reliability**: stable MSI code logic with known upgrade behavior
+2. **Medium reliability**: registry key/value with consistent vendor patterns
+3. **Lower reliability**: file existence only
+
+Avoid single-signal rules for complex app lifecycles. Combine signals when possible.
+
+Example decision:
+
+- Primary: MSI ProductCode + min version check
+- Fallback: registry DisplayVersion regex for non-MSI channel
+
+![Rule reliability scorecard for MSI, registry, and file signals](/images/ai-intune-detection-rules-04-scorecard.png)
+
+## Step 4: validate in a deterministic matrix
+
+Do not trust rule quality until tested against known states.
+
+Build a matrix with at least these rows:
+
+- fresh install
+- upgrade from previous supported version
+- uninstall + stale artifacts present
+- partial failed install
+- wrong architecture endpoint
+- user-context install on system-context rule
+
+Example matrix:
+
+| Scenario | Expected detection result | Actual | Pass/Fail |
+|---|---|---|---|
+| Fresh install v5.2 | Detected | Detected | Pass |
+| Upgrade v5.1 -> v5.2 | Detected | Detected | Pass |
+| Uninstalled, stale folder remains | Not detected | Detected | Fail |
+| Partial failed install | Not detected | Not detected | Pass |
+
+If your rule fails stale-artifact or partial-install tests, revise it before pilot.
+
+![Detection rule validation matrix with pass fail outcomes](/images/ai-intune-detection-rules-05-validation-matrix.png)
+
+## Step 5: implement in Intune and pilot safely
+
+Implementation steps:
+
+1. Open Intune Admin Center -> Apps -> Windows -> target Win32 app
+2. Configure detection rule from validated strategy
+3. assign to pilot device group (5-20 endpoints)
+4. monitor install + detection status for 48-72 hours
+5. review edge cases before broad assignment
+
+Mandatory screenshot checkpoints:
+
+- Detection rule configuration screen
+- Assignment to pilot group
+- Monitoring status page with success/fail summary
+
+![Intune detection rule configuration page with validated settings](/images/ai-intune-detection-rules-06-intune-config.png)
+
+## Step 6: build reusable rule patterns
+
+After each successful deployment, store pattern cards in your internal runbook:
+
+- App family
+- Installer type
+- Chosen primary/fallback rule
+- Known failure modes
+- Test cases that caught defects
+
+Over time you build a rule library that reduces packaging rework and speeds new app onboarding.
+
+Pattern example:
+
+- Vendor: Contoso Secure Agent
+- Type: MSI major upgrade model
+- Primary: ProductCode in approved list + DisplayVersion >= baseline
+- Known edge case: old agent leaves stale service key after uninstall
+- Guardrail: include registry value existence + expected version pattern
+
+![Reusable detection rule library template for endpoint teams](/images/ai-intune-detection-rules-07-pattern-library.png)
+
+## Internal links
+
+- [Deploy Apps with Intune Win32](/deployment/deploy-apps-intune-win32)
+- [Microsoft Intune for Desktop Engineers](/deployment/microsoft-intune-for-desktop-engineers)
+- [How to Use AI to Triage Intune Policy Failures Faster](/ai/ai-intune-policy-troubleshooting)
+- [AI for desktop engineers: practical enterprise guide](/ai/ai-for-desktop-engineers-practical-enterprise-guide)
+- [PowerShell Win32 App Installers](/scripting/powershell-win32-app-installers)
+- [Intune Enrollment Errors Fix](/troubleshooting/intune-enrollment-errors-fix)
+
+## FAQ
+
+### Should AI choose the final Intune detection rule?
+
+No. AI should propose candidate rules. Engineers pick the final rule after deterministic test validation.
+
+### Is MSI ProductCode always the best signal?
+
+Often, but not always. Some vendors change behavior across channels or wrap installers. Validate with lifecycle scenarios.
+
+### Can I rely on file existence checks only?
+
+For some apps, yes. For enterprise reliability, file-only checks are usually too brittle by themselves.
+
+### How many pilot devices are enough?
+
+Start with 5-20 representative endpoints across architectures and user profiles. Expand after stable results.
+
+### What metric should we track?
+
+Track detection accuracy, failed install false negatives, rework time per app package, and post-deployment incident rate.
+
+## CTA
+
+Pick your next two Win32 packages and run this exact process:
+
+1. Build installer intelligence sheet
+2. Generate AI rule candidates
+3. validate through matrix testing
+4. deploy to pilot only
+
+In one sprint, your team will move from fragile detection logic to repeatable, enterprise-safe deployment quality.

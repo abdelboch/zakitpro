@@ -1,0 +1,116 @@
+---
+title: "Remote Desktop Troubleshooting Guide"
+slug: "remote-desktop-troubleshooting"
+description: "Fix Remote Desktop connection issues. RDP not working? Can't connect? Here's the complete fix guide."
+publishedAt: "2026-02-27"
+pillar: troubleshooting
+difficulty: junior
+type: how-to
+tags: ["rdp", "remote-desktop", "troubleshooting", "network"]
+draft: false
+---
+
+# Remote Desktop Troubleshooting Guide
+
+RDP not connecting? Can't remote to that server? Here's how to diagnose and fix Remote Desktop issues.
+
+## Quick Checklist
+
+- [ ] RDP enabled on target
+- [ ] Network allows port 3389
+- [ ] User in Remote Desktop Users
+- [ ] Firewall not blocking
+- [ ] NLA configured correctly
+
+## Enable RDP
+
+```powershell
+# Enable RDP (Local)
+Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
+
+# Enable RDP through firewall
+Enable-NetFirewallRule -Name "RemoteDesktop-TCP"
+Enable-NetFirewallRule -Name "RemoteDesktop-UDP"
+```
+
+## Check RDP Status
+
+```powershell
+# Check if RDP is enabled
+Get-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections"
+
+# Check listening port
+Get-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name "PortNumber"
+```
+
+## Add User to RDP Users
+
+```powershell
+# Add user to Remote Desktop Users
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Username"
+
+# Or via AD
+Add-ADGroupMember -Identity "Remote Desktop Users" -Members "Username"
+```
+
+## Network Level Authentication
+
+```powershell
+# NLA required (more secure, can cause issues)
+# Check NLA status
+Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name "UserAuthentication"
+
+# Disable NLA (less secure, troubleshooting)
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name "UserAuthentication" -Value 0
+```
+
+## Common Errors
+
+### "Remote computer is not available"
+
+```powershell
+# Test connectivity
+Test-NetConnection -ComputerName "TargetPC" -Port 3389
+
+# Ping test
+Test-Connection -ComputerName "TargetPC"
+```
+
+### "Logon attempt failed"
+
+- Wrong credentials
+- Account disabled
+- Account expired
+- NLA issue
+
+### "The remote session was disconnected"
+
+- License issues (RDS)
+- Too many connections
+- Network interruption
+
+## Check RDS Licensing
+
+```powershell
+# Check RDS license server
+Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\TermService\Parameters" -Name "LicenseServer"
+
+# Check installed licenses
+Get-WmiObject -Class "Win32_TSLicenseKeyPack"
+```
+
+## Fix Corrupted RDP
+
+```powershell
+# Reset RDP stack
+Remove-Item -Path "HKCU:\Software\Microsoft\Terminal Server Client" -Recurse -Force
+
+# Delete RDP certificates
+Remove-Item -Path "HKLM:\Software\Microsoft\Terminal Server Client\Default" -Recurse -Force
+```
+
+## Wrap-Up
+
+Most RDP issues are firewall, permission, or NLA-related. Check connectivity first, then work through the list.
+
+Questions? Drop them below!

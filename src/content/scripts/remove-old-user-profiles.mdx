@@ -1,0 +1,137 @@
+---
+title: "Remove Old User Profiles"
+slug: "remove-old-user-profiles"
+description: "PowerShell script to remove stale user profiles from Windows machines."
+publishedAt: "2026-02-27"
+language: powershell
+pillar: scripting
+draft: false
+---
+
+# Remove Old User Profiles
+
+This script removes user profiles older than a specified number of days from Windows machines.
+
+## Usage
+
+```powershell
+.\Remove-OldProfiles.ps1 -DaysOld 90 -WhatIf
+```
+
+## Parameters
+
+- **DaysOld**: Number of days since last logon (default: 90)
+- **WhatIf**: Preview what would be deleted without actually deleting
+- **Force**: Skip confirmation prompts
+
+## Script
+
+```powershell
+<#
+.SYNOPSIS
+    Remove old user profiles from Windows machines.
+    
+.DESCRIPTION
+    This script removes user profiles that haven't been logged into for a specified number of days.
+    Supports -WhatIf mode for safe testing.
+    
+.PARAMETER DaysOld
+    Number of days since last logon (default: 90)
+    
+.PARAMETER WhatIf
+    Preview what would be deleted without actually deleting
+    
+.PARAMETER Force
+    Skip confirmation prompts
+    
+.EXAMPLE
+    .\Remove-OldProfiles.ps1 -DaysOld 90 -WhatIf
+    
+.EXAMPLE
+    .\Remove-OldProfiles.ps1 -DaysOld 60 -Force
+#>
+
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [Parameter(Mandatory=$false)]
+    [int]$DaysOld = 90,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$Force
+)
+
+$LogFile = "$env:TEMP\ProfileCleanup_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+
+function Write-Log {
+    param([string]$Message)
+    $Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $LogMessage = "[$Timestamp] $Message"
+    Write-Host $LogMessage
+    Add-Content -Path $LogFile -Value $LogMessage
+}
+
+Write-Log "Starting profile cleanup. DaysOld: $DaysOld"
+
+# Get all user profiles
+$Profiles = Get-CimInstance -ClassName Win32_UserProfile | 
+    Where-Object { $_.LocalPath -notmatch '^(C:|D:|E:|F:)\\Users\\(Public|Default|Administrator|System)' }
+
+$CutoffDate = (Get-Date).AddDays(-$DaysOld)
+$ToDelete = @()
+
+foreach ($Profile in $Profiles) {
+    $LastUse = $Profile.LastUseTime
+    $Username = $Profile.LocalPath -replace '.*\\', ''
+    
+    if ($LastUse -and $LastUse -lt $CutoffDate) {
+        $ToDelete += [PSCustomObject]@{
+            Username = $Username
+            LastUsed = $LastUse
+            Path = $Profile.LocalPath
+            DaysSince = ((Get-Date) - $LastUse).Days
+        }
+    }
+}
+
+if ($ToDelete.Count -eq 0) {
+    Write-Log "No profiles older than $DaysOld days found."
+    exit 0
+}
+
+Write-Log "Found $($ToDelete.Count) profiles to remove:"
+$ToDelete | ForEach-Object { Write-Log "  - $($_.Username) (last used: $($_.LastUsed), $($_.DaysSince) days ago)" }
+
+if ($WhatIfPreference -or $PSCmdlet.ShouldProcess("Delete $($ToDelete.Count) profiles")) {
+    if ($Force -or $PSCmdlet.ShouldContinue("Delete $($ToDelete.Count) old profiles?", "Confirm Deletion")) {
+        foreach ($Profile in $ToDelete) {
+            try {
+                # Remove the profile using WMI
+                $Profile | Remove-CimInstance -ErrorAction Stop
+                Write-Log "DELETED: $($Profile.Username)"
+            }
+            catch {
+                Write-Log "ERROR deleting $($Profile.Username): $_"
+            }
+        }
+    }
+}
+
+Write-Log "Profile cleanup complete. Log saved to: $LogFile"
+```
+
+## Important Notes
+
+1. **Always run with -WhatIf first** to see what will be deleted
+2. **Excluded accounts**: Public, Default, Administrator, System profiles are always preserved
+3. **Requires admin rights** to delete profiles
+4. **Logged actions** are saved to a log file in TEMP
+
+## Automation
+
+To run as a scheduled task:
+
+```powershell
+$Action = New-ScheduledTaskAction -Execute 'Powershell.exe' -Argument '-NoProfile -ExecutionPolicy Bypass -File C:\Scripts\Remove-OldProfiles.ps1 -DaysOld 90 -Force'
+$Trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Sunday -At 3AM
+Register-ScheduledTask -TaskName 'Cleanup Old Profiles' -Action $Action -Trigger $Trigger -RunLevel Highest
+```

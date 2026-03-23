@@ -1,0 +1,46 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+---
+
+{filteredHeadings.length > 0 && (
+  <nav class="text-sm">
+    <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">On this page</h4>
+    <ul class="space-y-2">
+      {filteredHeadings.map(heading => (
+        <li class={heading.depth === 3 ? 'ml-4' : ''}>
+          <a 
+            href={`#${heading.slug}`}
+            class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"
+            data-heading-link
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<script>
+  // Highlight current section on scroll
+  const headings = document.querySelectorAll('[data-heading-link]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        headings.forEach(h => h.classList.remove('text-accent', 'font-medium'));
+        const id = entry.target.getAttribute('id');
+        const link = document.querySelector(`[href="#${id}"]`);
+        if (link) {
+          link.classList.add('text-accent', 'font-medium');
+        }
+      }
+    });
+  }, { rootMargin: '-100px 0px -66%' });
+
+  document.querySelectorAll('h2[id], h3[id]').forEach(h => observer.observe(h));
+</script>
