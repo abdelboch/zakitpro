@@ -1,0 +1,15 @@
+Rebooting a device and hoping the Intune compliance state turns green is not a strategy. 
+
+When Intune throws a random hex error code and marks a device "Not Compliant", desktop engineers usually spend the next hour digging through the IntuneManagementExtension.log trying to figure out why.
+
+You don't have to do that anymore.
+
+Use a quick PowerShell one-liner to rip the last 50 error lines out of the log, drop them into your AI tool, and force it to find the exact failure point.
+
+Tell the AI to ignore the routine sync timeouts and give you the specific registry key or script that failed, plus the exact commands to verify it locally.
+
+The AI parses the noise. You execute the fix. 
+
+I wrote a breakdown of the exact script and prompt to use for this workflow. Link in the comments.
+
+#Intune #DesktopEngineering #AIOps #Troubleshooting #PowerShell #Windows11

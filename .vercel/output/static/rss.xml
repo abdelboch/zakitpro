@@ -5,8 +5,35 @@
     <link>https://zakitpro.com</link>
     <description>Technical articles, PowerShell scripts, and career guides for endpoint engineers</description>
     <language>en</language>
-    <lastBuildDate>Mon, 23 Mar 2026 18:09:21 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 23 Mar 2026 22:07:35 GMT</lastBuildDate>
     <atom:link href="https://zakitpro.com/rss.xml" rel="self" type="application/rss+xml"/>
+    
+    <item>
+      <title><![CDATA[Using AI to Automate Intune Windows Update Ring Management]]></title>
+      <link>https://zakitpro.com/ai/ai-automate-intune-windows-update-rings/</link>
+      <guid isPermaLink="true">https://zakitpro.com/ai/ai-automate-intune-windows-update-rings/</guid>
+      <description><![CDATA[Learn how to safely leverage AI to configure, manage, and troubleshoot Intune Windows Update Rings for enterprise deployments, while avoiding critical AI hallucinations.]]></description>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <category>AI-Augmented Engineering</category>
+    </item>
+    
+    <item>
+      <title><![CDATA[AI-Assisted Intune App Supersedence Change Review for Desktop Engineers]]></title>
+      <link>https://zakitpro.com/ai/ai-intune-app-supersedence-change-review/</link>
+      <guid isPermaLink="true">https://zakitpro.com/ai/ai-intune-app-supersedence-change-review/</guid>
+      <description><![CDATA[Use AI to review Intune app supersedence changes safely before production. A practical desktop engineering workflow for replacement chains, uninstall behavior, detection checks, and rollback risk.]]></description>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <category>AI-Augmented Engineering</category>
+    </item>
+    
+    <item>
+      <title><![CDATA[Using AI to Analyze Windows Event Logs Faster]]></title>
+      <link>https://zakitpro.com/ai/ai-windows-event-log-analysis-troubleshooting/</link>
+      <guid isPermaLink="true">https://zakitpro.com/ai/ai-windows-event-log-analysis-troubleshooting/</guid>
+      <description><![CDATA[Stop scrolling through thousands of Event Viewer logs. Learn how to export Windows Event Logs and use AI to spot the real failures hiding in the noise.]]></description>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <category>AI-Augmented Engineering</category>
+    </item>
     
     <item>
       <title><![CDATA[Using AI to Validate Windows LAPS Policies in Intune Before You Get Burned]]></title>
@@ -14,6 +41,24 @@
       <guid isPermaLink="true">https://zakitpro.com/ai/ai-validate-windows-laps-policies-intune/</guid>
       <description><![CDATA[A practical desktop engineering workflow for using AI to validate Windows LAPS policy coverage, conflicts, scope gaps, and read-back results in Microsoft Intune before they turn into a security mess.]]></description>
       <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <category>AI-Augmented Engineering</category>
+    </item>
+    
+    <item>
+      <title><![CDATA[How Desktop Engineers Can Use AI to Build Safer SCCM Boundary Group Validation Queries]]></title>
+      <link>https://zakitpro.com/ai/ai-sccm-boundary-group-query-validation/</link>
+      <guid isPermaLink="true">https://zakitpro.com/ai/ai-sccm-boundary-group-query-validation/</guid>
+      <description><![CDATA[A practical workflow for using AI to draft SCCM boundary group validation queries and reports without trusting hallucinated logic or making reckless production changes.]]></description>
+      <pubDate>Mon, 23 Mar 2026 00:00:00 GMT</pubDate>
+      <category>AI-Augmented Engineering</category>
+    </item>
+    
+    <item>
+      <title><![CDATA[How Desktop Engineers Can Use AI to Triage Windows Autopilot ESP Failures Faster]]></title>
+      <link>https://zakitpro.com/ai/ai-autopilot-esp-failure-triage/</link>
+      <guid isPermaLink="true">https://zakitpro.com/ai/ai-autopilot-esp-failure-triage/</guid>
+      <description><![CDATA[A practical workflow for using AI to speed up Windows Autopilot Enrollment Status Page troubleshooting without guessing, skipping evidence, or trusting hallucinated fixes.]]></description>
+      <pubDate>Sun, 22 Mar 2026 00:00:00 GMT</pubDate>
       <category>AI-Augmented Engineering</category>
     </item>
     
@@ -140,51 +185,6 @@
       <guid isPermaLink="true">https://zakitpro.com/ai/ai-remediation-script-review-checklist-for-desktop-engineers/</guid>
       <description><![CDATA[A practical checklist for reviewing AI-generated remediation scripts in endpoint environments, with safety gates, testing flow, and change-control discipline.]]></description>
       <pubDate>Sun, 08 Mar 2026 00:00:00 GMT</pubDate>
-      <category>AI-Augmented Engineering</category>
-    </item>
-    
-    <item>
-      <title><![CDATA[SCCM + AI Log Triage Playbook for Desktop Engineers]]></title>
-      <link>https://zakitpro.com/ai/sccm-ai-log-triage-playbook/</link>
-      <guid isPermaLink="true">https://zakitpro.com/ai/sccm-ai-log-triage-playbook/</guid>
-      <description><![CDATA[A practical guide to using AI for SCCM log triage so desktop engineers can isolate client install failures faster, with safer prompts and repeatable escalation notes.]]></description>
-      <pubDate>Sun, 08 Mar 2026 00:00:00 GMT</pubDate>
-      <category>AI-Augmented Engineering</category>
-    </item>
-    
-    <item>
-      <title><![CDATA[AI-Assisted Win32 App Packaging for Intune: A Desktop Engineer’s Fast, Safe Workflow]]></title>
-      <link>https://zakitpro.com/ai/ai-assisted-win32-app-packaging-intune-desktop-engineers/</link>
-      <guid isPermaLink="true">https://zakitpro.com/ai/ai-assisted-win32-app-packaging-intune-desktop-engineers/</guid>
-      <description><![CDATA[A practical workflow for packaging Win32 apps in Intune with AI-assisted scripting, strict detection logic, and safer staged rollout.]]></description>
-      <pubDate>Fri, 06 Mar 2026 00:00:00 GMT</pubDate>
-      <category>AI-Augmented Engineering</category>
-    </item>
-    
-    <item>
-      <title><![CDATA[AI log triage for SCCM client install failures]]></title>
-      <link>https://zakitpro.com/ai/ai-sccm-log-triage-client-install-failures/</link>
-      <guid isPermaLink="true">https://zakitpro.com/ai/ai-sccm-log-triage-client-install-failures/</guid>
-      <description><![CDATA[A practical workflow for desktop engineers to use AI for faster SCCM client install failure triage without exposing sensitive endpoint data.]]></description>
-      <pubDate>Fri, 06 Mar 2026 00:00:00 GMT</pubDate>
-      <category>AI-Augmented Engineering</category>
-    </item>
-    
-    <item>
-      <title><![CDATA[AI-Assisted SCCM Task Sequence Troubleshooting for Desktop Engineers]]></title>
-      <link>https://zakitpro.com/ai/ai-sccm-task-sequence-troubleshooting-prompts/</link>
-      <guid isPermaLink="true">https://zakitpro.com/ai/ai-sccm-task-sequence-troubleshooting-prompts/</guid>
-      <description><![CDATA[A practical workflow for using AI to triage SCCM task sequence failures faster while keeping enterprise troubleshooting disciplined and auditable.]]></description>
-      <pubDate>Fri, 06 Mar 2026 00:00:00 GMT</pubDate>
-      <category>AI-Augmented Engineering</category>
-    </item>
-    
-    <item>
-      <title><![CDATA[Local AI Ops for IT Teams: Run Fast Automations on Employee PCs Without Losing Control]]></title>
-      <link>https://zakitpro.com/ai/local-ai-ops-for-it-teams/</link>
-      <guid isPermaLink="true">https://zakitpro.com/ai/local-ai-ops-for-it-teams/</guid>
-      <description><![CDATA[A practical desktop engineering guide to deploying local AI automations on managed endpoints with guardrails, rollback paths, and measurable support impact.]]></description>
-      <pubDate>Fri, 06 Mar 2026 00:00:00 GMT</pubDate>
       <category>AI-Augmented Engineering</category>
     </item>
     

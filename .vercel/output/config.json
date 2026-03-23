@@ -2,6 +2,34 @@
 	"version": 3,
 	"routes": [
 		{
+			"src": "^/ai-powered-intune-error-resolution-2026$",
+			"headers": {
+				"Location": "/ai/ai-powered-intune-error-resolution-2026/"
+			},
+			"status": 301
+		},
+		{
+			"src": "^/ai-powered-powershell-2026$",
+			"headers": {
+				"Location": "/ai/ai-powered-powershell-2026/"
+			},
+			"status": 301
+		},
+		{
+			"src": "^/blog/ai-generated-microsoft-graph-queries-2026$",
+			"headers": {
+				"Location": "/ai/ai-generated-microsoft-graph-queries-2026/"
+			},
+			"status": 301
+		},
+		{
+			"src": "^/blog/ai-powered-powershell-2026$",
+			"headers": {
+				"Location": "/ai/ai-powered-powershell-2026/"
+			},
+			"status": 301
+		},
+		{
 			"handle": "filesystem"
 		},
 		{
