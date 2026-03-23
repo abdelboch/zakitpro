@@ -1,0 +1,212 @@
+---
+title: "AI-Assisted Intune App Supersedence Change Review for Desktop Engineers"
+description: "Use AI to review Intune app supersedence changes safely before production. A practical desktop engineering workflow for replacement chains, uninstall behavior, detection checks, and rollback risk."
+publishedAt: "2026-03-23"
+updatedAt: "2026-03-23"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["Intune", "Win32 Apps", "App Supersedence", "AI Automation", "Desktop Engineering", "Endpoint Management"]
+draft: false
+---
+
+Intune app supersedence looks simple in the portal right up until it burns a pilot ring.
+
+On paper, you are just telling one app to replace or update another. In practice, you are making a chain of assumptions about install context, uninstall behavior, detection truth, dependencies, assignments, and user impact. That is exactly the kind of review work AI can accelerate **if** you force it to reason from the facts you provide instead of letting it invent package logic.
+
+This guide shows a production-sane workflow for using AI to review an Intune app supersedence change before you touch a live group.
+
+## Where supersedence actually goes wrong
+
+Most supersedence failures are not caused by the button in Intune. They come from bad assumptions around the two packages involved.
+
+Common failure patterns:
+
+1. **The old app never uninstalls cleanly** so the new app installs into a broken state.
+2. **Detection rules overlap** and Intune decides the target state is already satisfied when it is not.
+3. **The replacement app needs a dependency** that the original package did not.
+4. **Assignments are broader than expected** and a pilot-style change lands in production.
+5. **Return codes are incomplete** so reboot-required or soft-fail scenarios are treated like hard failures.
+6. **Rollback is undefined** which means the team cannot recover fast when install success drops.
+
+AI is useful here because it can compare structured package facts, surface hidden assumptions, and turn that into a sharper review checklist. AI is dangerous when you ask it vague questions like, “Does this supersedence look okay?”
+
+## What to gather before prompting AI
+
+Do not paste random screenshots and hope for the best. Build a minimum evidence pack first.
+
+For the **current app** capture:
+
+- app name and version
+- install command
+- uninstall command
+- detection rule details
+- requirement rules
+- dependency apps
+- return codes
+- assignment scope
+- whether uninstall has been tested silently on a clean VM
+
+For the **replacement app** capture the same fields, plus:
+
+- whether it should **update** or **replace**
+- whether the supersedence relationship uses uninstall behavior
+- expected coexistence or no-coexistence rule
+- any new services, drivers, or reboot behavior
+
+For the **change window** capture:
+
+- pilot group name
+- production group name
+- rollback owner
+- success threshold
+- stop condition
+
+That evidence pack is what keeps AI grounded.
+
+## A better prompt for supersedence review
+
+Bad prompt:
+
+> Review this Intune app supersedence.
+
+Better prompt:
+
+> You are reviewing a Microsoft Intune Win32 app supersedence change for production risk.
+> Compare the old and new package details below.
+> Do not assume facts not provided.
+> Identify:
+> 1. uninstall risk,
+> 2. detection-rule conflict risk,
+> 3. dependency gaps,
+> 4. assignment blast radius,
+> 5. rollback requirements,
+> 6. missing validation steps before pilot.
+> Return the answer as:
+> - red flags
+> - questions that must be answered
+> - pilot validation checklist
+> - go / no-go recommendation with rationale.
+
+That structure makes AI much more useful because it stops acting like a package creator and starts acting like a review assistant.
+
+## The review workflow I would actually use
+
+### 1. Compare uninstall reality before install theory
+
+If the old package cannot uninstall silently and consistently, your supersedence chain is already suspect.
+
+Ask AI to compare:
+
+- uninstall command syntax
+- required switches
+- reboot behavior
+- leftover registry keys or files that may poison detection
+- user-context versus system-context mismatches
+
+If the old package has only been tested for install and not uninstall, treat that as a red flag, not a missing detail.
+
+### 2. Look for detection collisions
+
+This is where teams get embarrassed.
+
+If both packages detect the same MSI product code, file path, or broad registry location, Intune can decide the new state is satisfied even though the replacement never completed.
+
+Use AI to review whether detection sources are:
+
+- unique per version
+- version-aware instead of file-exists-only
+- resilient after uninstall
+- aligned with actual install context
+
+A good AI output here is not “looks good.”
+A good output is something like:
+
+> Both packages key off `C:\Program Files\Vendor\App\app.exe` existence only. This risks false-positive detection after in-place replacement or partial uninstall. Add version-aware file detection or MSI/product-specific logic.
+
+### 3. Review dependency and prerequisite drift
+
+A lot of supersedence pain comes from the new package quietly expecting .NET, VC++, WebView2, or a service dependency that the old package did not require.
+
+AI can help compare prereqs between versions and generate targeted questions:
+
+- Does the new installer require a newer runtime?
+- Did the vendor change from MSI to EXE bootstrapper?
+- Did install context or architecture assumptions change?
+- Does the new app require user logoff or reboot before detection settles?
+
+That is faster than manually scanning vendor docs every time, but only if you still validate the answer against your package notes.
+
+### 4. Pressure-test assignment scope
+
+Supersedence review is not just packaging review.
+It is targeting review.
+
+Ask AI to summarize blast radius from:
+
+- required versus available assignment
+- included and excluded groups
+- device filters
+- dependency assignments
+- autopilot ESP involvement for required apps
+
+If the replacement app is tied to Autopilot or a broad production device group, the threshold for “safe enough” should be much higher.
+
+### 5. Force a rollback plan before pilot
+
+If the review does not produce a rollback plan, the review is incomplete.
+
+AI can help turn your package facts into a rollback checklist:
+
+- disable or remove supersedence link
+- restore old required assignment if needed
+- re-enable prior dependency chain
+- confirm uninstall of broken replacement
+- define who approves stop/go during pilot
+
+That does not replace operator judgment. It just keeps the team from discovering mid-incident that nobody wrote down the reversal path.
+
+## A practical operator checklist
+
+Before enabling an Intune supersedence relationship, confirm all of these are true:
+
+- [ ] Old app uninstall was tested silently in the same context Intune will use
+- [ ] New app install was tested after old app uninstall, not just on a clean machine
+- [ ] Detection rules do not collide or stay true after partial uninstall
+- [ ] Dependency and requirement rules were compared between versions
+- [ ] Return codes include expected reboot and retry states
+- [ ] Pilot assignment is isolated from production
+- [ ] A rollback owner and stop condition are documented
+- [ ] AI review output was checked against real package facts, not trusted blindly
+
+## Example of a safe AI-assisted review output
+
+A strong AI-assisted summary should sound like this:
+
+> **Primary risk:** detection overlap between old and new packages.
+> **Secondary risk:** uninstall path for legacy version is unproven in system context.
+> **Pilot requirement:** validate uninstall -> install -> detection on three representative device states: clean install, upgraded install, and previously failed install.
+> **Recommendation:** no-go until version-aware detection is added and silent uninstall log is validated.
+
+That is operationally useful.
+It gives you a reason to delay, a reason to proceed, or a reason to narrow scope.
+
+## What AI should never decide for you
+
+Do not let AI decide:
+
+- whether vendor uninstall logic is trustworthy
+- whether a detection rule is “close enough”
+- whether pilot scope is politically safe
+- whether a failed uninstall is acceptable in production
+- whether rollback can be improvised later
+
+Those are engineering and change-management calls.
+
+## Bottom line
+
+AI is excellent at turning package facts into a sharper supersedence review.
+It is terrible at knowing which missing fact will take down your pilot ring.
+
+Use AI to compare the old and new app, surface blind spots, and tighten your validation plan.
+Then do the adult part of the job: test uninstall, test detection, test rollback, and limit blast radius before production.

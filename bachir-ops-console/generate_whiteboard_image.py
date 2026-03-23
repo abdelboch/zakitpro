@@ -11,6 +11,7 @@ Expected prompt file format:
 - line 1: topic/title
 - line 2: objective/summary
 - next 7 non-empty lines: panel descriptions
+- optional final 3 non-empty lines: badge labels
 """
 import argparse
 import base64
@@ -42,14 +43,15 @@ COLORS = {
 }
 
 
-def load_prompt_parts(prompt_file: Path) -> tuple[str, str, list[str]]:
+def load_prompt_parts(prompt_file: Path) -> tuple[str, str, list[str], list[str]]:
     lines = [line.strip() for line in prompt_file.read_text().splitlines() if line.strip()]
     if len(lines) < 9:
         raise ValueError(f"Prompt file must contain at least 9 non-empty lines, got {len(lines)}")
     topic_name = lines[0]
     summary = lines[1]
     sections = lines[2:9]
-    return topic_name, summary, sections
+    badges = lines[9:12] if len(lines) >= 12 else []
+    return topic_name, summary, sections, badges
 
 
 def build_prompt(topic_name: str, summary: str, sections: list[str]) -> str:
@@ -111,7 +113,7 @@ def _fit_font(draw: ImageDraw.ImageDraw, text: str, width: int, start_size: int,
     return _load_font(min_size, bold=bold)
 
 
-def render_local_whiteboard(topic_name: str, summary: str, sections: list[str], output_path: Path) -> Path:
+def render_local_whiteboard(topic_name: str, summary: str, sections: list[str], output_path: Path, badges: list[str] | None = None) -> Path:
     img = Image.new('RGB', CANVAS, COLORS['surface'])
     draw = ImageDraw.Draw(img)
 
@@ -178,7 +180,8 @@ def render_local_whiteboard(topic_name: str, summary: str, sections: list[str], 
             draw.line((x2 - 40, y2 - 22, x2 - 14, y2 - 22), fill=accent, width=4)
             draw.polygon([(x2 - 14, y2 - 22), (x2 - 24, y2 - 29), (x2 - 24, y2 - 15)], fill=accent)
 
-    badges = ['Protect Ring Scope', 'Review Graph Payload', 'Validate Read-Back']
+    badges = badges or ['Protect Ring Scope', 'Review Graph Payload', 'Validate Read-Back']
+    badges = (badges + ['Protect Ring Scope', 'Review Graph Payload', 'Validate Read-Back'])[:3]
     bx = MARGIN + 10
     by = CANVAS[1] - 108
     for i, badge in enumerate(badges):
@@ -193,7 +196,7 @@ def render_local_whiteboard(topic_name: str, summary: str, sections: list[str], 
     return output_path
 
 
-def generate_whiteboard_image(prompt_text: str, output_path: Path, topic_name: str, summary: str, sections: list[str]) -> tuple[Path, str]:
+def generate_whiteboard_image(prompt_text: str, output_path: Path, topic_name: str, summary: str, sections: list[str], badges: list[str] | None = None) -> tuple[Path, str]:
     api_key = os.environ.get('GEMINI_API_KEY')
     if api_key:
         payload = {
@@ -218,7 +221,7 @@ def generate_whiteboard_image(prompt_text: str, output_path: Path, topic_name: s
                         return output_path, 'gemini'
         print('WARN: Gemini image generation unavailable, using local Pillow fallback.')
 
-    return render_local_whiteboard(topic_name, summary, sections, output_path), 'local-fallback'
+    return render_local_whiteboard(topic_name, summary, sections, output_path, badges=badges), 'local-fallback'
 
 
 def main() -> int:
@@ -230,9 +233,9 @@ def main() -> int:
     prompt_file = Path(args.prompt_file)
     output_path = Path(args.output)
 
-    topic_name, summary, sections = load_prompt_parts(prompt_file)
+    topic_name, summary, sections, badges = load_prompt_parts(prompt_file)
     prompt_text = build_prompt(topic_name, summary, sections)
-    image_path, mode = generate_whiteboard_image(prompt_text, output_path, topic_name, summary, sections)
+    image_path, mode = generate_whiteboard_image(prompt_text, output_path, topic_name, summary, sections, badges=badges)
     print(f'IMAGE_PATH={image_path}')
     print(f'IMAGE_MODE={mode}')
     return 0
