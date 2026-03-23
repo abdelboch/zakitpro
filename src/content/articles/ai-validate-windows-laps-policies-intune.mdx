@@ -1,0 +1,241 @@
+---
+title: "Using AI to Validate Windows LAPS Policies in Intune Before You Get Burned"
+description: "A practical desktop engineering workflow for using AI to validate Windows LAPS policy coverage, conflicts, scope gaps, and read-back results in Microsoft Intune before they turn into a security mess."
+publishedAt: "2026-03-23"
+updatedAt: "2026-03-23"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["Windows LAPS", "Intune", "Account Protection", "AI Automation", "Desktop Engineering", "Endpoint Security"]
+draft: false
+---
+
+Windows LAPS is one of those controls everybody says they care about right up until they discover half the fleet is mis-scoped, the password rotation setting is inconsistent, and nobody checked whether the policy actually landed.
+
+That is the part AI can help with.
+
+Not the fake version where you ask a chatbot, "Is my LAPS setup secure?" and get a cheerful blob of nonsense. I mean the useful version: you give AI the policy facts, assignment facts, and read-back results, then make it point out holes before an auditor or an incident does it for you.
+
+This is a practical workflow for using AI to validate Windows LAPS policies in Intune without pretending the model understands your tenant better than you do.
+
+## Why LAPS validation goes sideways
+
+A lot of teams treat Windows LAPS like a one-and-done checkbox.
+
+They enable account protection policy, pick a few settings, assign it to a group, and move on. Then six months later they find one of these problems:
+
+- devices were never in scope
+- multiple policies fought each other
+- password backup target was not what the team thought it was
+- the wrong local admin account was being managed
+- password age settings drifted between rings
+- the policy showed as assigned, but device read-back told a different story
+
+That is not a Windows LAPS problem. That is an operations problem.
+
+And operations problems are where AI is actually worth your time, because it is good at comparing structured facts, surfacing mismatches, and forcing a cleaner review.
+
+## Where AI helps and where it does not
+
+AI is useful for:
+
+- comparing intended LAPS settings against deployed settings
+- spotting scope gaps between pilot and production groups
+- finding conflicting policy values across multiple profiles
+- generating a validation checklist from real tenant facts
+- summarizing read-back data into a go or no-go review
+
+AI is not useful for:
+
+- deciding whether your security team accepts the risk
+- knowing which break-glass devices are intentionally excluded
+- proving a policy applied when you never collected device evidence
+- replacing actual read-back validation in Intune or Graph
+
+If you skip evidence collection, AI just becomes a confidence machine.
+
+## The evidence pack to collect before you prompt anything
+
+Do not start with screenshots and vibes. Build a small fact pack first.
+
+For each Windows LAPS policy under review, capture:
+
+- policy name
+- policy type and platform
+- password backup target
+- password age days
+- managed account name or default admin behavior
+- post-authentication actions
+- history size if configured
+- assignment groups and exclusions
+- device filter details if used
+
+Then collect read-back evidence from actual devices:
+
+- a small pilot sample that should be in scope
+- at least one device that should be excluded
+- policy status in Intune
+- setting catalog or account protection read-back values
+- whether local admin password rotation succeeded
+- whether the password is backed up where you expect
+
+That last part matters. A LAPS policy that exists in the portal but is not producing the outcome you intended is not a working control. It is a decorative control.
+
+## The AI prompt that is actually worth using
+
+Bad prompt:
+
+> Review my Windows LAPS policy.
+
+Better prompt:
+
+> You are reviewing Windows LAPS policy implementation in Microsoft Intune.
+> Compare the intended settings, assignments, exclusions, and device read-back results below.
+> Do not assume facts not provided.
+> Identify:
+> 1. scope gaps,
+> 2. conflicting settings,
+> 3. risky exclusions,
+> 4. settings that are assigned but not confirmed on devices,
+> 5. validation steps required before broad rollout.
+> Return the answer as:
+> - red flags
+> - missing evidence
+> - pilot validation checklist
+> - go / no-go recommendation with rationale.
+
+That prompt does two important things.
+
+First, it forces the model to compare facts instead of improvising. Second, it keeps the output focused on validation, which is the only reason to involve AI here in the first place.
+
+## The workflow I would actually use
+
+### 1. Compare intended policy against real assignments
+
+Start with the obvious question most teams oddly avoid: did the right devices even get the right policy?
+
+Ask AI to compare:
+
+- included groups
+- excluded groups
+- filter logic
+- pilot versus production targeting
+- whether there are overlapping LAPS profiles on the same device population
+
+This catches the classic mistake where security thinks LAPS is deployed tenant-wide, but desktop engineering knows the assignment only covered one clean pilot group from last quarter.
+
+### 2. Check for conflicting LAPS settings across profiles
+
+This is where people get sloppy.
+
+If you have more than one account protection or settings catalog profile touching LAPS-related settings, AI can help you compare them side by side and call out collisions such as:
+
+- different password age values
+- different managed account names
+- different post-authentication actions
+- different backup expectations
+
+A good output here is not, "Everything looks secure."
+
+A good output is:
+
+> Device group overlap exists between Policy A and Policy B. Password age differs between profiles, and one profile defines a custom managed account while the other relies on the built-in administrator context. Resolve precedence before rollout.
+
+That is useful. It tells you where the mess is.
+
+### 3. Validate coverage instead of trusting configuration alone
+
+This is the part security reviews often miss.
+
+The job is not to admire clean settings in the portal. The job is to prove the control covers the devices you think it covers.
+
+Feed AI a simple matrix:
+
+- device should be in scope: yes or no
+- policy assignment status
+- read-back status
+- password rotation confirmed: yes or no
+- backup location confirmed: yes or no
+
+Then ask it to summarize patterns.
+
+If ten pilot devices are assigned but only six show the expected read-back, that is not close enough. That is four future exceptions you have not explained yet.
+
+### 4. Pressure-test exclusions before broad rollout
+
+LAPS exclusions have a way of living forever.
+
+A temporary support exception becomes a silent permanent hole unless somebody drags it into the light.
+
+Ask AI to flag exclusions that look risky based on:
+
+- broad dynamic groups
+- legacy device collections carried forward into Intune logic
+- break-glass naming that no longer matches actual use
+- exclusions without owner, reason, or expiry
+
+This does not replace judgment. It gives you a faster shortlist of the things that deserve judgment.
+
+### 5. Force a read-back review before calling it done
+
+This is non-negotiable.
+
+I do not care how clean the policy JSON looks. If you do not verify read-back on real devices, you do not know whether LAPS is working. You know whether a profile exists.
+
+Use AI to turn device evidence into a review summary:
+
+- devices validated successfully
+- devices assigned but missing expected settings
+- devices intentionally excluded
+- devices with unresolved status
+- next actions before broad deployment
+
+That makes the rollout conversation much sharper, especially if you are dealing with a security team that wants a yes or no answer instead of a vague status dump.
+
+## A practical operator checklist
+
+Before you tell anyone Windows LAPS is covered in Intune, confirm all of these are true:
+
+- [ ] Policy settings were exported or documented from the source of truth
+- [ ] Included and excluded groups were reviewed for scope accuracy
+- [ ] Overlapping LAPS-related profiles were compared for conflicts
+- [ ] Pilot devices were validated with real read-back results
+- [ ] At least one excluded device was checked to confirm exclusion behaves as intended
+- [ ] Password rotation was confirmed on in-scope devices
+- [ ] Password backup target was verified, not assumed
+- [ ] Exceptions have an owner, reason, and expiration plan
+- [ ] AI findings were checked against Intune or Graph before rollout decisions
+
+## What AI should never decide for you
+
+Do not let AI decide:
+
+- whether an exclusion is politically acceptable
+- whether a read-back failure is safe to ignore
+- whether backup location drift is an audit issue
+- whether overlapping policies are harmless
+- whether pilot coverage is good enough
+
+Those are engineering and governance decisions. The model can surface the problem. It does not own the answer.
+
+## Example of a strong AI-assisted review output
+
+A good summary sounds like this:
+
+> Primary risk: 18 percent of pilot devices show assignment success but no confirmed read-back for expected LAPS settings.
+> Secondary risk: one legacy exclusion group still removes shared support devices from scope with no documented owner.
+> Required action: validate policy precedence on overlapping profiles and confirm password backup target on three unresolved devices before production expansion.
+> Recommendation: no-go until read-back gaps are explained and exclusion ownership is documented.
+
+That is the level of bluntness you want.
+
+## Bottom line
+
+Windows LAPS validation is boring. Good.
+
+Boring security controls are usually the ones that save you later.
+
+AI is useful here because it can compare policy settings, assignments, exclusions, and device evidence faster than most teams can do it manually. What it cannot do is replace the adult part of the job: collect the facts, verify read-back, clean up exceptions, and refuse to call coverage complete when the evidence says otherwise.
+
+Use AI to tighten the review.
+Use engineering judgment to make the call.
