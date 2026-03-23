@@ -1,0 +1,64 @@
+---
+title: "Using AI to Analyze Windows Event Logs Faster"
+description: "Stop scrolling through thousands of Event Viewer logs. Learn how to export Windows Event Logs and use AI to spot the real failures hiding in the noise."
+publishedAt: "2026-03-23"
+pillar: "ai"
+difficulty: "mid"
+type: "how-to"
+tags: ["Windows Event Logs", "AI troubleshooting", "desktop engineering", "PowerShell", "Event Viewer"]
+draft: false
+---
+
+# Stop Scrolling Through Event Viewer
+
+If you work in desktop engineering, you know the pain. A user says "my machine keeps crashing at 2 PM," and you are stuck staring at the Windows Event Viewer. You scroll through hundreds of informational events, meaningless DCOM warnings, and noise, hoping to spot the one Error or Critical event that actually matters.
+
+It sucks. It wastes time. And honestly, it's a terrible way to troubleshoot.
+
+AI changes this entirely, but only if you feed it the right data. Don't dump a raw `.evtx` file into a chat window. Here is how you actually use AI to parse Windows Event Logs like a professional.
+
+## Exporting the Logs with PowerShell
+
+First, get the logs out of Event Viewer and into a format AI can actually read. PowerShell is your best friend here.
+
+Instead of exporting everything, grab the last 24 hours of System and Application errors:
+
+```powershell
+Get-WinEvent -FilterHashtable @{
+    LogName = 'System', 'Application'
+    Level = 1, 2, 3  # Critical, Error, Warning
+    StartTime = (Get-Date).AddHours(-24)
+} | Select-Object TimeCreated, Id, ProviderName, Message | Export-Csv -Path "C:\temp\eventlogs.csv" -NoTypeInformation
+```
+
+Now you have a clean, text-based CSV file containing only the events that might actually be causing the problem.
+
+## The Right Way to Prompt
+
+If you just drop the CSV into an AI and say "fix this," you'll get garbage back. It will hallucinate a fix for a random DCOM warning that has nothing to do with your user's crash. 
+
+You need to constrain the AI. Tell it exactly what you are looking for.
+
+**Use this prompt:**
+
+> "I am troubleshooting a Windows 11 machine that crashed around 2:00 PM today. Attached is a CSV of the System and Application event logs from the last 24 hours. 
+> 
+> Ignore standard Windows noise (like DCOM 10016 errors). 
+> 
+> Identify the sequence of events leading up to 2:00 PM. Tell me which service or application failed, the exact Event ID, and provide a top hypothesis for the root cause."
+
+## What You Get Back
+
+When you constrain the prompt, the output is incredible. 
+
+The AI will filter out the noise. It will build a timeline. "At 1:58 PM, the graphics driver threw Event ID 4101. At 1:59 PM, the application crashed with a faulting module. At 2:00 PM, the system experienced an unexpected shutdown (Event ID 6008)."
+
+You just saved 45 minutes of manual scrolling. 
+
+## The Operator Check
+
+AI is a tool, not a senior engineer. It will give you the timeline and a hypothesis, but you still have to verify it. If it blames the display driver, check the driver version. If it blames a specific application update, look at the recent deployment history in Intune.
+
+Don't blindly apply registry fixes an AI suggests based on a single log entry. Use the AI to find the needle in the haystack, then use your brain to decide what to do with the needle. 
+
+Stop scrolling. Start scripting the export, and let the AI do the heavy lifting.

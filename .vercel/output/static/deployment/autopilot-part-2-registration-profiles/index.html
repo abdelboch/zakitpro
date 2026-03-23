@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="en" class="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/png" href="/favicon.png"><meta name="generator" content="Astro v5.18.1"><!-- Primary Meta Tags --><title>Windows Autopilot Part 2: Register Devices &amp; Create Profiles | zakitpro</title><meta name="title" content="Windows Autopilot Part 2: Register Devices &#38; Create Profiles | zakitpro"><meta name="description" content="Learn how to register devices in Intune and create Autopilot deployment profiles."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://zakitpro.com/deployment/autopilot-part-2-registration-profiles/"><meta property="og:title" content="Windows Autopilot Part 2: Register Devices &#38; Create Profiles"><meta property="og:description" content="Learn how to register devices in Intune and create Autopilot deployment profiles."><meta property="og:image" content="https://zakitpro.com/og-default.png"><meta property="og:site_name" content="zakitpro"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://zakitpro.com/deployment/autopilot-part-2-registration-profiles/"><meta property="twitter:title" content="Windows Autopilot Part 2: Register Devices &#38; Create Profiles"><meta property="twitter:description" content="Learn how to register devices in Intune and create Autopilot deployment profiles."><meta property="twitter:image" content="https://zakitpro.com/og-default.png"><!-- RSS --><link rel="alternate" type="application/rss+xml" title="zakitpro RSS Feed" href="/rss.xml"><!-- Theme Script - Blocks FOUC --><script>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('zakitpro-theme')) {
+          return localStorage.getItem('zakitpro-theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      })();
+      
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+      window.localStorage.setItem('zakitpro-theme', theme);
+    </script><link rel="stylesheet" href="/_astro/_slug_.CBQKsqBp.css">
+<style>:root{--color-primary: #060f30;--color-secondary: #263d76;--color-accent: #0ea5e9;--color-surface: #eef6ff;--color-background: #ffffff}.dark{--color-primary: #f4f7ff;--color-secondary: #c6d9ff;--color-accent: #0ea5e9;--color-surface: #1a2752;--color-background: #060f30}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}.dark ::-webkit-scrollbar-thumb{background:#475569}pre{position:relative;padding:1rem;overflow-x:auto;border-radius:.5rem}pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose{max-width:720px}.prose h1,.prose h2,.prose h3,.prose h4{font-family:Inter,system-ui,sans-serif;font-weight:700;scroll-margin-top:5rem}.prose h1{font-size:2rem}.prose h2{font-size:1.5rem}.prose h3{font-size:1.25rem}.prose p{line-height:1.75;margin-bottom:1.25rem}.prose a{color:#0ea5e9;text-decoration:underline}.prose a:hover{color:#2864d3}.prose code:not(pre code){background:#f1f5f9;padding:.125rem .375rem;border-radius:.25rem;font-size:.875em}.dark .prose code:not(pre code){background:#334155}.prose pre{margin:1.5rem 0}.prose ul,.prose ol{margin:1rem 0;padding-left:1.5rem}.prose li{margin:.5rem 0}.prose blockquote{border-left:4px solid #47c0f8;padding-left:1rem;font-style:italic;color:#64748b;margin:1.5rem 0}.dark .prose blockquote{color:#94a3b8}
+.prose pre{position:relative;margin:1.5rem 0;border-radius:.5rem;overflow:hidden}.prose pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose pre[data-line-numbers]{counter-reset:line}.prose pre[data-line-numbers] .line:before{counter-increment:line;content:counter(line);display:inline-block;width:2rem;margin-right:1rem;text-align:right;color:#64748b;-webkit-user-select:none}.copy-btn{position:absolute;top:.5rem;right:.5rem;padding:.25rem .5rem;font-size:.75rem;background:#334155;color:#e2e8f0;border:none;border-radius:.25rem;cursor:pointer;opacity:0;transition:opacity .2s}.prose pre:hover .copy-btn{opacity:1}.lang-label{position:absolute;top:0;right:0;padding:.25rem .75rem;font-size:.75rem;font-weight:500;color:#94a3b8;background:#1e293b;border-bottom-left-radius:.5rem}
+</style><script type="module" src="/_astro/page.CyD_eNI3.js"></script></head> <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md">
+Skip to content
+</a> <!-- Header --> <header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-all duration-300" id="header"> <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between"> <!-- Logo --> <a href="/" class="flex items-center font-heading font-bold text-xl text-gray-900 dark:text-white hover:text-accent transition-colors"> <img src="/logo.png" alt="Site logo" class="w-16 h-16 object-contain"> </a> <!-- Desktop Nav --> <nav class="hidden md:flex items-center gap-6"> <div class="relative group"> <button class="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">
+Pillars
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg> </button> <div class="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2"> <a href="/troubleshooting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Windows Troubleshooting </a><a href="/scripting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Scripting &amp; Automation </a><a href="/deployment/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Deployment &amp; Imaging </a><a href="/security/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Endpoint Security </a><a href="/packaging/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> App Packaging </a><a href="/career/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Career &amp; Craft </a><a href="/ai/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> AI-Augmented Engineering </a> </div> </div> <a href="/scripts/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Scripts</a> <a href="/series/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Series</a> <a href="/error-codes/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Error Codes</a> <a href="/about/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">About</a> </nav> <!-- Right Side --> <div class="flex items-center gap-3"> <!-- Search --> <button id="search-trigger" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Search"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path> </svg> </button> <!-- Theme Toggle --> <button id="theme-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Toggle theme"> <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> </button> <!-- Mobile Menu --> <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300" aria-label="Menu"> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> <!-- Mobile Menu --> <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"> <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-2"> <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pillars</span> <a href="/troubleshooting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Windows Troubleshooting </a><a href="/scripting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Scripting &amp; Automation </a><a href="/deployment/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Deployment &amp; Imaging </a><a href="/security/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Endpoint Security </a><a href="/packaging/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> App Packaging </a><a href="/career/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Career &amp; Craft </a><a href="/ai/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> AI-Augmented Engineering </a> <hr class="my-2 border-gray-200 dark:border-gray-700"> <a href="/scripts/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Scripts</a> <a href="/series/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Series</a> <a href="/error-codes/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Error Codes</a> <a href="/about/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">About</a> </nav> </div> </header> <!-- Main Content --> <main id="main-content" class="min-h-screen">  <div class="max-w-7xl mx-auto px-4 py-8"> <!-- Breadcrumb --> <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6"> <a href="/" class="hover:text-accent">Home</a> <span>/</span> <a href="/deployment/" class="hover:text-accent">Deployment &amp; Imaging</a> <span>/</span> <span class="text-gray-900 dark:text-white">Windows Autopilot Part 2: Register Devices &amp; Create Profiles</span> </nav> <div class="lg:grid lg:grid-cols-4 lg:gap-8"> <!-- Left Sidebar - Table of Contents (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24"> <nav class="text-sm"> <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">On this page</h4> <ul class="space-y-2"> <li class> <a href="#understanding-the-hardware-hash" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Understanding the Hardware Hash </a> </li><li class> <a href="#method-1-automatic-registration-from-oem" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Method 1: Automatic Registration (From OEM) </a> </li><li class> <a href="#method-2-manual-registration-using-powershell" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Method 2: Manual Registration (Using PowerShell) </a> </li><li class="ml-4"> <a href="#step-1-install-the-autopilot-script" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 1: Install the AutoPilot Script </a> </li><li class="ml-4"> <a href="#step-2-generate-the-hardware-hash" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 2: Generate the Hardware Hash </a> </li><li class> <a href="#step-by-step-import-devices-to-intune" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step-by-Step: Import Devices to Intune </a> </li><li class> <a href="#create-an-autopilot-deployment-profile" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Create an Autopilot Deployment Profile </a> </li><li class="ml-4"> <a href="#step-1-basics" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 1: Basics </a> </li><li class="ml-4"> <a href="#step-2-out-of-box-experience-oobe" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 2: Out-of-Box Experience (OOBE) </a> </li><li class> <a href="#assign-the-profile-to-devices" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Assign the Profile to Devices </a> </li><li class> <a href="#verify-the-assignment" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Verify the Assignment </a> </li><li class> <a href="#quick-recap" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Quick Recap </a> </li><li class> <a href="#whats-next" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> What’s Next? </a> </li> </ul> </nav> </div> </aside> <!-- Main Content --> <article class="lg:col-span-2"> <!-- Article Header --> <header class="mb-8"> <div class="flex flex-wrap items-center gap-3 mb-4"> <span class="text-sm text-gray-600 dark:text-gray-400"> February 28, 2026 </span> <span class="text-gray-400">•</span> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"> Junior (1-3 years) </span> <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"> How-To </span> </div> <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Windows Autopilot Part 2: Register Devices &amp; Create Profiles</h1> <p class="text-lg text-gray-600 dark:text-gray-400">Learn how to register devices in Intune and create Autopilot deployment profiles.</p>  </header> <!-- Article Content --> <div class="prose dark:prose-invert max-w-none"> <p>In <a href="/autopilot-part-1-prerequisites">Part 1</a>, we set up our prerequisites. Now it’s time to register your first device in Intune and create a deployment profile that tells Autopilot how to configure new PCs.</p>
+<p>Let’s dive in!</p>
+<h2 id="understanding-the-hardware-hash">Understanding the Hardware Hash</h2>
+<p>Before we register a device, you need to understand what Autopilot actually needs. Each Windows device has a unique identifier called a <strong>hardware hash</strong> — a long string of characters that identifies that specific machine.</p>
+<p>Autopilot uses this hash to:</p>
+<ol>
+<li>Identify the device uniquely</li>
+<li>Look up which profile to apply</li>
+<li>Enroll it in your Intune tenant</li>
+</ol>
+<blockquote>
+<p>💡 <strong>Tip:</strong> Think of the hardware hash like a serial number that Intune uses to recognize and claim the device.</p>
+</blockquote>
+<h2 id="method-1-automatic-registration-from-oem">Method 1: Automatic Registration (From OEM)</h2>
+<p>If you’re buying new devices from major manufacturers like Dell, HP, or Lenovo, you can skip the manual registration! These OEMs automatically submit their devices to Microsoft, and you can claim them in Intune.</p>
+<p><strong>How to claim OEM devices:</strong></p>
+<ol>
+<li>Go to <strong>Devices → Windows → Windows devices</strong> in Endpoint Manager</li>
+<li>Click <strong>Add</strong> and select <strong>Search OEM devices</strong></li>
+<li>The devices will appear — just claim them!</li>
+</ol>
+<p>This is the easiest method for purchasing new hardware.</p>
+<h2 id="method-2-manual-registration-using-powershell">Method 2: Manual Registration (Using PowerShell)</h2>
+<p>For testing, used devices, or devices not registered by an OEM, you’ll need to gather the hardware hash manually.</p>
+<h3 id="step-1-install-the-autopilot-script">Step 1: Install the AutoPilot Script</h3>
+<p>On the Windows device you want to register (it should be running Windows 10/11 and have network access):</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#6A737D"># Open PowerShell as Administrator and run:</span></span>
+<span class="line"><span style="color:#79B8FF">Install-Script</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Name </span><span style="color:#79B8FF">Get-WindowsAutoPilotInfo</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Scope CurrentUser</span></span></code></pre>
+<p>When prompted to install NuGet, type <strong>Y</strong> and press Enter.</p>
+<h3 id="step-2-generate-the-hardware-hash">Step 2: Generate the Hardware Hash</h3>
+<p>Now run the script to capture the hardware hash:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#6A737D"># Generate the CSV file</span></span>
+<span class="line"><span style="color:#79B8FF">Get-WindowsAutoPilotInfo</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Computer </span><span style="color:#F97583">.</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">OutputFile autopilot.csv</span></span></code></pre>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>PowerShell script running and generating the CSV file</em></p>
+</blockquote>
+<p>This creates a file called <code>autopilot.csv</code> in your current folder. Open it — you should see something like:</p>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Contents of autopilot.csv showing hardware hash, serial number, etc.</em></p>
+</blockquote>
+<p>The CSV contains:</p>
+<ul>
+<li><strong>Device Serial Number</strong></li>
+<li><strong>Windows Product ID</strong></li>
+<li><strong>Hardware Hash</strong> (the important part!)</li>
+<li><strong>Make/Model</strong></li>
+</ul>
+<h2 id="step-by-step-import-devices-to-intune">Step-by-Step: Import Devices to Intune</h2>
+<p>Now let’s get that CSV into Intune.</p>
+<ol>
+<li>Open the <strong><a href="https://endpoint.microsoft.com">Microsoft Endpoint Manager admin center</a></strong></li>
+<li>Go to <strong>Devices → Windows → Windows devices</strong></li>
+<li>Click <strong>Add</strong></li>
+<li>Select <strong>Import Windows devices</strong></li>
+</ol>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Intune device import page</em></p>
+</blockquote>
+<ol start="5">
+<li>Click <strong>Browse</strong> and select your <code>autopilot.csv</code> file</li>
+<li>Click <strong>Import</strong></li>
+</ol>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Upload CSV file to Intune</em></p>
+</blockquote>
+<p>Wait a minute or two for the import to complete. You should see a success message when done.</p>
+<blockquote>
+<p>💡 <strong>Tip:</strong> You can import multiple devices at once — just add more rows to your CSV file!</p>
+</blockquote>
+<h2 id="create-an-autopilot-deployment-profile">Create an Autopilot Deployment Profile</h2>
+<p>Now for the magic — the deployment profile tells Autopilot how to set up the device. Let’s create one.</p>
+<ol>
+<li>In Endpoint Manager, go to <strong>Devices → Windows → Autopilot deployment profiles</strong></li>
+<li>Click <strong>Create profile</strong></li>
+<li>Select <strong>Windows PC</strong></li>
+</ol>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Profile creation wizard - getting started</em></p>
+</blockquote>
+<h3 id="step-1-basics">Step 1: Basics</h3>
+<p>Fill in the basics:</p>
+<ul>
+<li><strong>Name:</strong> <code>Standard User Profile</code> (or whatever makes sense)</li>
+<li><strong>Description:</strong> <code>Default profile for standard user devices</code></li>
+</ul>
+<p>Click <strong>Next</strong>.</p>
+<h3 id="step-2-out-of-box-experience-oobe">Step 2: Out-of-Box Experience (OOBE)</h3>
+<p>This is where you configure what the user sees during setup:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Setting</th><th>Recommended Value</th><th>Why</th></tr></thead><tbody><tr><td>Deployment mode</td><td>User-driven</td><td>User sets up their own device</td></tr><tr><td>Join to</td><td>Azure AD joined</td><td>Modern cloud management</td></tr><tr><td>Language (OS)</td><td>Match hardware</td><td>Uses the keyboard/language detected</td></tr><tr><td>Hide change account options</td><td>Yes</td><td>Keeps experience simple</td></tr><tr><td>Hide privacy settings</td><td>Yes</td><td>Reduces user clicks</td></tr><tr><td>Skip Cortana</td><td>Yes</td><td>Faster setup</td></tr><tr><td>OEM Registration</td><td>Skip</td><td>We’re using Intune</td></tr><tr><td>Auto-logon</td><td>Disable</td><td>Security best practice</td></tr></tbody></table>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Profile creation wizard - OOBE settings</em></p>
+</blockquote>
+<p>For <strong>Keyboard</strong>, you can:</p>
+<ul>
+<li>Leave blank (uses detected keyboard)</li>
+<li>Add a primary keyboard (e.g., US English)</li>
+<li>Add a login keyboard if different</li>
+</ul>
+<p>Click <strong>Next</strong> → <strong>Create</strong> to save your profile.</p>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Profile created successfully</em></p>
+</blockquote>
+<h2 id="assign-the-profile-to-devices">Assign the Profile to Devices</h2>
+<p>Your profile is created, but it’s not attached to any devices yet. Let’s fix that.</p>
+<ol>
+<li>Go to <strong>Devices → Windows → Autopilot deployment profiles</strong></li>
+<li>Select your new profile</li>
+<li>Click <strong>Assign</strong></li>
+</ol>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Assignment blade</em></p>
+</blockquote>
+<ol start="4">
+<li>Choose one of these options:
+<ul>
+<li><strong>Select groups</strong> — assign to a specific Azure AD group</li>
+<li><strong>All devices</strong> — every Autopilot device gets this profile</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>💡 <strong>Tip:</strong> For testing, create a small Azure AD group called “Autopilot Test Devices” and assign only a few devices to it. This lets you validate before rolling out to everyone.</p>
+</blockquote>
+<blockquote>
+<p><strong>Screenshot:</strong> <em>Profile assigned to devices</em></p>
+</blockquote>
+<h2 id="verify-the-assignment">Verify the Assignment</h2>
+<p>After assigning, your devices should show up in the profile’s device list. You can check this by:</p>
+<ol>
+<li>Opening the profile</li>
+<li>Looking at the <strong>Devices</strong> tab</li>
+</ol>
+<p>It may take a few minutes for the assignment to propagate.</p>
+<h2 id="quick-recap">Quick Recap</h2>
+<p>In this part, you learned:</p>
+<ul>
+<li>✅ What a hardware hash is</li>
+<li>✅ How to get the hardware hash using PowerShell</li>
+<li>✅ How to import devices into Intune</li>
+<li>✅ How to create an Autopilot deployment profile</li>
+<li>✅ How to assign the profile to devices</li>
+</ul>
+<h2 id="whats-next">What’s Next?</h2>
+<p>In <a href="/autopilot-part-3-testing-troubleshooting">Part 3</a>, we’ll actually test the deployment, verify the device enrolls correctly, and troubleshoot common issues that might come up.</p>
+<p><strong>Questions?</strong> Let me know in the comments!</p> </div> <!-- Tags --> <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700"> <div class="flex flex-wrap gap-2"> <a href="/tags/autopilot" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#autopilot </a><a href="/tags/intune" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#intune </a><a href="/tags/deployment" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#deployment </a><a href="/tags/beginner" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#beginner </a> </div> </div> <!-- Was this helpful? --> <div class="mt-8 flex items-center gap-4"> <span class="text-sm text-gray-600 dark:text-gray-400">Was this helpful?</span> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👍 Yes
+</button> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👎 No
+</button> </div> <!-- Giscus Comments --> <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700"> <script src="https://giscus.app/client.js" data-repo="your-username/zakitpro-comments" data-repo-id="YOUR_REPO_ID" data-category="Comments" data-category-id="YOUR_CATEGORY_ID" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="en" crossorigin="anonymous" async>
+          </script> </div> </article> <!-- Right Sidebar - Metadata (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24 space-y-6"> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Pillar</h4> <a href="/deployment/" class="text-accent hover:underline font-medium"> Deployment &amp; Imaging </a> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Difficulty</h4> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"> Junior (1-3 years) </span> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Published</h4> <p class="text-sm text-gray-700 dark:text-gray-300"> February 28, 2026 </p> </div> </div> </aside> </div> </div>  </main> <!-- Footer --> <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16"> <div class="max-w-6xl mx-auto px-4 py-12"> <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8"> <div> <p class="text-sm text-gray-600 dark:text-gray-400">IT Desktop Engineering Blog</p> </div> <div> <h4 class="font-semibold mb-4">Pillars</h4> <ul class="space-y-2 text-sm"> <li><a href="/troubleshooting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Windows Troubleshooting</a></li><li><a href="/scripting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripting &amp; Automation</a></li><li><a href="/deployment/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Deployment &amp; Imaging</a></li><li><a href="/security/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Endpoint Security</a></li><li><a href="/packaging/" class="text-gray-600 dark:text-gray-400 hover:text-accent">App Packaging</a></li><li><a href="/career/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Career &amp; Craft</a></li><li><a href="/ai/" class="text-gray-600 dark:text-gray-400 hover:text-accent">AI-Augmented Engineering</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Content</h4> <ul class="space-y-2 text-sm"> <li><a href="/scripts/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripts</a></li> <li><a href="/series/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Series</a></li> <li><a href="/error-codes/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Error Codes</a></li> <li><a href="/about/" class="text-gray-600 dark:text-gray-400 hover:text-accent">About</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Subscribe</h4> <ul class="space-y-2 text-sm"> <li><a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-accent">RSS Feed</a></li> </ul> </div> </div> <div class="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"> <p class="text-sm text-gray-600 dark:text-gray-400">No ads. No tracking. No fluff.</p> <p class="text-sm text-gray-600 dark:text-gray-400">© 2026. All rights reserved.</p> </div> </div> </footer> <!-- Theme Toggle Script --> <script type="module">const t=document.getElementById("theme-toggle");t?.addEventListener("click",()=>{document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("zakitpro-theme","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("zakitpro-theme","dark"))});const n=document.getElementById("mobile-menu-btn"),m=document.getElementById("mobile-menu");n?.addEventListener("click",()=>{m?.classList.toggle("hidden")});document.addEventListener("keydown",e=>{(e.metaKey||e.ctrlKey)&&e.key==="k"&&(e.preventDefault(),document.getElementById("search-trigger")?.click())});</script>  </body> </html> 

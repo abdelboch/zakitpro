@@ -1,0 +1,385 @@
+<!DOCTYPE html><html lang="en" class="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/png" href="/favicon.png"><meta name="generator" content="Astro v5.18.1"><!-- Primary Meta Tags --><title>Endpoint Privilege Manager Part 3: Management &amp; Troubleshooting | zakitpro</title><meta name="title" content="Endpoint Privilege Manager Part 3: Management &#38; Troubleshooting | zakitpro"><meta name="description" content="Monitor EPM activity, generate reports, and fix common issues."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://zakitpro.com/security/epm-part-3-management-troubleshooting/"><meta property="og:title" content="Endpoint Privilege Manager Part 3: Management &#38; Troubleshooting"><meta property="og:description" content="Monitor EPM activity, generate reports, and fix common issues."><meta property="og:image" content="https://zakitpro.com/og-default.png"><meta property="og:site_name" content="zakitpro"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://zakitpro.com/security/epm-part-3-management-troubleshooting/"><meta property="twitter:title" content="Endpoint Privilege Manager Part 3: Management &#38; Troubleshooting"><meta property="twitter:description" content="Monitor EPM activity, generate reports, and fix common issues."><meta property="twitter:image" content="https://zakitpro.com/og-default.png"><!-- RSS --><link rel="alternate" type="application/rss+xml" title="zakitpro RSS Feed" href="/rss.xml"><!-- Theme Script - Blocks FOUC --><script>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('zakitpro-theme')) {
+          return localStorage.getItem('zakitpro-theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      })();
+      
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+      window.localStorage.setItem('zakitpro-theme', theme);
+    </script><link rel="stylesheet" href="/_astro/_slug_.CBQKsqBp.css">
+<style>:root{--color-primary: #060f30;--color-secondary: #263d76;--color-accent: #0ea5e9;--color-surface: #eef6ff;--color-background: #ffffff}.dark{--color-primary: #f4f7ff;--color-secondary: #c6d9ff;--color-accent: #0ea5e9;--color-surface: #1a2752;--color-background: #060f30}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}.dark ::-webkit-scrollbar-thumb{background:#475569}pre{position:relative;padding:1rem;overflow-x:auto;border-radius:.5rem}pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose{max-width:720px}.prose h1,.prose h2,.prose h3,.prose h4{font-family:Inter,system-ui,sans-serif;font-weight:700;scroll-margin-top:5rem}.prose h1{font-size:2rem}.prose h2{font-size:1.5rem}.prose h3{font-size:1.25rem}.prose p{line-height:1.75;margin-bottom:1.25rem}.prose a{color:#0ea5e9;text-decoration:underline}.prose a:hover{color:#2864d3}.prose code:not(pre code){background:#f1f5f9;padding:.125rem .375rem;border-radius:.25rem;font-size:.875em}.dark .prose code:not(pre code){background:#334155}.prose pre{margin:1.5rem 0}.prose ul,.prose ol{margin:1rem 0;padding-left:1.5rem}.prose li{margin:.5rem 0}.prose blockquote{border-left:4px solid #47c0f8;padding-left:1rem;font-style:italic;color:#64748b;margin:1.5rem 0}.dark .prose blockquote{color:#94a3b8}
+.prose pre{position:relative;margin:1.5rem 0;border-radius:.5rem;overflow:hidden}.prose pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose pre[data-line-numbers]{counter-reset:line}.prose pre[data-line-numbers] .line:before{counter-increment:line;content:counter(line);display:inline-block;width:2rem;margin-right:1rem;text-align:right;color:#64748b;-webkit-user-select:none}.copy-btn{position:absolute;top:.5rem;right:.5rem;padding:.25rem .5rem;font-size:.75rem;background:#334155;color:#e2e8f0;border:none;border-radius:.25rem;cursor:pointer;opacity:0;transition:opacity .2s}.prose pre:hover .copy-btn{opacity:1}.lang-label{position:absolute;top:0;right:0;padding:.25rem .75rem;font-size:.75rem;font-weight:500;color:#94a3b8;background:#1e293b;border-bottom-left-radius:.5rem}
+</style><script type="module" src="/_astro/page.CyD_eNI3.js"></script></head> <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md">
+Skip to content
+</a> <!-- Header --> <header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-all duration-300" id="header"> <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between"> <!-- Logo --> <a href="/" class="flex items-center font-heading font-bold text-xl text-gray-900 dark:text-white hover:text-accent transition-colors"> <img src="/logo.png" alt="Site logo" class="w-16 h-16 object-contain"> </a> <!-- Desktop Nav --> <nav class="hidden md:flex items-center gap-6"> <div class="relative group"> <button class="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">
+Pillars
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg> </button> <div class="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2"> <a href="/troubleshooting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Windows Troubleshooting </a><a href="/scripting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Scripting &amp; Automation </a><a href="/deployment/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Deployment &amp; Imaging </a><a href="/security/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Endpoint Security </a><a href="/packaging/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> App Packaging </a><a href="/career/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Career &amp; Craft </a><a href="/ai/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> AI-Augmented Engineering </a> </div> </div> <a href="/scripts/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Scripts</a> <a href="/series/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Series</a> <a href="/error-codes/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Error Codes</a> <a href="/about/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">About</a> </nav> <!-- Right Side --> <div class="flex items-center gap-3"> <!-- Search --> <button id="search-trigger" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Search"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path> </svg> </button> <!-- Theme Toggle --> <button id="theme-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Toggle theme"> <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> </button> <!-- Mobile Menu --> <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300" aria-label="Menu"> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> <!-- Mobile Menu --> <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"> <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-2"> <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pillars</span> <a href="/troubleshooting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Windows Troubleshooting </a><a href="/scripting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Scripting &amp; Automation </a><a href="/deployment/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Deployment &amp; Imaging </a><a href="/security/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Endpoint Security </a><a href="/packaging/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> App Packaging </a><a href="/career/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Career &amp; Craft </a><a href="/ai/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> AI-Augmented Engineering </a> <hr class="my-2 border-gray-200 dark:border-gray-700"> <a href="/scripts/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Scripts</a> <a href="/series/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Series</a> <a href="/error-codes/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Error Codes</a> <a href="/about/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">About</a> </nav> </div> </header> <!-- Main Content --> <main id="main-content" class="min-h-screen">  <div class="max-w-7xl mx-auto px-4 py-8"> <!-- Breadcrumb --> <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6"> <a href="/" class="hover:text-accent">Home</a> <span>/</span> <a href="/security/" class="hover:text-accent">Endpoint Security</a> <span>/</span> <span class="text-gray-900 dark:text-white">Endpoint Privilege Manager Part 3: Management &amp; Troubleshooting</span> </nav> <div class="lg:grid lg:grid-cols-4 lg:gap-8"> <!-- Left Sidebar - Table of Contents (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24"> <nav class="text-sm"> <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">On this page</h4> <ul class="space-y-2"> <li class> <a href="#monitoring-activity" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Monitoring Activity </a> </li><li class="ml-4"> <a href="#activity-logs" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Activity Logs </a> </li><li class="ml-4"> <a href="#filtering-logs" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Filtering Logs </a> </li><li class> <a href="#generating-reports" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Generating Reports </a> </li><li class="ml-4"> <a href="#usage-summary" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Usage Summary </a> </li><li class="ml-4"> <a href="#export-reports" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Export Reports </a> </li><li class="ml-4"> <a href="#custom-reports" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Custom Reports </a> </li><li class> <a href="#troubleshooting-common-issues" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Troubleshooting Common Issues </a> </li><li class="ml-4"> <a href="#issue-1-policy-not-applying-to-devices" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Issue 1: Policy Not Applying to Devices </a> </li><li class="ml-4"> <a href="#issue-2-users-cant-request-elevation" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Issue 2: Users Can’t Request Elevation </a> </li><li class="ml-4"> <a href="#issue-3-approval-not-working" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Issue 3: Approval Not Working </a> </li><li class="ml-4"> <a href="#issue-4-elevation-failures" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Issue 4: Elevation Failures </a> </li><li class="ml-4"> <a href="#issue-5-password-rotation-not-working" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Issue 5: Password Rotation Not Working </a> </li><li class> <a href="#best-practices-for-ongoing-management" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Best Practices for Ongoing Management </a> </li><li class="ml-4"> <a href="#1-regular-monitoring" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 1. Regular Monitoring </a> </li><li class="ml-4"> <a href="#2-policy-tuning" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 2. Policy Tuning </a> </li><li class="ml-4"> <a href="#3-user-communication" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 3. User Communication </a> </li><li class="ml-4"> <a href="#4-documentation" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 4. Documentation </a> </li><li class="ml-4"> <a href="#5-audit-preparation" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 5. Audit Preparation </a> </li><li class> <a href="#advanced-tips" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Advanced Tips </a> </li><li class="ml-4"> <a href="#enable-self-service-approval" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Enable Self-Service Approval </a> </li><li class="ml-4"> <a href="#use-conditional-access" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Use Conditional Access </a> </li><li class="ml-4"> <a href="#integrate-with-microsoft-defender" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Integrate with Microsoft Defender </a> </li><li class> <a href="#wrapping-up" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Wrapping Up </a> </li> </ul> </nav> </div> </aside> <!-- Main Content --> <article class="lg:col-span-2"> <!-- Article Header --> <header class="mb-8"> <div class="flex flex-wrap items-center gap-3 mb-4"> <span class="text-sm text-gray-600 dark:text-gray-400"> February 28, 2026 </span> <span class="text-gray-400">•</span> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"> Mid-Level (3-5 years) </span> <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"> How-To </span> </div> <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Endpoint Privilege Manager Part 3: Management &amp; Troubleshooting</h1> <p class="text-lg text-gray-600 dark:text-gray-400">Monitor EPM activity, generate reports, and fix common issues.</p>  </header> <!-- Article Content --> <div class="prose dark:prose-invert max-w-none"> <h1 id="endpoint-privilege-manager-part-3-management--troubleshooting">Endpoint Privilege Manager Part 3: Management &amp; Troubleshooting</h1>
+<p>You’ve enabled EPM and created policies. Now comes the ongoing work: monitoring what’s happening, generating reports for auditors, and fixing issues when things go wrong.</p>
+<p>Let’s cover it all.</p>
+<h2 id="monitoring-activity">Monitoring Activity</h2>
+<p>EPM provides several ways to see what’s happening in your environment.</p>
+<h3 id="activity-logs">Activity Logs</h3>
+<p>The first place to check when something goes wrong—or just to verify operations are working.</p>
+<p><strong>Screenshot:</strong> <img src="/images/epm-part-3-activity-logs.png" alt/></p>
+<p>To access:</p>
+<ol>
+<li>Go to <strong>Microsoft Endpoint Manager</strong></li>
+<li>Navigate to <strong>Devices</strong> → <strong>Endpoint Privilege Management</strong> → <strong>Activity logs</strong></li>
+</ol>
+<p>What you’ll see:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Column</th><th>Description</th></tr></thead><tbody><tr><td><strong>User</strong></td><td>Who requested elevation</td></tr><tr><td><strong>Device</strong></td><td>Which device</td></tr><tr><td><strong>Application</strong></td><td>What was being run</td></tr><tr><td><strong>Request time</strong></td><td>When request was made</td></tr><tr><td><strong>Status</strong></td><td>Approved, Rejected, Expired</td></tr><tr><td><strong>Duration</strong></td><td>How long access lasted</td></tr></tbody></table>
+<h3 id="filtering-logs">Filtering Logs</h3>
+<p>Use filters to find specific events:</p>
+<ul>
+<li><strong>Date range</strong> – Last 24h, 7 days, 30 days, custom</li>
+<li><strong>User</strong> – Specific user or group</li>
+<li><strong>Device</strong> – Specific device</li>
+<li><strong>Status</strong> – Approved, Rejected, Expired</li>
+<li><strong>Application</strong> – Specific app or script</li>
+</ul>
+<p><strong>Example filter for troubleshooting:</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Status: Rejected</span></span>
+<span class="line"><span>Date: Last 7 days</span></span>
+<span class="line"><span>User: john.doe@contoso.com</span></span></code></pre>
+<h2 id="generating-reports">Generating Reports</h2>
+<h3 id="usage-summary">Usage Summary</h3>
+<p>Get an overview of EPM usage:</p>
+<ol>
+<li>Go to <strong>Endpoint Privilege Management</strong> → <strong>Overview</strong></li>
+<li>View key metrics:
+<ul>
+<li>Total elevation requests</li>
+<li>Approval rate (% approved)</li>
+<li>Most used applications</li>
+<li>Most active users</li>
+</ul>
+</li>
+</ol>
+<h3 id="export-reports">Export Reports</h3>
+<p>For deeper analysis or audit purposes:</p>
+<ol>
+<li><strong>Reports</strong> → <strong>Export</strong></li>
+<li>Choose format: CSV or PDF</li>
+<li>Select date range</li>
+<li>Include details:
+<ul>
+<li>User information</li>
+<li>Device information</li>
+<li>Application details</li>
+<li>Timestamps</li>
+<li>Approval details</li>
+</ul>
+</li>
+</ol>
+<p><strong>Screenshot:</strong> <img src="/images/epm-part-3-reports.png" alt/></p>
+<h3 id="custom-reports">Custom Reports</h3>
+<p>Need something specific? Use Microsoft Graph API:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#6A737D"># Get EPM activity via Graph API</span></span>
+<span class="line"><span style="color:#6A737D"># Requires: Microsoft Graph API permissions</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Install Graph module if needed</span></span>
+<span class="line"><span style="color:#79B8FF">Install-Module</span><span style="color:#E1E4E8"> Microsoft.Graph </span><span style="color:#F97583">-</span><span style="color:#E1E4E8">Scope CurrentUser</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Connect to Graph</span></span>
+<span class="line"><span style="color:#79B8FF">Connect-MgGraph</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Scopes </span><span style="color:#9ECBFF">&quot;DeviceManagementConfiguration.Read.All&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># Get EPM activity</span></span>
+<span class="line"><span style="color:#79B8FF">Get-MgDeviceManagementDeviceManagementIntentAssignment</span><span style="color:#F97583"> `</span></span>
+<span class="line"><span style="color:#F97583">    -</span><span style="color:#E1E4E8">DeviceManagementIntentId </span><span style="color:#9ECBFF">&quot;EPM-POLICY-ID&quot;</span></span></code></pre>
+<h2 id="troubleshooting-common-issues">Troubleshooting Common Issues</h2>
+<h3 id="issue-1-policy-not-applying-to-devices">Issue 1: Policy Not Applying to Devices</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Devices show in Endpoint Manager but no EPM policy</li>
+<li>Users don’t see elevation requests</li>
+</ul>
+<p><strong>Troubleshooting steps:</strong></p>
+<ol>
+<li>
+<p><strong>Check device enrollment status</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Go to Devices → All devices</span></span>
+<span class="line"><span>Verify: Last check-in &lt; 24 hours</span></span>
+<span class="line"><span>Verify: Enrollment state = Enrolled</span></span></code></pre>
+</li>
+<li>
+<p><strong>Verify policy assignment</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Go to Policies → [Your Policy] → Properties</span></span>
+<span class="line"><span>Check: Assignments are configured</span></span>
+<span class="line"><span>Check: Devices/users are in included groups</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check EPM compatibility</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Devices must be:</span></span>
+<span class="line"><span>- Azure AD joined OR</span></span>
+<span class="line"><span>- Hybrid Azure AD joined</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Run on device:</span></span>
+<span class="line"><span>dsregcmd /status</span></span></code></pre>
+</li>
+<li>
+<p><strong>Sync device</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>On device: Start → Settings → Accounts → Access work or school</span></span>
+<span class="line"><span>Click: Sync</span></span></code></pre>
+</li>
+</ol>
+<h3 id="issue-2-users-cant-request-elevation">Issue 2: Users Can’t Request Elevation</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>User tries to elevate but gets no prompt</li>
+<li>No request appears in Activity logs</li>
+</ul>
+<p><strong>Troubleshooting steps:</strong></p>
+<ol>
+<li>
+<p><strong>Verify user is in correct group</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Check: User is in policy&#39;s Included groups</span></span>
+<span class="line"><span>Check: User is NOT in Excluded groups</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check policy status</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Go to Devices → Endpoint Privilege Management → Policies</span></span>
+<span class="line"><span>Verify: Policy shows &quot;Deployed&quot;</span></span>
+<span class="line"><span>Check: Last modified date is recent</span></span></code></pre>
+</li>
+<li>
+<p><strong>Verify user has required license</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Users need:</span></span>
+<span class="line"><span>- Intune Plan 1 or 2 license, OR</span></span>
+<span class="line"><span>- Microsoft 365 Business Premium</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check device compliance</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Devices must be:</span></span>
+<span class="line"><span>- Compliant (or marked as compliant if no compliance policy)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Check: Devices → Compliance</span></span></code></pre>
+</li>
+</ol>
+<h3 id="issue-3-approval-not-working">Issue 3: Approval Not Working</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Requests show “Pending” indefinitely</li>
+<li>Approvers not receiving notifications</li>
+</ul>
+<p><strong>Troubleshooting steps:</strong></p>
+<ol>
+<li>
+<p><strong>Verify approver configuration</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Go to Policy → Settings → Approval</span></span>
+<span class="line"><span>Check: Approvers are specified</span></span>
+<span class="line"><span>Check: Approvers have correct permissions</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check email notifications</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Verify: Approver email is correct</span></span>
+<span class="line"><span>Check: Email not in spam</span></span>
+<span class="line"><span>Verify: SendGrid/notification service active</span></span></code></pre>
+</li>
+<li>
+<p><strong>Manual approval test</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>As admin, go to:</span></span>
+<span class="line"><span>Devices → Endpoint Privilege Management → Approvals</span></span>
+<span class="line"><span>Manually approve a pending request</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check approver permissions</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Approvers need Intune role with:</span></span>
+<span class="line"><span>- Endpoint Privilege Management: Approve requests</span></span></code></pre>
+</li>
+</ol>
+<h3 id="issue-4-elevation-failures">Issue 4: Elevation Failures</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Request approved but elevation fails</li>
+<li>User gets error when running elevated app</li>
+</ul>
+<p><strong>Troubleshooting steps:</strong></p>
+<ol>
+<li>
+<p><strong>Check application compatibility</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Not all apps support elevation:</span></span>
+<span class="line"><span>- UWP apps generally don&#39;t need elevation</span></span>
+<span class="line"><span>- Some apps block elevation for security</span></span>
+<span class="line"><span>- Check app documentation</span></span></code></pre>
+</li>
+<li>
+<p><strong>Review error details</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>In Activity logs:</span></span>
+<span class="line"><span>- Expand the failed request</span></span>
+<span class="line"><span>- Read the error message</span></span>
+<span class="line"><span>- Note the error code</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check for conflicts</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Possible conflicts:</span></span>
+<span class="line"><span>- Application Control policies</span></span>
+<span class="line"><span>- Windows Defender Application Control</span></span>
+<span class="line"><span>- Third-party security software</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Test: Temporarily disable other policies</span></span></code></pre>
+</li>
+<li>
+<p><strong>Verify local admin status</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>After successful elevation, verify:</span></span>
+<span class="line"><span>- User should now have admin context</span></span>
+<span class="line"><span>- Check: whoami /groups</span></span></code></pre>
+</li>
+</ol>
+<h3 id="issue-5-password-rotation-not-working">Issue 5: Password Rotation Not Working</h3>
+<p><strong>Symptoms:</strong></p>
+<ul>
+<li>Scheduled policies not rotating passwords</li>
+<li>Old password still works</li>
+</ul>
+<p><strong>Troubleshooting steps:</strong></p>
+<ol>
+<li>
+<p><strong>Verify scheduled policy is active</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Go to Policies → [Scheduled Policy]</span></span>
+<span class="line"><span>Check: Status = Deployed</span></span>
+<span class="line"><span>Check: Next rotation time</span></span></code></pre>
+</li>
+<li>
+<p><strong>Check rotation logs</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Activity logs → Filter by:</span></span>
+<span class="line"><span>- Event type: Password rotation</span></span>
+<span class="line"><span>- Date: Expected rotation date</span></span></code></pre>
+</li>
+<li>
+<p><strong>Verify device connectivity</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Devices must connect at least weekly</span></span>
+<span class="line"><span>Check: Last check-in time</span></span></code></pre>
+</li>
+<li>
+<p><strong>Review password policy</strong></p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Verify complexity requirements match:</span></span>
+<span class="line"><span>- Minimum length</span></span>
+<span class="line"><span>- Character requirements</span></span></code></pre>
+</li>
+</ol>
+<h2 id="best-practices-for-ongoing-management">Best Practices for Ongoing Management</h2>
+<h3 id="1-regular-monitoring">1. Regular Monitoring</h3>
+<ul>
+<li><strong>Daily:</strong> Check Activity logs for errors</li>
+<li><strong>Weekly:</strong> Review usage summary</li>
+<li><strong>Monthly:</strong> Generate compliance report for leadership</li>
+</ul>
+<h3 id="2-policy-tuning">2. Policy Tuning</h3>
+<p>Based on monitoring data:</p>
+<ul>
+<li>Adjust elevation duration if users constantly need more time</li>
+<li>Add frequently used apps to approved list</li>
+<li>Refine approval workflows based on request volume</li>
+</ul>
+<h3 id="3-user-communication">3. User Communication</h3>
+<p>Keep users informed:</p>
+<ul>
+<li>Explain when and how to request elevation</li>
+<li>Provide instructions for Company Portal access</li>
+<li>Set expectations for approval times</li>
+</ul>
+<h3 id="4-documentation">4. Documentation</h3>
+<p>Maintain internal docs:</p>
+<ul>
+<li>Current policy configurations</li>
+<li>Approval workflows</li>
+<li>Troubleshooting procedures</li>
+<li>Contact info for EPM admins</li>
+</ul>
+<h3 id="5-audit-preparation">5. Audit Preparation</h3>
+<p>For compliance audits:</p>
+<ul>
+<li>Export reports regularly (monthly minimum)</li>
+<li>Document any policy exceptions</li>
+<li>Keep approval records for at least 1 year</li>
+<li>Review and update access reviews quarterly</li>
+</ul>
+<h2 id="advanced-tips">Advanced Tips</h2>
+<h3 id="enable-self-service-approval">Enable Self-Service Approval</h3>
+<p>Reduce IT burden by allowing managers to approve their team’s requests:</p>
+<ol>
+<li>Create approver group of department managers</li>
+<li>Configure policy to use group as approvers</li>
+<li>Managers get email notifications</li>
+<li>Approve directly from email or Endpoint Manager</li>
+</ol>
+<h3 id="use-conditional-access">Use Conditional Access</h3>
+<p>Add extra security:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Configure Conditional Access policy:</span></span>
+<span class="line"><span>- Require compliant device for elevation requests</span></span>
+<span class="line"><span>- Block elevation from non-compliant devices</span></span>
+<span class="line"><span>- Require MFA for high-risk requests</span></span></code></pre>
+<h3 id="integrate-with-microsoft-defender">Integrate with Microsoft Defender</h3>
+<p>Enhanced threat protection:</p>
+<ul>
+<li>Elevation requests trigger Defender analysis</li>
+<li>Block elevation for high-risk applications</li>
+<li>Alert on suspicious elevation patterns</li>
+</ul>
+<h2 id="wrapping-up">Wrapping Up</h2>
+<p>Endpoint Privilege Manager is a powerful tool—but only if you monitor it actively. The key takeaways:</p>
+<ol>
+<li><strong>Monitor Activity Logs</strong> – Don’t wait for users to report problems</li>
+<li><strong>Start Small</strong> – Pilot before broad deployment</li>
+<li><strong>Document Everything</strong> – Future you will thank present you</li>
+<li><strong>Iterate</strong> – Adjust policies based on real usage</li>
+<li><strong>Communicate</strong> – Users need to know how to get help</li>
+</ol>
+<p>With these practices, you’ll have a secure, compliant, and manageable EPM deployment.</p>
+<hr/>
+<p><strong>Series: Endpoint Privilege Manager</strong></p>
+<ul>
+<li><a href="/epm-part-1-introduction-setup">Part 1: Introduction &amp; Setup</a></li>
+<li><a href="/epm-part-2-policies-rules">Part 2: Creating Policies &amp; Rules</a></li>
+<li>Part 3: Management &amp; Troubleshooting (You are here)</li>
+</ul> </div> <!-- Tags --> <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700"> <div class="flex flex-wrap gap-2"> <a href="/tags/intune" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#intune </a><a href="/tags/endpoint-privilege-manager" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#endpoint-privilege-manager </a><a href="/tags/troubleshooting" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#troubleshooting </a> </div> </div> <!-- Was this helpful? --> <div class="mt-8 flex items-center gap-4"> <span class="text-sm text-gray-600 dark:text-gray-400">Was this helpful?</span> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👍 Yes
+</button> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👎 No
+</button> </div> <!-- Giscus Comments --> <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700"> <script src="https://giscus.app/client.js" data-repo="your-username/zakitpro-comments" data-repo-id="YOUR_REPO_ID" data-category="Comments" data-category-id="YOUR_CATEGORY_ID" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="en" crossorigin="anonymous" async>
+          </script> </div> </article> <!-- Right Sidebar - Metadata (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24 space-y-6"> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Pillar</h4> <a href="/security/" class="text-accent hover:underline font-medium"> Endpoint Security </a> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Difficulty</h4> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"> Mid-Level (3-5 years) </span> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Published</h4> <p class="text-sm text-gray-700 dark:text-gray-300"> February 28, 2026 </p> </div> </div> </aside> </div> </div>  </main> <!-- Footer --> <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16"> <div class="max-w-6xl mx-auto px-4 py-12"> <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8"> <div> <p class="text-sm text-gray-600 dark:text-gray-400">IT Desktop Engineering Blog</p> </div> <div> <h4 class="font-semibold mb-4">Pillars</h4> <ul class="space-y-2 text-sm"> <li><a href="/troubleshooting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Windows Troubleshooting</a></li><li><a href="/scripting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripting &amp; Automation</a></li><li><a href="/deployment/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Deployment &amp; Imaging</a></li><li><a href="/security/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Endpoint Security</a></li><li><a href="/packaging/" class="text-gray-600 dark:text-gray-400 hover:text-accent">App Packaging</a></li><li><a href="/career/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Career &amp; Craft</a></li><li><a href="/ai/" class="text-gray-600 dark:text-gray-400 hover:text-accent">AI-Augmented Engineering</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Content</h4> <ul class="space-y-2 text-sm"> <li><a href="/scripts/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripts</a></li> <li><a href="/series/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Series</a></li> <li><a href="/error-codes/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Error Codes</a></li> <li><a href="/about/" class="text-gray-600 dark:text-gray-400 hover:text-accent">About</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Subscribe</h4> <ul class="space-y-2 text-sm"> <li><a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-accent">RSS Feed</a></li> </ul> </div> </div> <div class="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"> <p class="text-sm text-gray-600 dark:text-gray-400">No ads. No tracking. No fluff.</p> <p class="text-sm text-gray-600 dark:text-gray-400">© 2026. All rights reserved.</p> </div> </div> </footer> <!-- Theme Toggle Script --> <script type="module">const t=document.getElementById("theme-toggle");t?.addEventListener("click",()=>{document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("zakitpro-theme","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("zakitpro-theme","dark"))});const n=document.getElementById("mobile-menu-btn"),m=document.getElementById("mobile-menu");n?.addEventListener("click",()=>{m?.classList.toggle("hidden")});document.addEventListener("keydown",e=>{(e.metaKey||e.ctrlKey)&&e.key==="k"&&(e.preventDefault(),document.getElementById("search-trigger")?.click())});</script>  </body> </html> 

@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="en" class="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/png" href="/favicon.png"><meta name="generator" content="Astro v5.18.1"><!-- Primary Meta Tags --><title>Using AI to generate Intune detection rules | zakitpro</title><meta name="title" content="Using AI to generate Intune detection rules | zakitpro"><meta name="description" content="A practical enterprise workflow for generating and validating Intune Win32 detection rules with AI, including prompts, testing matrix, and rollback-safe deployment patterns."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://zakitpro.com/ai/using-ai-to-generate-intune-detection-rules/"><meta property="og:title" content="Using AI to generate Intune detection rules"><meta property="og:description" content="A practical enterprise workflow for generating and validating Intune Win32 detection rules with AI, including prompts, testing matrix, and rollback-safe deployment patterns."><meta property="og:image" content="https://zakitpro.com/og-default.png"><meta property="og:site_name" content="zakitpro"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://zakitpro.com/ai/using-ai-to-generate-intune-detection-rules/"><meta property="twitter:title" content="Using AI to generate Intune detection rules"><meta property="twitter:description" content="A practical enterprise workflow for generating and validating Intune Win32 detection rules with AI, including prompts, testing matrix, and rollback-safe deployment patterns."><meta property="twitter:image" content="https://zakitpro.com/og-default.png"><!-- RSS --><link rel="alternate" type="application/rss+xml" title="zakitpro RSS Feed" href="/rss.xml"><!-- Theme Script - Blocks FOUC --><script>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('zakitpro-theme')) {
+          return localStorage.getItem('zakitpro-theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      })();
+      
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+      window.localStorage.setItem('zakitpro-theme', theme);
+    </script><link rel="stylesheet" href="/_astro/_slug_.CBQKsqBp.css">
+<style>:root{--color-primary: #060f30;--color-secondary: #263d76;--color-accent: #0ea5e9;--color-surface: #eef6ff;--color-background: #ffffff}.dark{--color-primary: #f4f7ff;--color-secondary: #c6d9ff;--color-accent: #0ea5e9;--color-surface: #1a2752;--color-background: #060f30}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}.dark ::-webkit-scrollbar-thumb{background:#475569}pre{position:relative;padding:1rem;overflow-x:auto;border-radius:.5rem}pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose{max-width:720px}.prose h1,.prose h2,.prose h3,.prose h4{font-family:Inter,system-ui,sans-serif;font-weight:700;scroll-margin-top:5rem}.prose h1{font-size:2rem}.prose h2{font-size:1.5rem}.prose h3{font-size:1.25rem}.prose p{line-height:1.75;margin-bottom:1.25rem}.prose a{color:#0ea5e9;text-decoration:underline}.prose a:hover{color:#2864d3}.prose code:not(pre code){background:#f1f5f9;padding:.125rem .375rem;border-radius:.25rem;font-size:.875em}.dark .prose code:not(pre code){background:#334155}.prose pre{margin:1.5rem 0}.prose ul,.prose ol{margin:1rem 0;padding-left:1.5rem}.prose li{margin:.5rem 0}.prose blockquote{border-left:4px solid #47c0f8;padding-left:1rem;font-style:italic;color:#64748b;margin:1.5rem 0}.dark .prose blockquote{color:#94a3b8}
+.prose pre{position:relative;margin:1.5rem 0;border-radius:.5rem;overflow:hidden}.prose pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose pre[data-line-numbers]{counter-reset:line}.prose pre[data-line-numbers] .line:before{counter-increment:line;content:counter(line);display:inline-block;width:2rem;margin-right:1rem;text-align:right;color:#64748b;-webkit-user-select:none}.copy-btn{position:absolute;top:.5rem;right:.5rem;padding:.25rem .5rem;font-size:.75rem;background:#334155;color:#e2e8f0;border:none;border-radius:.25rem;cursor:pointer;opacity:0;transition:opacity .2s}.prose pre:hover .copy-btn{opacity:1}.lang-label{position:absolute;top:0;right:0;padding:.25rem .75rem;font-size:.75rem;font-weight:500;color:#94a3b8;background:#1e293b;border-bottom-left-radius:.5rem}
+</style><script type="module" src="/_astro/page.CyD_eNI3.js"></script></head> <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md">
+Skip to content
+</a> <!-- Header --> <header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-all duration-300" id="header"> <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between"> <!-- Logo --> <a href="/" class="flex items-center font-heading font-bold text-xl text-gray-900 dark:text-white hover:text-accent transition-colors"> <img src="/logo.png" alt="Site logo" class="w-16 h-16 object-contain"> </a> <!-- Desktop Nav --> <nav class="hidden md:flex items-center gap-6"> <div class="relative group"> <button class="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">
+Pillars
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg> </button> <div class="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2"> <a href="/troubleshooting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Windows Troubleshooting </a><a href="/scripting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Scripting &amp; Automation </a><a href="/deployment/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Deployment &amp; Imaging </a><a href="/security/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Endpoint Security </a><a href="/packaging/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> App Packaging </a><a href="/career/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Career &amp; Craft </a><a href="/ai/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> AI-Augmented Engineering </a> </div> </div> <a href="/scripts/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Scripts</a> <a href="/series/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Series</a> <a href="/error-codes/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Error Codes</a> <a href="/about/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">About</a> </nav> <!-- Right Side --> <div class="flex items-center gap-3"> <!-- Search --> <button id="search-trigger" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Search"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path> </svg> </button> <!-- Theme Toggle --> <button id="theme-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Toggle theme"> <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> </button> <!-- Mobile Menu --> <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300" aria-label="Menu"> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> <!-- Mobile Menu --> <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"> <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-2"> <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pillars</span> <a href="/troubleshooting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Windows Troubleshooting </a><a href="/scripting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Scripting &amp; Automation </a><a href="/deployment/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Deployment &amp; Imaging </a><a href="/security/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Endpoint Security </a><a href="/packaging/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> App Packaging </a><a href="/career/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Career &amp; Craft </a><a href="/ai/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> AI-Augmented Engineering </a> <hr class="my-2 border-gray-200 dark:border-gray-700"> <a href="/scripts/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Scripts</a> <a href="/series/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Series</a> <a href="/error-codes/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Error Codes</a> <a href="/about/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">About</a> </nav> </div> </header> <!-- Main Content --> <main id="main-content" class="min-h-screen">  <div class="max-w-7xl mx-auto px-4 py-8"> <!-- Breadcrumb --> <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6"> <a href="/" class="hover:text-accent">Home</a> <span>/</span> <a href="/ai/" class="hover:text-accent">AI-Augmented Engineering</a> <span>/</span> <span class="text-gray-900 dark:text-white">Using AI to generate Intune detection rules</span> </nav> <div class="lg:grid lg:grid-cols-4 lg:gap-8"> <!-- Left Sidebar - Table of Contents (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24"> <nav class="text-sm"> <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">On this page</h4> <ul class="space-y-2"> <li class> <a href="#url-keyword-and-intent" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> URL, keyword, and intent </a> </li><li class> <a href="#table-of-contents" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Table of contents </a> </li><li class> <a href="#why-detection-rules-fail-in-enterprise-environments" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Why detection rules fail in enterprise environments </a> </li><li class> <a href="#where-ai-helps-and-where-it-does-not" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Where AI helps and where it does not </a> </li><li class> <a href="#step-1-collect-installer-intelligence-first" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 1: collect installer intelligence first </a> </li><li class> <a href="#step-2-prompt-ai-for-candidate-detection-strategies" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 2: prompt AI for candidate detection strategies </a> </li><li class> <a href="#step-3-rank-rule-options-by-reliability" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 3: rank rule options by reliability </a> </li><li class> <a href="#step-4-validate-in-a-deterministic-matrix" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 4: validate in a deterministic matrix </a> </li><li class> <a href="#step-5-implement-in-intune-and-pilot-safely" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 5: implement in Intune and pilot safely </a> </li><li class> <a href="#step-6-build-reusable-rule-patterns" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Step 6: build reusable rule patterns </a> </li><li class> <a href="#internal-links" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Internal links </a> </li><li class> <a href="#faq" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> FAQ </a> </li><li class="ml-4"> <a href="#should-ai-choose-the-final-intune-detection-rule" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Should AI choose the final Intune detection rule? </a> </li><li class="ml-4"> <a href="#is-msi-productcode-always-the-best-signal" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Is MSI ProductCode always the best signal? </a> </li><li class="ml-4"> <a href="#can-i-rely-on-file-existence-checks-only" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Can I rely on file existence checks only? </a> </li><li class="ml-4"> <a href="#how-many-pilot-devices-are-enough" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> How many pilot devices are enough? </a> </li><li class="ml-4"> <a href="#what-metric-should-we-track" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> What metric should we track? </a> </li><li class> <a href="#cta" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> CTA </a> </li> </ul> </nav> </div> </aside> <!-- Main Content --> <article class="lg:col-span-2"> <!-- Article Header --> <header class="mb-8"> <div class="flex flex-wrap items-center gap-3 mb-4"> <span class="text-sm text-gray-600 dark:text-gray-400"> March 4, 2026 </span> <span class="text-gray-400">•</span> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"> Mid-Level (3-5 years) </span> <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"> How-To </span> </div> <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Using AI to generate Intune detection rules</h1> <p class="text-lg text-gray-600 dark:text-gray-400">A practical enterprise workflow for generating and validating Intune Win32 detection rules with AI, including prompts, testing matrix, and rollback-safe deployment patterns.</p>  </header> <!-- Article Content --> <div class="prose dark:prose-invert max-w-none"> <h1 id="using-ai-to-generate-intune-detection-rules">Using AI to generate Intune detection rules</h1>
+<p>Intune app deployments fail for many reasons, but detection logic is one of the most common pain points. A package installs fine in testing, then production reports “not installed” because detection is fragile.</p>
+<p>AI helps here if you use it for what it is good at: generating structured candidate rules quickly so engineers can validate and choose the safest option.</p>
+<p>This guide gives you a production-safe workflow for using AI to generate Intune detection rules that survive real enterprise conditions.</p>
+<h2 id="url-keyword-and-intent">URL, keyword, and intent</h2>
+<ul>
+<li>Suggested URL: <code>/ai/using-ai-to-generate-intune-detection-rules</code></li>
+<li>Primary keyword: <code>using AI to generate Intune detection rules</code></li>
+<li>Search intent: practical, enterprise-safe how-to for Win32 app detection logic</li>
+<li>Meta title suggestion: <code>Using AI to Generate Intune Detection Rules (Enterprise Workflow)</code></li>
+<li>Meta description suggestion: <code>Generate stronger Intune Win32 detection rules with AI, then validate with deterministic testing before deployment.</code></li>
+</ul>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#why-detection-rules-fail-in-enterprise-environments">Why detection rules fail in enterprise environments</a></li>
+<li><a href="#where-ai-helps-and-where-it-does-not">Where AI helps and where it does not</a></li>
+<li><a href="#step-1-collect-installer-intelligence-first">Step 1: collect installer intelligence first</a></li>
+<li><a href="#step-2-prompt-ai-for-candidate-detection-strategies">Step 2: prompt AI for candidate detection strategies</a></li>
+<li><a href="#step-3-rank-rule-options-by-reliability">Step 3: rank rule options by reliability</a></li>
+<li><a href="#step-4-validate-in-a-deterministic-matrix">Step 4: validate in a deterministic matrix</a></li>
+<li><a href="#step-5-implement-in-intune-and-pilot-safely">Step 5: implement in Intune and pilot safely</a></li>
+<li><a href="#step-6-build-reusable-rule-patterns">Step 6: build reusable rule patterns</a></li>
+<li><a href="#internal-links">Internal links</a></li>
+<li><a href="#faq">FAQ</a></li>
+<li><a href="#cta">CTA</a></li>
+</ul>
+<h2 id="why-detection-rules-fail-in-enterprise-environments">Why detection rules fail in enterprise environments</h2>
+<p>Detection logic often breaks because teams choose signals that look stable but are not.</p>
+<p>Common examples:</p>
+<ul>
+<li>version value exists in lab but changes format in production</li>
+<li>install path differs between device architecture/user context</li>
+<li>MSI product code changes between minor vendor releases</li>
+<li>file existence check passes on a stale leftover from old installs</li>
+</ul>
+<p>AI can help you generate better candidates faster, but only if your input evidence is solid.</p>
+<p><img src="/images/ai-intune-detection-rules-01-failure-map.png" alt="Intune Win32 app detection flow showing common failure points"/></p>
+<h2 id="where-ai-helps-and-where-it-does-not">Where AI helps and where it does not</h2>
+<p>AI helps with:</p>
+<ul>
+<li>translating installer artifacts into rule candidates</li>
+<li>proposing fallback logic</li>
+<li>generating test scenarios you might miss</li>
+</ul>
+<p>AI does not help with:</p>
+<ul>
+<li>deciding business risk tolerance</li>
+<li>confirming real endpoint behavior without tests</li>
+<li>magically fixing bad packaging</li>
+</ul>
+<p>Treat AI as a fast assistant, not a source of truth.</p>
+<h2 id="step-1-collect-installer-intelligence-first">Step 1: collect installer intelligence first</h2>
+<p>Before prompting AI, build a structured artifact pack:</p>
+<ul>
+<li>installer type (MSI/EXE/script wrapper)</li>
+<li>silent install command used</li>
+<li>uninstall command</li>
+<li>install path and file set</li>
+<li>registry keys/values created</li>
+<li>service/process indicators</li>
+<li>app versioning behavior across updates</li>
+</ul>
+<p>For MSI apps, include:</p>
+<ul>
+<li>ProductCode</li>
+<li>UpgradeCode</li>
+<li>Publisher and version examples</li>
+</ul>
+<p>For EXE/wrapped apps, include:</p>
+<ul>
+<li>deterministic file/hash candidates</li>
+<li>registry footprints with expected value patterns</li>
+</ul>
+<p>This prep step is what separates good AI outputs from generic noise.</p>
+<p><img src="/images/ai-intune-detection-rules-02-installer-intel.png" alt="Installer intelligence worksheet for detection rule design"/></p>
+<h2 id="step-2-prompt-ai-for-candidate-detection-strategies">Step 2: prompt AI for candidate detection strategies</h2>
+<p>Use a prompt that asks for options and trade-offs, not one final rule.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="text"><code><span class="line"><span>You are assisting with Intune Win32 app detection rule design.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Context:</span></span>
+<span class="line"><span>- Installer type: &lt;MSI/EXE&gt;</span></span>
+<span class="line"><span>- Install context: &lt;system/user&gt;</span></span>
+<span class="line"><span>- Evidence: &lt;files, paths, registry, product codes, services&gt;</span></span>
+<span class="line"><span>- Update behavior: &lt;minor/major version pattern&gt;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Task:</span></span>
+<span class="line"><span>1) Propose 3 detection rule strategies.</span></span>
+<span class="line"><span>2) For each strategy, explain strengths, failure modes, and maintenance risk.</span></span>
+<span class="line"><span>3) Recommend one primary and one fallback strategy.</span></span>
+<span class="line"><span>4) Provide exact Intune rule implementation details.</span></span>
+<span class="line"><span>5) List test cases required to validate reliability.</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Constraints:</span></span>
+<span class="line"><span>- Prefer deterministic signals over brittle ones.</span></span>
+<span class="line"><span>- Avoid assumptions not supported by evidence.</span></span>
+<span class="line"><span>- No fabricated paths or registry keys.</span></span></code></pre>
+<p>Expected output structure:</p>
+<ul>
+<li>Strategy A: MSI product code</li>
+<li>Strategy B: registry value with version regex</li>
+<li>Strategy C: file path + version check</li>
+</ul>
+<p><img src="/images/ai-intune-detection-rules-03-prompt-output.png" alt="AI prompt and response structure for Intune detection strategies"/></p>
+<h2 id="step-3-rank-rule-options-by-reliability">Step 3: rank rule options by reliability</h2>
+<p>Use this reliability lens before implementation:</p>
+<ol>
+<li><strong>High reliability</strong>: stable MSI code logic with known upgrade behavior</li>
+<li><strong>Medium reliability</strong>: registry key/value with consistent vendor patterns</li>
+<li><strong>Lower reliability</strong>: file existence only</li>
+</ol>
+<p>Avoid single-signal rules for complex app lifecycles. Combine signals when possible.</p>
+<p>Example decision:</p>
+<ul>
+<li>Primary: MSI ProductCode + min version check</li>
+<li>Fallback: registry DisplayVersion regex for non-MSI channel</li>
+</ul>
+<p><img src="/images/ai-intune-detection-rules-04-scorecard.png" alt="Rule reliability scorecard for MSI, registry, and file signals"/></p>
+<h2 id="step-4-validate-in-a-deterministic-matrix">Step 4: validate in a deterministic matrix</h2>
+<p>Do not trust rule quality until tested against known states.</p>
+<p>Build a matrix with at least these rows:</p>
+<ul>
+<li>fresh install</li>
+<li>upgrade from previous supported version</li>
+<li>uninstall + stale artifacts present</li>
+<li>partial failed install</li>
+<li>wrong architecture endpoint</li>
+<li>user-context install on system-context rule</li>
+</ul>
+<p>Example matrix:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Scenario</th><th>Expected detection result</th><th>Actual</th><th>Pass/Fail</th></tr></thead><tbody><tr><td>Fresh install v5.2</td><td>Detected</td><td>Detected</td><td>Pass</td></tr><tr><td>Upgrade v5.1 -&gt; v5.2</td><td>Detected</td><td>Detected</td><td>Pass</td></tr><tr><td>Uninstalled, stale folder remains</td><td>Not detected</td><td>Detected</td><td>Fail</td></tr><tr><td>Partial failed install</td><td>Not detected</td><td>Not detected</td><td>Pass</td></tr></tbody></table>
+<p>If your rule fails stale-artifact or partial-install tests, revise it before pilot.</p>
+<p><img src="/images/ai-intune-detection-rules-05-validation-matrix.png" alt="Detection rule validation matrix with pass fail outcomes"/></p>
+<h2 id="step-5-implement-in-intune-and-pilot-safely">Step 5: implement in Intune and pilot safely</h2>
+<p>Implementation steps:</p>
+<ol>
+<li>Open Intune Admin Center -&gt; Apps -&gt; Windows -&gt; target Win32 app</li>
+<li>Configure detection rule from validated strategy</li>
+<li>assign to pilot device group (5-20 endpoints)</li>
+<li>monitor install + detection status for 48-72 hours</li>
+<li>review edge cases before broad assignment</li>
+</ol>
+<p>Mandatory screenshot checkpoints:</p>
+<ul>
+<li>Detection rule configuration screen</li>
+<li>Assignment to pilot group</li>
+<li>Monitoring status page with success/fail summary</li>
+</ul>
+<p><img src="/images/ai-intune-detection-rules-06-intune-config.png" alt="Intune detection rule configuration page with validated settings"/></p>
+<h2 id="step-6-build-reusable-rule-patterns">Step 6: build reusable rule patterns</h2>
+<p>After each successful deployment, store pattern cards in your internal runbook:</p>
+<ul>
+<li>App family</li>
+<li>Installer type</li>
+<li>Chosen primary/fallback rule</li>
+<li>Known failure modes</li>
+<li>Test cases that caught defects</li>
+</ul>
+<p>Over time you build a rule library that reduces packaging rework and speeds new app onboarding.</p>
+<p>Pattern example:</p>
+<ul>
+<li>Vendor: Contoso Secure Agent</li>
+<li>Type: MSI major upgrade model</li>
+<li>Primary: ProductCode in approved list + DisplayVersion &gt;= baseline</li>
+<li>Known edge case: old agent leaves stale service key after uninstall</li>
+<li>Guardrail: include registry value existence + expected version pattern</li>
+</ul>
+<p><img src="/images/ai-intune-detection-rules-07-pattern-library.png" alt="Reusable detection rule library template for endpoint teams"/></p>
+<h2 id="internal-links">Internal links</h2>
+<ul>
+<li><a href="/deployment/deploy-apps-intune-win32">Deploy Apps with Intune Win32</a></li>
+<li><a href="/deployment/microsoft-intune-for-desktop-engineers">Microsoft Intune for Desktop Engineers</a></li>
+<li><a href="/ai/ai-intune-policy-troubleshooting">How to Use AI to Triage Intune Policy Failures Faster</a></li>
+<li><a href="/ai/ai-for-desktop-engineers-practical-enterprise-guide">AI for desktop engineers: practical enterprise guide</a></li>
+<li><a href="/scripting/powershell-win32-app-installers">PowerShell Win32 App Installers</a></li>
+<li><a href="/troubleshooting/intune-enrollment-errors-fix">Intune Enrollment Errors Fix</a></li>
+</ul>
+<h2 id="faq">FAQ</h2>
+<h3 id="should-ai-choose-the-final-intune-detection-rule">Should AI choose the final Intune detection rule?</h3>
+<p>No. AI should propose candidate rules. Engineers pick the final rule after deterministic test validation.</p>
+<h3 id="is-msi-productcode-always-the-best-signal">Is MSI ProductCode always the best signal?</h3>
+<p>Often, but not always. Some vendors change behavior across channels or wrap installers. Validate with lifecycle scenarios.</p>
+<h3 id="can-i-rely-on-file-existence-checks-only">Can I rely on file existence checks only?</h3>
+<p>For some apps, yes. For enterprise reliability, file-only checks are usually too brittle by themselves.</p>
+<h3 id="how-many-pilot-devices-are-enough">How many pilot devices are enough?</h3>
+<p>Start with 5-20 representative endpoints across architectures and user profiles. Expand after stable results.</p>
+<h3 id="what-metric-should-we-track">What metric should we track?</h3>
+<p>Track detection accuracy, failed install false negatives, rework time per app package, and post-deployment incident rate.</p>
+<h2 id="cta">CTA</h2>
+<p>Pick your next two Win32 packages and run this exact process:</p>
+<ol>
+<li>Build installer intelligence sheet</li>
+<li>Generate AI rule candidates</li>
+<li>validate through matrix testing</li>
+<li>deploy to pilot only</li>
+</ol>
+<p>In one sprint, your team will move from fragile detection logic to repeatable, enterprise-safe deployment quality.</p> </div> <!-- Tags --> <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700"> <div class="flex flex-wrap gap-2"> <a href="/tags/ai" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#ai </a><a href="/tags/intune" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#intune </a><a href="/tags/detection-rules" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#detection-rules </a><a href="/tags/win32" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#win32 </a><a href="/tags/endpoint-management" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#endpoint-management </a><a href="/tags/desktop-engineering" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#desktop-engineering </a> </div> </div> <!-- Was this helpful? --> <div class="mt-8 flex items-center gap-4"> <span class="text-sm text-gray-600 dark:text-gray-400">Was this helpful?</span> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👍 Yes
+</button> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👎 No
+</button> </div> <!-- Giscus Comments --> <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700"> <script src="https://giscus.app/client.js" data-repo="your-username/zakitpro-comments" data-repo-id="YOUR_REPO_ID" data-category="Comments" data-category-id="YOUR_CATEGORY_ID" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="en" crossorigin="anonymous" async>
+          </script> </div> </article> <!-- Right Sidebar - Metadata (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24 space-y-6"> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Pillar</h4> <a href="/ai/" class="text-accent hover:underline font-medium"> AI-Augmented Engineering </a> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Difficulty</h4> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"> Mid-Level (3-5 years) </span> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Published</h4> <p class="text-sm text-gray-700 dark:text-gray-300"> March 4, 2026 </p> </div> </div> </aside> </div> </div>  </main> <!-- Footer --> <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16"> <div class="max-w-6xl mx-auto px-4 py-12"> <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8"> <div> <p class="text-sm text-gray-600 dark:text-gray-400">IT Desktop Engineering Blog</p> </div> <div> <h4 class="font-semibold mb-4">Pillars</h4> <ul class="space-y-2 text-sm"> <li><a href="/troubleshooting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Windows Troubleshooting</a></li><li><a href="/scripting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripting &amp; Automation</a></li><li><a href="/deployment/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Deployment &amp; Imaging</a></li><li><a href="/security/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Endpoint Security</a></li><li><a href="/packaging/" class="text-gray-600 dark:text-gray-400 hover:text-accent">App Packaging</a></li><li><a href="/career/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Career &amp; Craft</a></li><li><a href="/ai/" class="text-gray-600 dark:text-gray-400 hover:text-accent">AI-Augmented Engineering</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Content</h4> <ul class="space-y-2 text-sm"> <li><a href="/scripts/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripts</a></li> <li><a href="/series/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Series</a></li> <li><a href="/error-codes/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Error Codes</a></li> <li><a href="/about/" class="text-gray-600 dark:text-gray-400 hover:text-accent">About</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Subscribe</h4> <ul class="space-y-2 text-sm"> <li><a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-accent">RSS Feed</a></li> </ul> </div> </div> <div class="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"> <p class="text-sm text-gray-600 dark:text-gray-400">No ads. No tracking. No fluff.</p> <p class="text-sm text-gray-600 dark:text-gray-400">© 2026. All rights reserved.</p> </div> </div> </footer> <!-- Theme Toggle Script --> <script type="module">const t=document.getElementById("theme-toggle");t?.addEventListener("click",()=>{document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("zakitpro-theme","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("zakitpro-theme","dark"))});const n=document.getElementById("mobile-menu-btn"),m=document.getElementById("mobile-menu");n?.addEventListener("click",()=>{m?.classList.toggle("hidden")});document.addEventListener("keydown",e=>{(e.metaKey||e.ctrlKey)&&e.key==="k"&&(e.preventDefault(),document.getElementById("search-trigger")?.click())});</script>  </body> </html> 

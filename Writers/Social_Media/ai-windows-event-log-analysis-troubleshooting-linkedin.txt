@@ -1,0 +1,20 @@
+Staring at the Windows Event Viewer for an hour is a terrible way to troubleshoot.
+
+Most desktop engineers waste entirely too much time scrolling past meaningless DCOM warnings trying to find the one Error event that actually caused a machine to crash.
+
+Stop doing that. Use AI to do the heavy lifting.
+
+But do not just dump a raw .evtx file into a chatbot. That guarantees hallucinations. 
+
+The real workflow:
+1. Use PowerShell to export only the Warnings, Errors, and Criticals from the last 24 hours to a CSV.
+2. Feed the CSV to the AI with a strict prompt.
+3. Tell it to ignore standard Windows noise and build a timeline leading up to the exact time of the crash.
+4. Let the AI give you the specific Event ID and failing module.
+5. You, the engineer, verify the hypothesis before taking action.
+
+AI finds the needle in the haystack. You decide what to do with the needle.
+
+I wrote a full guide on the exact PowerShell script and AI prompt to use for this workflow. Link in the comments.
+
+#DesktopEngineering #Intune #Windows11 #PowerShell #AIOps #Troubleshooting

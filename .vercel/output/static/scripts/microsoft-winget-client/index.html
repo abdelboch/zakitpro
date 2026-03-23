@@ -1,0 +1,196 @@
+<!DOCTYPE html><html lang="en" class="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/png" href="/favicon.png"><meta name="generator" content="Astro v5.18.1"><!-- Primary Meta Tags --><title>Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers | zakitpro</title><meta name="title" content="Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers | zakitpro"><meta name="description" content="Learn how to use Microsoft.WinGet.Client to find, install, update, export, and standardize Windows apps with PowerShell at enterprise scale."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://zakitpro.com/scripts/microsoft-winget-client/"><meta property="og:title" content="Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers"><meta property="og:description" content="Learn how to use Microsoft.WinGet.Client to find, install, update, export, and standardize Windows apps with PowerShell at enterprise scale."><meta property="og:image" content="https://zakitpro.com/og-default.png"><meta property="og:site_name" content="zakitpro"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://zakitpro.com/scripts/microsoft-winget-client/"><meta property="twitter:title" content="Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers"><meta property="twitter:description" content="Learn how to use Microsoft.WinGet.Client to find, install, update, export, and standardize Windows apps with PowerShell at enterprise scale."><meta property="twitter:image" content="https://zakitpro.com/og-default.png"><!-- RSS --><link rel="alternate" type="application/rss+xml" title="zakitpro RSS Feed" href="/rss.xml"><!-- Theme Script - Blocks FOUC --><script>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('zakitpro-theme')) {
+          return localStorage.getItem('zakitpro-theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      })();
+      
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+      window.localStorage.setItem('zakitpro-theme', theme);
+    </script><link rel="stylesheet" href="/_astro/_slug_.CBQKsqBp.css">
+<style>:root{--color-primary: #060f30;--color-secondary: #263d76;--color-accent: #0ea5e9;--color-surface: #eef6ff;--color-background: #ffffff}.dark{--color-primary: #f4f7ff;--color-secondary: #c6d9ff;--color-accent: #0ea5e9;--color-surface: #1a2752;--color-background: #060f30}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}.dark ::-webkit-scrollbar-thumb{background:#475569}pre{position:relative;padding:1rem;overflow-x:auto;border-radius:.5rem}pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose{max-width:720px}.prose h1,.prose h2,.prose h3,.prose h4{font-family:Inter,system-ui,sans-serif;font-weight:700;scroll-margin-top:5rem}.prose h1{font-size:2rem}.prose h2{font-size:1.5rem}.prose h3{font-size:1.25rem}.prose p{line-height:1.75;margin-bottom:1.25rem}.prose a{color:#0ea5e9;text-decoration:underline}.prose a:hover{color:#2864d3}.prose code:not(pre code){background:#f1f5f9;padding:.125rem .375rem;border-radius:.25rem;font-size:.875em}.dark .prose code:not(pre code){background:#334155}.prose pre{margin:1.5rem 0}.prose ul,.prose ol{margin:1rem 0;padding-left:1.5rem}.prose li{margin:.5rem 0}.prose blockquote{border-left:4px solid #47c0f8;padding-left:1rem;font-style:italic;color:#64748b;margin:1.5rem 0}.dark .prose blockquote{color:#94a3b8}
+</style><script type="module" src="/_astro/page.CyD_eNI3.js"></script></head> <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md">
+Skip to content
+</a> <!-- Header --> <header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-all duration-300" id="header"> <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between"> <!-- Logo --> <a href="/" class="flex items-center font-heading font-bold text-xl text-gray-900 dark:text-white hover:text-accent transition-colors"> <img src="/logo.png" alt="Site logo" class="w-16 h-16 object-contain"> </a> <!-- Desktop Nav --> <nav class="hidden md:flex items-center gap-6"> <div class="relative group"> <button class="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">
+Pillars
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg> </button> <div class="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2"> <a href="/troubleshooting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Windows Troubleshooting </a><a href="/scripting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Scripting &amp; Automation </a><a href="/deployment/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Deployment &amp; Imaging </a><a href="/security/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Endpoint Security </a><a href="/packaging/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> App Packaging </a><a href="/career/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Career &amp; Craft </a><a href="/ai/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> AI-Augmented Engineering </a> </div> </div> <a href="/scripts/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Scripts</a> <a href="/series/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Series</a> <a href="/error-codes/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Error Codes</a> <a href="/about/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">About</a> </nav> <!-- Right Side --> <div class="flex items-center gap-3"> <!-- Search --> <button id="search-trigger" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Search"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path> </svg> </button> <!-- Theme Toggle --> <button id="theme-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Toggle theme"> <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> </button> <!-- Mobile Menu --> <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300" aria-label="Menu"> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> <!-- Mobile Menu --> <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"> <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-2"> <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pillars</span> <a href="/troubleshooting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Windows Troubleshooting </a><a href="/scripting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Scripting &amp; Automation </a><a href="/deployment/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Deployment &amp; Imaging </a><a href="/security/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Endpoint Security </a><a href="/packaging/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> App Packaging </a><a href="/career/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Career &amp; Craft </a><a href="/ai/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> AI-Augmented Engineering </a> <hr class="my-2 border-gray-200 dark:border-gray-700"> <a href="/scripts/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Scripts</a> <a href="/series/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Series</a> <a href="/error-codes/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Error Codes</a> <a href="/about/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">About</a> </nav> </div> </header> <!-- Main Content --> <main id="main-content" class="min-h-screen">  <div class="max-w-4xl mx-auto px-4 py-8"> <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6"> <a href="/" class="hover:text-accent">Home</a> <span>/</span> <a href="/scripts/" class="hover:text-accent">Scripts</a> <span>/</span> <span class="text-gray-900 dark:text-white">Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers</span> </nav> <article> <header class="mb-8"> <div class="flex items-center gap-3 mb-4"> <span class="text-sm text-gray-600 dark:text-gray-400"> March 8, 2026 </span> <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"> powershell </span> </div> <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers</h1> <p class="text-lg text-gray-600 dark:text-gray-400">Learn how to use Microsoft.WinGet.Client to find, install, update, export, and standardize Windows apps with PowerShell at enterprise scale.</p> </header> <div class="prose dark:prose-invert max-w-none"> <h1 id="microsoftwingetclient-powershell-package-management-for-desktop-engineers">Microsoft.WinGet.Client: PowerShell Package Management for Desktop Engineers</h1>
+<p>If you manage Windows endpoints long enough, software sprawl turns into a full-time nuisance. One machine has 7-Zip 23.x, another has 24.x, a third has a mystery vendor installer from 2022, and somehow everybody swears they are on the “latest version.” That is where <strong><a href="https://www.powershellgallery.com/packages/Microsoft.WinGet.Client">Microsoft.WinGet.Client</a></strong> earns its keep.</p>
+<p>This PowerShell Gallery module gives desktop engineers a supported way to control the <strong>Windows Package Manager</strong> from PowerShell. Instead of relying on manual clicks or fragile one-off install scripts, you can discover packages, install apps, update software, export package lists, and standardize endpoint application state with repeatable automation.</p>
+<p>With more than 149 million downloads on the PowerShell Gallery, <code>Microsoft.WinGet.Client</code> has become one of the most practical modules for modern Windows endpoint management.</p>
+<h2 id="what-microsoftwingetclient-does">What Microsoft.WinGet.Client Does</h2>
+<p><code>Microsoft.WinGet.Client</code> is the PowerShell module for the Windows Package Manager client. In plain English: it lets you manage WinGet from scripts and remediation workflows instead of treating application installs like a help desk scavenger hunt.</p>
+<p>The module exposes cmdlets such as:</p>
+<ul>
+<li><code>Find-WinGetPackage</code></li>
+<li><code>Get-WinGetPackage</code></li>
+<li><code>Install-WinGetPackage</code></li>
+<li><code>Update-WinGetPackage</code></li>
+<li><code>Uninstall-WinGetPackage</code></li>
+<li><code>Export-WinGetPackage</code></li>
+<li><code>Get-WinGetSource</code></li>
+<li><code>Add-WinGetSource</code></li>
+<li><code>Repair-WinGetPackageManager</code></li>
+</ul>
+<p>That makes it useful for several desktop engineering jobs:</p>
+<ul>
+<li>building standard app baselines for new endpoints</li>
+<li>automating common software installs during provisioning</li>
+<li>updating approved apps outside heavyweight packaging workflows</li>
+<li>auditing what is actually installed on a device</li>
+<li>repairing broken package manager components before they waste your afternoon</li>
+</ul>
+<h2 id="why-desktop-engineers-need-it">Why Desktop Engineers Need It</h2>
+<p>There is a reason this module matters in real enterprise environments.</p>
+<h3 id="1-it-reduces-packaging-friction">1. It reduces packaging friction</h3>
+<p>Not every deployment needs a custom Win32 wrapper, custom detection logic, and a three-stage pilot. Sometimes you just need a reliable, scriptable way to put <strong>PowerToys, 7-Zip, VS Code, Notepad++, Git, or Company Portal dependencies</strong> on a workstation and move on with your life.</p>
+<h3 id="2-it-fits-modern-endpoint-workflows">2. It fits modern endpoint workflows</h3>
+<p>If your team uses <strong>Intune, PowerShell remediations, proactive remediations, remote support tools, or Autopilot-driven provisioning</strong>, a PowerShell-native package management layer is useful immediately. You can script installs and updates without bolting together a random mix of vendor EXEs and hope.</p>
+<h3 id="3-it-helps-with-standardization">3. It helps with standardization</h3>
+<p>Desktop engineering is not just about getting apps installed. It is about getting the <strong>same apps</strong>, in the <strong>same state</strong>, on the <strong>right devices</strong>. <code>Microsoft.WinGet.Client</code> helps you define and repeat that baseline.</p>
+<h3 id="4-it-improves-troubleshooting">4. It improves troubleshooting</h3>
+<p>When an endpoint has a broken WinGet registration, missing sources, or stale client components, the module gives you commands to inspect and repair the package management stack directly.</p>
+<h2 id="install-microsoftwingetclient">Install Microsoft.WinGet.Client</h2>
+<p>Run PowerShell as an administrator and install the module from the PowerShell Gallery:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Install-Module</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Name Microsoft.WinGet.Client </span><span style="color:#F97583">-</span><span style="color:#E1E4E8">Force</span></span>
+<span class="line"><span style="color:#79B8FF">Import-Module</span><span style="color:#E1E4E8"> Microsoft.WinGet.Client</span></span></code></pre>
+<p>If your environment uses the newer PSResourceGet tooling, you can also install it with:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Install-PSResource</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Name Microsoft.WinGet.Client</span></span></code></pre>
+<p>After importing the module, verify that the client is available:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Get-WinGetVersion</span></span></code></pre>
+<p>That is the first sanity check I would run before building anything bigger around it.</p>
+<h2 id="core-commands-every-desktop-engineer-should-know">Core Commands Every Desktop Engineer Should Know</h2>
+<p>Here are the commands that do the real work.</p>
+<h3 id="find-an-application-in-the-winget-sources">Find an application in the WinGet sources</h3>
+<p>Need to confirm a package ID before you automate deployment? Search the repository first.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Find-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Query </span><span style="color:#9ECBFF">&quot;7zip&quot;</span></span></code></pre>
+<p>You can also search for a more exact package:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Find-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id </span><span style="color:#9ECBFF">&quot;7zip.7zip&quot;</span></span></code></pre>
+<p>This is useful when you are validating package naming before wrapping the logic into Intune, a task sequence, or a provisioning script.</p>
+<h3 id="install-an-approved-app">Install an approved app</h3>
+<p>Once you know the package ID, installation is straightforward:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Install-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id </span><span style="color:#9ECBFF">&quot;7zip.7zip&quot;</span></span></code></pre>
+<p>For a more realistic desktop engineering example, you might install multiple baseline tools during endpoint setup:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#E1E4E8">$apps </span><span style="color:#F97583">=</span><span style="color:#F97583"> @</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;7zip.7zip&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Microsoft.PowerToys&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Git.Git&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Microsoft.VisualStudioCode&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">foreach</span><span style="color:#E1E4E8"> ($app </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> $apps) {</span></span>
+<span class="line"><span style="color:#79B8FF">    Install-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id $app</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>That kind of loop is not glamorous, but it is exactly the sort of boring, repeatable work you want automated.</p>
+<h3 id="inventory-what-is-already-installed">Inventory what is already installed</h3>
+<p>If a machine is behaving like a junk drawer, check what WinGet sees:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Get-WinGetPackage</span></span></code></pre>
+<p>You can narrow the results to a specific product:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Get-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id </span><span style="color:#9ECBFF">&quot;Microsoft.PowerToys&quot;</span></span></code></pre>
+<p>This is handy for audit scripts, compliance checks, and remediation reporting.</p>
+<h3 id="update-installed-applications">Update installed applications</h3>
+<p>One of the best uses for <code>Microsoft.WinGet.Client</code> is software hygiene. Instead of waiting for users to click “Update later” for six months straight, you can script updates:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Update-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id </span><span style="color:#9ECBFF">&quot;Microsoft.PowerToys&quot;</span></span></code></pre>
+<p>If you want to work through a set of approved packages:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#E1E4E8">$approvedApps </span><span style="color:#F97583">=</span><span style="color:#F97583"> @</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;7zip.7zip&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Git.Git&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Microsoft.PowerToys&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Microsoft.VisualStudioCode&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">foreach</span><span style="color:#E1E4E8"> ($app </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> $approvedApps) {</span></span>
+<span class="line"><span style="color:#79B8FF">    Update-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id $app</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>That is especially useful for IT-managed utility apps that do not justify a full packaging project every single time a minor release drops.</p>
+<h3 id="remove-unwanted-software">Remove unwanted software</h3>
+<p>If you are cleaning up lab machines, kiosk endpoints, or stale support tools, uninstalling through the module is simple:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Uninstall-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id </span><span style="color:#9ECBFF">&quot;Microsoft.PowerToys&quot;</span></span></code></pre>
+<p>This helps when you want to standardize a support image or strip non-approved tooling from shared devices.</p>
+<h3 id="export-package-state-for-rebuilds-or-standardization">Export package state for rebuilds or standardization</h3>
+<p><code>Export-WinGetPackage</code> is underrated. It gives you a way to capture package state so you can reuse it during rebuilds or migration planning.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Export-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">OutputPath </span><span style="color:#9ECBFF">&quot;C:\Temp\winget-apps.json&quot;</span></span></code></pre>
+<p>That exported list can become a reference point for:</p>
+<ul>
+<li>new build standards</li>
+<li>pilot groups</li>
+<li>break/fix rebuilds</li>
+<li>replacement device preparation</li>
+</ul>
+<p>Yes, there are fancier ways to manage app portfolios. This one is fast, practical, and usually good enough to get work done.</p>
+<h2 id="where-it-fits-in-an-enterprise-desktop-engineering-stack">Where It Fits in an Enterprise Desktop Engineering Stack</h2>
+<p><code>Microsoft.WinGet.Client</code> does not replace everything.</p>
+<p>It will not magically solve:</p>
+<ul>
+<li>complex packaging with custom transforms</li>
+<li>apps that require licensing workflows</li>
+<li>brittle legacy installers with ugly silent switches</li>
+<li>every detection/reporting need in Intune or Configuration Manager</li>
+</ul>
+<p>What it <strong>does</strong> do is fill a really useful gap between fully manual installs and heavyweight app packaging.</p>
+<p>A smart way to use it is:</p>
+<ol>
+<li><strong>Use WinGet + PowerShell</strong> for approved mainstream applications.</li>
+<li><strong>Use Intune or SCCM</strong> to distribute the script or remediation logic.</li>
+<li><strong>Reserve full custom packaging</strong> for ugly enterprise apps that deserve the extra ceremony.</li>
+</ol>
+<p>That division of labor keeps your engineering effort pointed at the messy stuff, instead of wasting time rebuilding what WinGet already handles well.</p>
+<h2 id="example-build-a-simple-baseline-script">Example: Build a Simple Baseline Script</h2>
+<p>Here is a starter example for a baseline app install script that desktop engineers can adapt:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Import-Module</span><span style="color:#E1E4E8"> Microsoft.WinGet.Client</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">$baselineApps </span><span style="color:#F97583">=</span><span style="color:#F97583"> @</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;7zip.7zip&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Google.Chrome&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Git.Git&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Microsoft.PowerToys&quot;</span><span style="color:#F97583">,</span></span>
+<span class="line"><span style="color:#9ECBFF">    &quot;Microsoft.VisualStudioCode&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">foreach</span><span style="color:#E1E4E8"> ($app </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> $baselineApps) {</span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">        $existing </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> Get-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id $app </span><span style="color:#F97583">-</span><span style="color:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">-not</span><span style="color:#E1E4E8"> $existing) {</span></span>
+<span class="line"><span style="color:#79B8FF">            Install-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id $app</span></span>
+<span class="line"><span style="color:#79B8FF">            Write-Host</span><span style="color:#9ECBFF"> &quot;Installed </span><span style="color:#E1E4E8">$app</span><span style="color:#9ECBFF">&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        else</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">            Update-WinGetPackage</span><span style="color:#F97583"> -</span><span style="color:#E1E4E8">Id $app </span><span style="color:#F97583">-</span><span style="color:#E1E4E8">ErrorAction SilentlyContinue</span></span>
+<span class="line"><span style="color:#79B8FF">            Write-Host</span><span style="color:#9ECBFF"> &quot;Checked/updated </span><span style="color:#E1E4E8">$app</span><span style="color:#9ECBFF">&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#F97583">    catch</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#79B8FF">        Write-Warning</span><span style="color:#9ECBFF"> &quot;Failed to process </span><span style="color:#E1E4E8">$app</span><span style="color:#9ECBFF"> : </span><span style="color:#F97583">$</span><span style="color:#9ECBFF">(</span><span style="color:#79B8FF">$_</span><span style="color:#E1E4E8">.Exception.Message</span><span style="color:#9ECBFF">)</span><span style="color:#9ECBFF">&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>This is the kind of script that works well in:</p>
+<ul>
+<li>Intune remediation scripts</li>
+<li>technician-led build workflows</li>
+<li>post-imaging clean-up steps</li>
+<li>lab refresh projects</li>
+<li>endpoint rebuild playbooks</li>
+</ul>
+<h2 id="troubleshooting-tips">Troubleshooting Tips</h2>
+<p>If the module or package manager behaves badly, start with the obvious checks.</p>
+<h3 id="verify-the-winget-client-health">Verify the WinGet client health</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Get-WinGetVersion</span></span>
+<span class="line"><span style="color:#79B8FF">Assert-WinGetPackageManager</span></span></code></pre>
+<h3 id="check-package-sources">Check package sources</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Get-WinGetSource</span></span></code></pre>
+<p>If a source is broken or missing, repair it:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Reset-WinGetSource</span></span></code></pre>
+<h3 id="repair-the-package-manager">Repair the package manager</h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="powershell"><code><span class="line"><span style="color:#79B8FF">Repair-WinGetPackageManager</span></span></code></pre>
+<p>That is a solid first move when WinGet is installed but clearly acting possessed.</p>
+<h2 id="final-take">Final Take</h2>
+<p>If you support Windows endpoints in 2026, you should know <code>Microsoft.WinGet.Client</code> cold. It gives desktop engineers a practical way to <strong>discover, install, update, export, and repair application state with PowerShell</strong>, which makes it perfect for provisioning, remediation, standardization, and day-two endpoint support.</p>
+<p>It is not a silver bullet. Nothing in endpoint management ever is. But it is one of the most useful PowerShell Gallery modules for reducing software chaos on Windows devices.</p>
+<p>If your current app deployment method is “someone downloads it from a browser and hopes for the best,” this module is a much better plan.</p> </div> </article> </div>  </main> <!-- Footer --> <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16"> <div class="max-w-6xl mx-auto px-4 py-12"> <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8"> <div> <p class="text-sm text-gray-600 dark:text-gray-400">IT Desktop Engineering Blog</p> </div> <div> <h4 class="font-semibold mb-4">Pillars</h4> <ul class="space-y-2 text-sm"> <li><a href="/troubleshooting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Windows Troubleshooting</a></li><li><a href="/scripting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripting &amp; Automation</a></li><li><a href="/deployment/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Deployment &amp; Imaging</a></li><li><a href="/security/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Endpoint Security</a></li><li><a href="/packaging/" class="text-gray-600 dark:text-gray-400 hover:text-accent">App Packaging</a></li><li><a href="/career/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Career &amp; Craft</a></li><li><a href="/ai/" class="text-gray-600 dark:text-gray-400 hover:text-accent">AI-Augmented Engineering</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Content</h4> <ul class="space-y-2 text-sm"> <li><a href="/scripts/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripts</a></li> <li><a href="/series/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Series</a></li> <li><a href="/error-codes/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Error Codes</a></li> <li><a href="/about/" class="text-gray-600 dark:text-gray-400 hover:text-accent">About</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Subscribe</h4> <ul class="space-y-2 text-sm"> <li><a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-accent">RSS Feed</a></li> </ul> </div> </div> <div class="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"> <p class="text-sm text-gray-600 dark:text-gray-400">No ads. No tracking. No fluff.</p> <p class="text-sm text-gray-600 dark:text-gray-400">© 2026. All rights reserved.</p> </div> </div> </footer> <!-- Theme Toggle Script --> <script type="module">const t=document.getElementById("theme-toggle");t?.addEventListener("click",()=>{document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("zakitpro-theme","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("zakitpro-theme","dark"))});const n=document.getElementById("mobile-menu-btn"),m=document.getElementById("mobile-menu");n?.addEventListener("click",()=>{m?.classList.toggle("hidden")});document.addEventListener("keydown",e=>{(e.metaKey||e.ctrlKey)&&e.key==="k"&&(e.preventDefault(),document.getElementById("search-trigger")?.click())});</script>  </body> </html>

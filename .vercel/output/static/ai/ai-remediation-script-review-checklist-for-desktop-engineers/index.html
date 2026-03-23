@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="en" class="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="icon" type="image/png" href="/favicon.png"><meta name="generator" content="Astro v5.18.1"><!-- Primary Meta Tags --><title>AI Remediation Script Review Checklist for Desktop Engineers | zakitpro</title><meta name="title" content="AI Remediation Script Review Checklist for Desktop Engineers | zakitpro"><meta name="description" content="A practical checklist for reviewing AI-generated remediation scripts in endpoint environments, with safety gates, testing flow, and change-control discipline."><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://zakitpro.com/ai/ai-remediation-script-review-checklist-for-desktop-engineers/"><meta property="og:title" content="AI Remediation Script Review Checklist for Desktop Engineers"><meta property="og:description" content="A practical checklist for reviewing AI-generated remediation scripts in endpoint environments, with safety gates, testing flow, and change-control discipline."><meta property="og:image" content="https://zakitpro.com/og-default.png"><meta property="og:site_name" content="zakitpro"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://zakitpro.com/ai/ai-remediation-script-review-checklist-for-desktop-engineers/"><meta property="twitter:title" content="AI Remediation Script Review Checklist for Desktop Engineers"><meta property="twitter:description" content="A practical checklist for reviewing AI-generated remediation scripts in endpoint environments, with safety gates, testing flow, and change-control discipline."><meta property="twitter:image" content="https://zakitpro.com/og-default.png"><!-- RSS --><link rel="alternate" type="application/rss+xml" title="zakitpro RSS Feed" href="/rss.xml"><!-- Theme Script - Blocks FOUC --><script>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('zakitpro-theme')) {
+          return localStorage.getItem('zakitpro-theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          return 'light';
+        }
+        return 'dark';
+      })();
+      
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+      window.localStorage.setItem('zakitpro-theme', theme);
+    </script><link rel="stylesheet" href="/_astro/_slug_.CBQKsqBp.css">
+<style>:root{--color-primary: #060f30;--color-secondary: #263d76;--color-accent: #0ea5e9;--color-surface: #eef6ff;--color-background: #ffffff}.dark{--color-primary: #f4f7ff;--color-secondary: #c6d9ff;--color-accent: #0ea5e9;--color-surface: #1a2752;--color-background: #060f30}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}.dark ::-webkit-scrollbar-thumb{background:#475569}pre{position:relative;padding:1rem;overflow-x:auto;border-radius:.5rem}pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose{max-width:720px}.prose h1,.prose h2,.prose h3,.prose h4{font-family:Inter,system-ui,sans-serif;font-weight:700;scroll-margin-top:5rem}.prose h1{font-size:2rem}.prose h2{font-size:1.5rem}.prose h3{font-size:1.25rem}.prose p{line-height:1.75;margin-bottom:1.25rem}.prose a{color:#0ea5e9;text-decoration:underline}.prose a:hover{color:#2864d3}.prose code:not(pre code){background:#f1f5f9;padding:.125rem .375rem;border-radius:.25rem;font-size:.875em}.dark .prose code:not(pre code){background:#334155}.prose pre{margin:1.5rem 0}.prose ul,.prose ol{margin:1rem 0;padding-left:1.5rem}.prose li{margin:.5rem 0}.prose blockquote{border-left:4px solid #47c0f8;padding-left:1rem;font-style:italic;color:#64748b;margin:1.5rem 0}.dark .prose blockquote{color:#94a3b8}
+.prose pre{position:relative;margin:1.5rem 0;border-radius:.5rem;overflow:hidden}.prose pre code{font-family:JetBrains Mono,Consolas,monospace;font-size:.875rem;line-height:1.7}.prose pre[data-line-numbers]{counter-reset:line}.prose pre[data-line-numbers] .line:before{counter-increment:line;content:counter(line);display:inline-block;width:2rem;margin-right:1rem;text-align:right;color:#64748b;-webkit-user-select:none}.copy-btn{position:absolute;top:.5rem;right:.5rem;padding:.25rem .5rem;font-size:.75rem;background:#334155;color:#e2e8f0;border:none;border-radius:.25rem;cursor:pointer;opacity:0;transition:opacity .2s}.prose pre:hover .copy-btn{opacity:1}.lang-label{position:absolute;top:0;right:0;padding:.25rem .75rem;font-size:.75rem;font-weight:500;color:#94a3b8;background:#1e293b;border-bottom-left-radius:.5rem}
+</style><script type="module" src="/_astro/page.CyD_eNI3.js"></script></head> <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200"> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-md">
+Skip to content
+</a> <!-- Header --> <header class="sticky top-0 z-40 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-all duration-300" id="header"> <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between"> <!-- Logo --> <a href="/" class="flex items-center font-heading font-bold text-xl text-gray-900 dark:text-white hover:text-accent transition-colors"> <img src="/logo.png" alt="Site logo" class="w-16 h-16 object-contain"> </a> <!-- Desktop Nav --> <nav class="hidden md:flex items-center gap-6"> <div class="relative group"> <button class="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">
+Pillars
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path> </svg> </button> <div class="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2"> <a href="/troubleshooting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Windows Troubleshooting </a><a href="/scripting/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Scripting &amp; Automation </a><a href="/deployment/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Deployment &amp; Imaging </a><a href="/security/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Endpoint Security </a><a href="/packaging/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> App Packaging </a><a href="/career/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> Career &amp; Craft </a><a href="/ai/" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> AI-Augmented Engineering </a> </div> </div> <a href="/scripts/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Scripts</a> <a href="/series/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Series</a> <a href="/error-codes/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Error Codes</a> <a href="/about/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">About</a> </nav> <!-- Right Side --> <div class="flex items-center gap-3"> <!-- Search --> <button id="search-trigger" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Search"> <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path> </svg> </button> <!-- Theme Toggle --> <button id="theme-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Toggle theme"> <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> </button> <!-- Mobile Menu --> <button id="mobile-menu-btn" class="md:hidden p-2 text-gray-600 dark:text-gray-300" aria-label="Menu"> <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button> </div> </div> <!-- Mobile Menu --> <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"> <nav class="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-2"> <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pillars</span> <a href="/troubleshooting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Windows Troubleshooting </a><a href="/scripting/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Scripting &amp; Automation </a><a href="/deployment/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Deployment &amp; Imaging </a><a href="/security/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Endpoint Security </a><a href="/packaging/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> App Packaging </a><a href="/career/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> Career &amp; Craft </a><a href="/ai/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"> AI-Augmented Engineering </a> <hr class="my-2 border-gray-200 dark:border-gray-700"> <a href="/scripts/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Scripts</a> <a href="/series/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Series</a> <a href="/error-codes/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">Error Codes</a> <a href="/about/" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">About</a> </nav> </div> </header> <!-- Main Content --> <main id="main-content" class="min-h-screen">  <div class="max-w-7xl mx-auto px-4 py-8"> <!-- Breadcrumb --> <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6"> <a href="/" class="hover:text-accent">Home</a> <span>/</span> <a href="/ai/" class="hover:text-accent">AI-Augmented Engineering</a> <span>/</span> <span class="text-gray-900 dark:text-white">AI Remediation Script Review Checklist for Desktop Engineers</span> </nav> <div class="lg:grid lg:grid-cols-4 lg:gap-8"> <!-- Left Sidebar - Table of Contents (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24"> <nav class="text-sm"> <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">On this page</h4> <ul class="space-y-2"> <li class> <a href="#table-of-contents" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Table of contents </a> </li><li class> <a href="#where-ai-scripts-usually-fail-in-endpoint-environments" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Where AI scripts usually fail in endpoint environments </a> </li><li class> <a href="#the-10-point-review-checklist-before-pilot-deployment" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> The 10-point review checklist before pilot deployment </a> </li><li class="ml-4"> <a href="#1-confirm-the-exact-problem-statement" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 1) Confirm the exact problem statement </a> </li><li class="ml-4"> <a href="#2-verify-scope-control" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 2) Verify scope control </a> </li><li class="ml-4"> <a href="#3-inspect-destructive-actions-line-by-line" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 3) Inspect destructive actions line by line </a> </li><li class="ml-4"> <a href="#4-enforce-idempotency" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 4) Enforce idempotency </a> </li><li class="ml-4"> <a href="#5-validate-error-handling-and-exit-codes" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 5) Validate error handling and exit codes </a> </li><li class="ml-4"> <a href="#6-confirm-telemetry-and-audit-output" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 6) Confirm telemetry and audit output </a> </li><li class="ml-4"> <a href="#7-check-for-environment-assumptions" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 7) Check for environment assumptions </a> </li><li class="ml-4"> <a href="#8-add-a-dry-run-or-what-if-mode-where-possible" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 8) Add a dry-run or what-if mode where possible </a> </li><li class="ml-4"> <a href="#9-require-peer-review-with-checklist-sign-off" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 9) Require peer review with checklist sign-off </a> </li><li class="ml-4"> <a href="#10-define-rollback-before-approval" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> 10) Define rollback before approval </a> </li><li class> <a href="#a-safe-test-flow-lab-pilot-phased-rollout" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> A safe test flow: lab, pilot, phased rollout </a> </li><li class="ml-4"> <a href="#phase-1-lab-validation" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Phase 1: Lab validation </a> </li><li class="ml-4"> <a href="#phase-2-pilot-ring" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Phase 2: Pilot ring </a> </li><li class="ml-4"> <a href="#phase-3-controlled-expansion" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Phase 3: Controlled expansion </a> </li><li class> <a href="#how-to-integrate-the-checklist-into-intune-and-sccm-change-control" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> How to integrate the checklist into Intune and SCCM change control </a> </li><li class="ml-4"> <a href="#intune-pattern" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Intune pattern </a> </li><li class="ml-4"> <a href="#sccm-pattern" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> SCCM pattern </a> </li><li class> <a href="#example-fixing-a-stuck-windows-update-agent-with-ai-assisted-scripting" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Example: fixing a stuck Windows Update agent with AI-assisted scripting </a> </li><li class> <a href="#common-review-mistakes-that-cause-avoidable-incidents" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Common review mistakes that cause avoidable incidents </a> </li><li class> <a href="#start-this-week-with-a-lightweight-enforcement-rule" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Start this week with a lightweight enforcement rule </a> </li><li class> <a href="#faq" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> FAQ </a> </li><li class="ml-4"> <a href="#should-we-ban-ai-generated-remediation-scripts-in-enterprise-endpoint-teams" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Should we ban AI-generated remediation scripts in enterprise endpoint teams? </a> </li><li class="ml-4"> <a href="#how-many-reviewers-should-approve-a-remediation-script" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> How many reviewers should approve a remediation script? </a> </li><li class="ml-4"> <a href="#what-is-the-minimum-safe-pilot-size" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> What is the minimum safe pilot size? </a> </li><li class="ml-4"> <a href="#can-ai-help-with-rollback-generation-too" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Can AI help with rollback generation too? </a> </li><li class="ml-4"> <a href="#which-kpi-should-we-track-to-prove-this-process-works" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> Which KPI should we track to prove this process works? </a> </li><li class> <a href="#cta-copy-this-checklist-into-your-change-template" class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"> CTA: copy this checklist into your change template </a> </li> </ul> </nav> </div> </aside> <!-- Main Content --> <article class="lg:col-span-2"> <!-- Article Header --> <header class="mb-8"> <div class="flex flex-wrap items-center gap-3 mb-4"> <span class="text-sm text-gray-600 dark:text-gray-400"> March 7, 2026 </span> <span class="text-gray-400">•</span> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"> Mid-Level (3-5 years) </span> <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"> How-To </span> </div> <h1 class="text-3xl md:text-4xl font-heading font-bold mb-4">AI Remediation Script Review Checklist for Desktop Engineers</h1> <p class="text-lg text-gray-600 dark:text-gray-400">A practical checklist for reviewing AI-generated remediation scripts in endpoint environments, with safety gates, testing flow, and change-control discipline.</p>  </header> <!-- Article Content --> <div class="prose dark:prose-invert max-w-none"> <h1 id="ai-remediation-script-review-checklist-for-desktop-engineers">AI remediation script review checklist for desktop engineers</h1>
+<p>AI can write a remediation script in 30 seconds. Cleaning up the damage from a bad script can take days.</p>
+<p>If you manage Intune or SCCM endpoints, the risk is familiar: a script looks clean, it passes a quick glance, then it restarts the wrong service, deletes the wrong key, or hits machines outside scope. The script is not the hard part anymore. Review discipline is.</p>
+<p>This guide gives you a practical review checklist for AI-generated remediation scripts before they touch production endpoints. It’s designed for desktop engineers who need speed without gambling with fleet stability.</p>
+<h2 id="table-of-contents">Table of contents</h2>
+<ul>
+<li><a href="#where-ai-scripts-usually-fail-in-endpoint-environments">Where AI scripts usually fail in endpoint environments</a></li>
+<li><a href="#the-10-point-review-checklist-before-pilot-deployment">The 10-point review checklist before pilot deployment</a></li>
+<li><a href="#a-safe-test-flow-lab-pilot-phased-rollout">A safe test flow: lab, pilot, phased rollout</a></li>
+<li><a href="#how-to-integrate-the-checklist-into-intune-and-sccm-change-control">How to integrate the checklist into Intune and SCCM change control</a></li>
+<li><a href="#example-fixing-a-stuck-windows-update-agent-with-ai-assisted-scripting">Example: fixing a stuck Windows Update agent with AI-assisted scripting</a></li>
+<li><a href="#common-review-mistakes-that-cause-avoidable-incidents">Common review mistakes that cause avoidable incidents</a></li>
+<li><a href="#faq">FAQ</a></li>
+</ul>
+<h2 id="where-ai-scripts-usually-fail-in-endpoint-environments">Where AI scripts usually fail in endpoint environments</h2>
+<p>Most bad outcomes are not because the script was malicious. They happen because the script was context-blind.</p>
+<p>Common failure modes:</p>
+<ul>
+<li>Assumes a service exists with the same name on every OS build.</li>
+<li>Uses broad wildcards in registry or file operations.</li>
+<li>Ignores device state (battery, VPN, user session, encryption).</li>
+<li>Treats error handling as an afterthought.</li>
+<li>Lacks rollback logic when partial changes succeed.</li>
+</ul>
+<p>AI is strong at producing plausible code. Endpoint engineering demands code that is predictable under edge cases. That’s the gap your review process has to close.</p>
+<p>If your team is still building prompt hygiene, pair this with <a href="/ai/how-to-prompt-ai-to-write-secure-powershell">How to Prompt AI to Write Secure PowerShell</a>. If you’re troubleshooting policy behavior, also keep <a href="/ai/ai-intune-policy-troubleshooting">AI Intune policy troubleshooting</a> nearby.</p>
+<h2 id="the-10-point-review-checklist-before-pilot-deployment">The 10-point review checklist before pilot deployment</h2>
+<p>Use this checklist every time. Do not skip steps because “it’s a simple fix.”</p>
+<h3 id="1-confirm-the-exact-problem-statement">1) Confirm the exact problem statement</h3>
+<p>Your script must answer one specific incident pattern, not a loose category.</p>
+<p>Bad: “Fix Windows Update issues.”
+Good: “Reset WU components for devices stuck at 0% download with error 0x8024401c after proxy change.”</p>
+<p>If the target condition is fuzzy, AI output will be fuzzy too.</p>
+<h3 id="2-verify-scope-control">2) Verify scope control</h3>
+<p>Check how target devices are selected:</p>
+<ul>
+<li>Intune assignment filters or dynamic groups</li>
+<li>SCCM collections</li>
+<li>Exclusion rules for servers, kiosks, VIP devices</li>
+</ul>
+<p>Scope errors are the fastest path to a broad outage.</p>
+<h3 id="3-inspect-destructive-actions-line-by-line">3) Inspect destructive actions line by line</h3>
+<p>Flag any command that can remove, disable, or overwrite:</p>
+<ul>
+<li><code>Remove-Item</code></li>
+<li><code>Set-ItemProperty</code></li>
+<li><code>Stop-Service</code> / <code>Set-Service -StartupType Disabled</code></li>
+<li><code>schtasks /delete</code></li>
+<li>WMI method calls that force state changes</li>
+</ul>
+<p>Every destructive line needs a reason and a guard condition.</p>
+<h3 id="4-enforce-idempotency">4) Enforce idempotency</h3>
+<p>The script should be safe to run more than once.</p>
+<p>Look for:</p>
+<ul>
+<li>Existence checks before create/delete</li>
+<li>“Already compliant” exit paths</li>
+<li>Deterministic outcomes on rerun</li>
+</ul>
+<p>If second run behavior is unknown, production behavior is unknown.</p>
+<h3 id="5-validate-error-handling-and-exit-codes">5) Validate error handling and exit codes</h3>
+<p>A remediation script that always exits <code>0</code> is a liar.</p>
+<p>Require:</p>
+<ul>
+<li>Structured <code>try/catch</code> blocks</li>
+<li>Explicit failure exit codes</li>
+<li>Clear log messages for each failure branch</li>
+</ul>
+<p>This is essential for Intune remediation reporting and SCCM status interpretation.</p>
+<h3 id="6-confirm-telemetry-and-audit-output">6) Confirm telemetry and audit output</h3>
+<p>Before rollout, decide where proof lands:</p>
+<ul>
+<li>Local log file path</li>
+<li>Event log entries</li>
+<li>Detection output consumed by management platform</li>
+</ul>
+<p>No telemetry means no confidence during incident review.</p>
+<h3 id="7-check-for-environment-assumptions">7) Check for environment assumptions</h3>
+<p>Read for hidden assumptions:</p>
+<ul>
+<li>Requires admin context</li>
+<li>Requires internet or specific proxy</li>
+<li>Depends on domain reachability</li>
+<li>Assumes BitLocker suspended/not suspended</li>
+</ul>
+<p>Call these out in script comments and change record.</p>
+<h3 id="8-add-a-dry-run-or-what-if-mode-where-possible">8) Add a dry-run or what-if mode where possible</h3>
+<p>For high-risk actions, support simulation first.</p>
+<p>Even a simple switch (<code>-WhatIfMode</code>) that logs intended changes can prevent painful mistakes during pilot.</p>
+<h3 id="9-require-peer-review-with-checklist-sign-off">9) Require peer review with checklist sign-off</h3>
+<p>No self-approval for AI-generated remediation.</p>
+<p>Reviewer should verify:</p>
+<ul>
+<li>Logic correctness</li>
+<li>Platform compatibility</li>
+<li>Rollback feasibility</li>
+<li>Operational readability at 2 a.m.</li>
+</ul>
+<h3 id="10-define-rollback-before-approval">10) Define rollback before approval</h3>
+<p>Rollback is not “we’ll figure it out if needed.”</p>
+<p>Document:</p>
+<ul>
+<li>Trigger condition for rollback</li>
+<li>Exact rollback script/steps</li>
+<li>Decision owner</li>
+<li>Communication path</li>
+</ul>
+<p>If rollback is vague, approval should be blocked.</p>
+<h2 id="a-safe-test-flow-lab-pilot-phased-rollout">A safe test flow: lab, pilot, phased rollout</h2>
+<p>The flow below keeps speed while containing blast radius.</p>
+<h3 id="phase-1-lab-validation">Phase 1: Lab validation</h3>
+<ul>
+<li>Test on representative OS versions.</li>
+<li>Include one intentionally broken device and one healthy device.</li>
+<li>Capture baseline and post-run state.</li>
+</ul>
+<p>Goal: prove script does not harm healthy machines.</p>
+<h3 id="phase-2-pilot-ring">Phase 2: Pilot ring</h3>
+<ul>
+<li>1-3% of target population.</li>
+<li>Include devices from different network paths (LAN, VPN, remote).</li>
+<li>Monitor 24-48 hours before expansion.</li>
+</ul>
+<p>Goal: catch real-world edge cases without wide impact.</p>
+<h3 id="phase-3-controlled-expansion">Phase 3: Controlled expansion</h3>
+<ul>
+<li>Expand in increments (10% &gt; 25% &gt; 50% &gt; 100%).</li>
+<li>Gate each increment on success metrics.</li>
+<li>Pause automatically if failure threshold breached.</li>
+</ul>
+<p>Goal: make “stop” easy and fast.</p>
+<p>For rollout risk framing, this complements <a href="/ai/ai-change-risk-review-intune-baselines">AI change risk review for Intune baselines</a>.</p>
+<h2 id="how-to-integrate-the-checklist-into-intune-and-sccm-change-control">How to integrate the checklist into Intune and SCCM change control</h2>
+<p>The checklist only works if it becomes part of process, not tribal memory.</p>
+<h3 id="intune-pattern">Intune pattern</h3>
+<ul>
+<li>Keep a template change record for remediation scripts.</li>
+<li>Require checklist answers in the PR or ticket.</li>
+<li>Attach pilot evidence (success/fail counts, logs, rollback readiness).</li>
+<li>Block broad assignment until peer sign-off is complete.</li>
+</ul>
+<h3 id="sccm-pattern">SCCM pattern</h3>
+<ul>
+<li>Tie script package/version to CAB ticket ID.</li>
+<li>Require collection scope and exclusion proof.</li>
+<li>Store execution logs with incident timeline.</li>
+<li>Record post-deployment verification in closure notes.</li>
+</ul>
+<p>In both platforms, make checklist completion auditable. Governance improves when evidence is easy to inspect.</p>
+<h2 id="example-fixing-a-stuck-windows-update-agent-with-ai-assisted-scripting">Example: fixing a stuck Windows Update agent with AI-assisted scripting</h2>
+<p>Incident: a subset of laptops fails monthly cumulative update scan after proxy changes.</p>
+<p>AI-generated draft includes:</p>
+<ul>
+<li>Stop <code>wuauserv</code> and <code>bits</code></li>
+<li>Clear <code>SoftwareDistribution</code></li>
+<li>Re-register update components</li>
+<li>Restart services</li>
+</ul>
+<p>Without review, this is risky. With checklist review:</p>
+<ul>
+<li>Scope narrowed to devices returning specific scan error pattern.</li>
+<li>Health pre-check added (disk free space, battery, VPN state).</li>
+<li>Idempotency added for folder reset logic.</li>
+<li>Event log writes added for each step.</li>
+<li>Non-zero exit codes added for partial failure.</li>
+<li>Rollback documented: restore services and abort if re-registration fails.</li>
+</ul>
+<p>Result: pilot resolved target issue without collateral failures, and failures were diagnosable from logs instead of guesswork.</p>
+<h2 id="common-review-mistakes-that-cause-avoidable-incidents">Common review mistakes that cause avoidable incidents</h2>
+<ul>
+<li>Trusting script readability more than script behavior.</li>
+<li>Skipping pilot because “it worked in a VM.”</li>
+<li>Mixing remediation logic and cleanup logic in one untested block.</li>
+<li>Approving without rollback owner.</li>
+<li>Expanding scope before telemetry confirms success.</li>
+</ul>
+<p>If your team keeps repeating these mistakes, don’t add more tooling first. Tighten review gates.</p>
+<h2 id="start-this-week-with-a-lightweight-enforcement-rule">Start this week with a lightweight enforcement rule</h2>
+<p>If you want immediate improvement, enforce one policy now:</p>
+<p>“No AI-generated remediation script reaches production without completed checklist, peer review, and rollback plan.”</p>
+<p>That single rule prevents most self-inflicted endpoint incidents.</p>
+<h2 id="faq">FAQ</h2>
+<h3 id="should-we-ban-ai-generated-remediation-scripts-in-enterprise-endpoint-teams">Should we ban AI-generated remediation scripts in enterprise endpoint teams?</h3>
+<p>No. Banning usually drives shadow usage. A better approach is governed usage with review gates, scope controls, and audit trails.</p>
+<h3 id="how-many-reviewers-should-approve-a-remediation-script">How many reviewers should approve a remediation script?</h3>
+<p>At least one peer reviewer besides the author. For high-risk scripts that touch security controls, require a second approver from platform/security.</p>
+<h3 id="what-is-the-minimum-safe-pilot-size">What is the minimum safe pilot size?</h3>
+<p>There is no universal number, but 1-3% is a practical starting point if the sample includes diverse device/network profiles.</p>
+<h3 id="can-ai-help-with-rollback-generation-too">Can AI help with rollback generation too?</h3>
+<p>Yes, but rollback should be reviewed with the same rigor as remediation. A bad rollback can make an incident worse.</p>
+<h3 id="which-kpi-should-we-track-to-prove-this-process-works">Which KPI should we track to prove this process works?</h3>
+<p>Track remediation-related incident rate and mean time to recover after script deployment. If governance is working, both should improve.</p>
+<h2 id="cta-copy-this-checklist-into-your-change-template">CTA: copy this checklist into your change template</h2>
+<p>Do not keep the review checklist in someone’s notes app. Put it in your actual change template, require sign-off fields, and make it the default path for every AI-generated remediation script.</p> </div> <!-- Tags --> <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700"> <div class="flex flex-wrap gap-2"> <a href="/tags/ai" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#ai </a><a href="/tags/desktop-engineering" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#desktop-engineering </a><a href="/tags/powershell" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#powershell </a><a href="/tags/intune" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#intune </a><a href="/tags/change-control" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:bg-accent hover:text-white transition-colors">
+#change-control </a> </div> </div> <!-- Was this helpful? --> <div class="mt-8 flex items-center gap-4"> <span class="text-sm text-gray-600 dark:text-gray-400">Was this helpful?</span> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👍 Yes
+</button> <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+👎 No
+</button> </div> <!-- Giscus Comments --> <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700"> <script src="https://giscus.app/client.js" data-repo="your-username/zakitpro-comments" data-repo-id="YOUR_REPO_ID" data-category="Comments" data-category-id="YOUR_CATEGORY_ID" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="en" crossorigin="anonymous" async>
+          </script> </div> </article> <!-- Right Sidebar - Metadata (Desktop) --> <aside class="hidden lg:block lg:col-span-1"> <div class="sticky top-24 space-y-6"> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Pillar</h4> <a href="/ai/" class="text-accent hover:underline font-medium"> AI-Augmented Engineering </a> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Difficulty</h4> <span class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"> Mid-Level (3-5 years) </span> </div> <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"> <h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Published</h4> <p class="text-sm text-gray-700 dark:text-gray-300"> March 7, 2026 </p> </div> </div> </aside> </div> </div>  </main> <!-- Footer --> <footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-16"> <div class="max-w-6xl mx-auto px-4 py-12"> <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8"> <div> <p class="text-sm text-gray-600 dark:text-gray-400">IT Desktop Engineering Blog</p> </div> <div> <h4 class="font-semibold mb-4">Pillars</h4> <ul class="space-y-2 text-sm"> <li><a href="/troubleshooting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Windows Troubleshooting</a></li><li><a href="/scripting/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripting &amp; Automation</a></li><li><a href="/deployment/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Deployment &amp; Imaging</a></li><li><a href="/security/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Endpoint Security</a></li><li><a href="/packaging/" class="text-gray-600 dark:text-gray-400 hover:text-accent">App Packaging</a></li><li><a href="/career/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Career &amp; Craft</a></li><li><a href="/ai/" class="text-gray-600 dark:text-gray-400 hover:text-accent">AI-Augmented Engineering</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Content</h4> <ul class="space-y-2 text-sm"> <li><a href="/scripts/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Scripts</a></li> <li><a href="/series/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Series</a></li> <li><a href="/error-codes/" class="text-gray-600 dark:text-gray-400 hover:text-accent">Error Codes</a></li> <li><a href="/about/" class="text-gray-600 dark:text-gray-400 hover:text-accent">About</a></li> </ul> </div> <div> <h4 class="font-semibold mb-4">Subscribe</h4> <ul class="space-y-2 text-sm"> <li><a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-accent">RSS Feed</a></li> </ul> </div> </div> <div class="pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4"> <p class="text-sm text-gray-600 dark:text-gray-400">No ads. No tracking. No fluff.</p> <p class="text-sm text-gray-600 dark:text-gray-400">© 2026. All rights reserved.</p> </div> </div> </footer> <!-- Theme Toggle Script --> <script type="module">const t=document.getElementById("theme-toggle");t?.addEventListener("click",()=>{document.documentElement.classList.contains("dark")?(document.documentElement.classList.remove("dark"),localStorage.setItem("zakitpro-theme","light")):(document.documentElement.classList.add("dark"),localStorage.setItem("zakitpro-theme","dark"))});const n=document.getElementById("mobile-menu-btn"),m=document.getElementById("mobile-menu");n?.addEventListener("click",()=>{m?.classList.toggle("hidden")});document.addEventListener("keydown",e=>{(e.metaKey||e.ctrlKey)&&e.key==="k"&&(e.preventDefault(),document.getElementById("search-trigger")?.click())});</script>  </body> </html> 
