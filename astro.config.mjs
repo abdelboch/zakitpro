@@ -22,6 +22,13 @@ export default defineConfig({
   build: {
     inlineStylesheets: 'auto'
   },
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ['/pagefind/pagefind.js']
+      }
+    }
+  },
   prefetch: {
     defaultStrategy: 'viewport'
   }
