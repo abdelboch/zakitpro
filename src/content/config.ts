@@ -58,9 +58,15 @@ const tools = defineCollection({
   })
 });
 
+const social = defineCollection({
+  type: 'content',
+  schema: z.object({}).passthrough()
+});
+
 export const collections = {
   articles,
   scripts,
   series,
-  tools
+  tools,
+  social
 };

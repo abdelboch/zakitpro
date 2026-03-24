@@ -1,3 +1,46 @@
+// Shared constants
+export const pillarNames: Record<string, string> = {
+  troubleshooting: 'Windows Troubleshooting',
+  scripting: 'Scripting & Automation',
+  deployment: 'Deployment & Imaging',
+  security: 'Endpoint Security',
+  packaging: 'App Packaging',
+  career: 'Career & Craft',
+  ai: 'AI-Augmented Engineering'
+};
+
+export const pillarDescriptions: Record<string, string> = {
+  troubleshooting: 'Boot failures, BSOD, event log forensics, profile corruption, error codes',
+  scripting: 'PowerShell, Graph API, task automation, scheduled jobs',
+  deployment: 'Autopilot, WinPE, MDT, driver injection, provisioning',
+  security: 'CIS benchmarks, LAPS, Defender for Endpoint, BitLocker, Conditional Access',
+  packaging: 'Win32/Intune packaging, PSADT, silent installs, detection rules',
+  career: 'Career progression, lab setup, cert roadmaps, documentation, tooling',
+  ai: 'AI workflows for endpoint engineering, prompt ops, AI-assisted troubleshooting, and governance'
+};
+
+export const difficultyColors: Record<string, string> = {
+  junior: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  mid: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  senior: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+};
+
+export const difficultyLabels: Record<string, string> = {
+  junior: 'Junior (1-3 years)',
+  mid: 'Mid-Level (3-5 years)',
+  senior: 'Senior (5+ years)'
+};
+
+export const typeLabels: Record<string, string> = {
+  'war-story': 'War Story',
+  'deep-dive': 'Deep Dive',
+  'how-to': 'How-To',
+  'script-drop': 'Script Drop',
+  'error-reference': 'Error Reference',
+  'opinion': 'Opinion',
+  'career-guide': 'Career Guide'
+};
+
 // Reading time utility
 export function calculateReadingTime(content: string): string {
   // Strip MDX/HTML tags

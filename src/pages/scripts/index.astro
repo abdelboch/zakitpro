@@ -1,18 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { pillarNames } from '../../utils/index';
 
 const scripts = await getCollection('scripts', ({ data }) => !data.draft);
-
-const pillarNames = {
-  troubleshooting: 'Windows Troubleshooting',
-  scripting: 'Scripting & Automation',
-  deployment: 'Deployment & Imaging',
-  security: 'Endpoint Security',
-  packaging: 'App Packaging',
-  career: 'Career & Craft',
-  ai: 'AI-Augmented Engineering'
-};
 
 const languageColors = {
   powershell: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -31,7 +22,7 @@ const languageColors = {
     
     <!-- Filters -->
     <div class="flex flex-wrap gap-4 mb-8">
-      <select id="language-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+      <select id="language-filter" aria-label="Filter by language" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
         <option value="">All Languages</option>
         <option value="powershell">PowerShell</option>
         <option value="cmd">CMD</option>
@@ -39,7 +30,7 @@ const languageColors = {
         <option value="registry">Registry</option>
       </select>
       
-      <select id="pillar-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+      <select id="pillar-filter" aria-label="Filter by pillar" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
         <option value="">All Pillars</option>
         {Object.entries(pillarNames).map(([id, name]) => (
           <option value={id}>{name}</option>

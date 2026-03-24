@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { pillarNames, difficultyColors, difficultyLabels, typeLabels } from '../../utils/index';
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles', ({ data }) => !data.draft);
@@ -12,41 +13,22 @@ export async function getStaticPaths() {
 
 const { article } = Astro.props;
 const { Content, headings } = await article.render();
-
-const pillarNames = {
-  troubleshooting: 'Windows Troubleshooting',
-  scripting: 'Scripting & Automation',
-  deployment: 'Deployment & Imaging',
-  security: 'Endpoint Security',
-  packaging: 'App Packaging',
-  career: 'Career & Craft',
-  ai: 'AI-Augmented Engineering'
-};
-
-const difficultyColors = {
-  junior: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  mid: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  senior: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-};
-
-const difficultyLabels = {
-  junior: 'Junior (1-3 years)',
-  mid: 'Mid-Level (3-5 years)',
-  senior: 'Senior (5+ years)'
-};
-
-const typeLabels = {
-  'war-story': 'War Story',
-  'deep-dive': 'Deep Dive',
-  'how-to': 'How-To',
-  'script-drop': 'Script Drop',
-  'error-reference': 'Error Reference',
-  'opinion': 'Opinion',
-  'career-guide': 'Career Guide'
-};
 ---
 
-<BaseLayout title={article.data.title} description={article.data.description}>
+<BaseLayout
+  title={article.data.title}
+  description={article.data.description}
+  pillar={article.data.pillar}
+  article={{
+    title: article.data.title,
+    publishedAt: article.data.publishedAt,
+    updatedAt: article.data.updatedAt,
+    pillar: article.data.pillar,
+    difficulty: article.data.difficulty,
+    type: article.data.type,
+    tags: article.data.tags
+  }}
+>
   <div class="max-w-7xl mx-auto px-4 py-8">
     <!-- Breadcrumb -->
     <nav class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -83,6 +65,34 @@ const typeLabels = {
       
       <!-- Main Content -->
       <article class="lg:col-span-2">
+        <!-- Mobile TOC -->
+        {headings && headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 3 && (
+          <div class="lg:hidden mb-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+              id="mobile-toc-btn"
+              class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 text-sm font-semibold text-gray-900 dark:text-white"
+              aria-expanded="false"
+              aria-controls="mobile-toc"
+            >
+              On this page
+              <svg id="mobile-toc-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <nav id="mobile-toc" class="hidden px-4 py-3 bg-white dark:bg-gray-900">
+              <ul class="space-y-2 text-sm">
+                {headings.filter(h => h.depth >= 2 && h.depth <= 3).map(heading => (
+                  <li class={heading.depth === 3 ? 'ml-4' : ''}>
+                    <a href={`#${heading.slug}`} class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1 mobile-toc-link">
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        )}
+
         <!-- Article Header -->
         <header class="mb-8">
           <div class="flex flex-wrap items-center gap-3 mb-4">
@@ -138,25 +148,12 @@ const typeLabels = {
           </button>
         </div>
         
-        <!-- Giscus Comments -->
+        <!-- Comments -->
         <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <script 
-            src="https://giscus.app/client.js"
-            data-repo="your-username/zakitpro-comments"
-            data-repo-id="YOUR_REPO_ID"
-            data-category="Comments"
-            data-category-id="YOUR_CATEGORY_ID"
-            data-mapping="pathname"
-            data-strict="0"
-            data-reactions-enabled="1"
-            data-emit-metadata="0"
-            data-input-position="bottom"
-            data-theme="preferred_color_scheme"
-            data-lang="en"
-            crossorigin="anonymous"
-            async
-          >
-          </script>
+          <h3 class="text-lg font-semibold mb-4">Comments</h3>
+          <div class="rounded-lg border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-6 text-center text-sm text-gray-500 dark:text-gray-400">
+            Comments are coming soon. Have feedback? Reach out via the <a href="/about/" class="text-accent hover:underline">About</a> page.
+          </div>
         </div>
       </article>
       
@@ -188,6 +185,26 @@ const typeLabels = {
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  // Mobile TOC
+  const tocBtn = document.getElementById('mobile-toc-btn');
+  const tocPanel = document.getElementById('mobile-toc');
+  const tocChevron = document.getElementById('mobile-toc-chevron');
+  tocBtn?.addEventListener('click', () => {
+    const expanded = tocBtn.getAttribute('aria-expanded') === 'true';
+    tocBtn.setAttribute('aria-expanded', String(!expanded));
+    tocPanel?.classList.toggle('hidden');
+    tocChevron?.classList.toggle('rotate-180');
+  });
+  document.querySelectorAll('.mobile-toc-link').forEach(link => {
+    link.addEventListener('click', () => {
+      tocPanel?.classList.add('hidden');
+      tocBtn?.setAttribute('aria-expanded', 'false');
+      tocChevron?.classList.remove('rotate-180');
+    });
+  });
+</script>
 
 <style is:global>
   /* Code block styling */

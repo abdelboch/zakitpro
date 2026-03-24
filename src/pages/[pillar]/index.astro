@@ -3,25 +3,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import ArticleCard from '../../components/ArticleCard.astro';
 import DifficultyBadge from '../../components/DifficultyBadge.astro';
+import { pillarNames, pillarDescriptions } from '../../utils/index';
 
 export async function getStaticPaths() {
-  const pillars = ['troubleshooting', 'scripting', 'deployment', 'security', 'packaging', 'career', 'ai'];
-  return pillars.map(pillar => ({
-    params: { pillar }
-  }));
+  return Object.keys(pillarNames).map(pillar => ({ params: { pillar } }));
 }
 
 const { pillar } = Astro.params;
-
-const pillarNames = {
-  troubleshooting: 'Windows Troubleshooting',
-  scripting: 'Scripting & Automation',
-  deployment: 'Deployment & Imaging',
-  security: 'Endpoint Security',
-  packaging: 'App Packaging',
-  career: 'Career & Craft',
-  ai: 'AI-Augmented Engineering'
-};
 
 
 
@@ -65,16 +53,6 @@ const aiClusters = [
     points: ['AI usage policy for endpoint teams', 'Data handling boundaries', 'Auditability and change control']
   }
 ];
-
-const pillarDescriptions = {
-  troubleshooting: 'Boot failures, BSOD, event log forensics, profile corruption, error codes',
-  scripting: 'PowerShell, Graph API, task automation, scheduled jobs',
-  deployment: 'Autopilot, WinPE, MDT, driver injection, provisioning',
-  security: 'CIS benchmarks, LAPS, Defender for Endpoint, BitLocker, Conditional Access',
-  packaging: 'Win32/Intune packaging, PSADT, silent installs, detection rules',
-  career: 'Career progression, lab setup, cert roadmaps, documentation, tooling',
-  ai: 'AI workflows for endpoint engineering, prompt ops, AI-assisted troubleshooting, and governance'
-};
 
 // Get all articles for this pillar
 const allArticles = await getCollection('articles', ({ data }) => !data.draft);
@@ -131,14 +109,14 @@ const types = ['war-story', 'deep-dive', 'how-to', 'script-drop', 'error-referen
 
     <!-- Filters -->
     <div class="flex flex-wrap gap-4 mb-8">
-      <select id="difficulty-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+      <select id="difficulty-filter" aria-label="Filter by difficulty" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
         <option value="">All Levels</option>
         {difficulties.map(d => (
           <option value={d}>{d.charAt(0).toUpperCase() + d.slice(1)}</option>
         ))}
       </select>
       
-      <select id="type-filter" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
+      <select id="type-filter" aria-label="Filter by type" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg">
         <option value="">All Types</option>
         {types.map(t => (
           <option value={t}>{t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>
@@ -159,36 +137,65 @@ const types = ['war-story', 'deep-dive', 'how-to', 'script-drop', 'error-referen
       )}
     </div>
     
-    <!-- Pagination placeholder -->
-    {pillarArticles.length > 15 && (
-      <div class="mt-8 flex justify-center gap-2">
-        <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Previous</button>
-        <button class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">Next</button>
-      </div>
-    )}
+    <!-- Pagination -->
+    <div id="pagination" class="mt-8 flex justify-center items-center gap-2 hidden">
+      <button id="prev-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">← Previous</button>
+      <span id="page-info" class="text-sm text-gray-600 dark:text-gray-400 px-2"></span>
+      <button id="next-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Next →</button>
+    </div>
   </div>
 </BaseLayout>
 
 <script>
-  const difficultyFilter = document.getElementById('difficulty-filter');
-  const typeFilter = document.getElementById('type-filter');
-  const articles = document.querySelectorAll('.article-item');
-  
-  function filterArticles() {
+  const PAGE_SIZE = 12;
+  let currentPage = 1;
+  let visibleItems: HTMLElement[] = [];
+
+  const difficultyFilter = document.getElementById('difficulty-filter') as HTMLSelectElement;
+  const typeFilter = document.getElementById('type-filter') as HTMLSelectElement;
+  const allItems = Array.from(document.querySelectorAll('.article-item')) as HTMLElement[];
+  const pagination = document.getElementById('pagination');
+  const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
+  const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
+  const pageInfo = document.getElementById('page-info');
+
+  function applyFilters() {
     const difficulty = difficultyFilter?.value || '';
     const type = typeFilter?.value || '';
-    
-    articles.forEach(article => {
-      const articleDifficulty = article.getAttribute('data-difficulty');
-      const articleType = article.getAttribute('data-type');
-      
-      const matchesDifficulty = !difficulty || articleDifficulty === difficulty;
-      const matchesType = !type || articleType === type;
-      
-      (article as HTMLElement).style.display = matchesDifficulty && matchesType ? 'block' : 'none';
+    visibleItems = allItems.filter(item => {
+      const matchesDifficulty = !difficulty || item.getAttribute('data-difficulty') === difficulty;
+      const matchesType = !type || item.getAttribute('data-type') === type;
+      return matchesDifficulty && matchesType;
     });
+    currentPage = 1;
+    renderPage();
   }
-  
-  difficultyFilter?.addEventListener('change', filterArticles);
-  typeFilter?.addEventListener('change', filterArticles);
+
+  function renderPage() {
+    const totalPages = Math.max(1, Math.ceil(visibleItems.length / PAGE_SIZE));
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+
+    allItems.forEach(item => item.style.display = 'none');
+    visibleItems.slice(start, end).forEach(item => item.style.display = 'block');
+
+    if (pagination) {
+      if (visibleItems.length > PAGE_SIZE) {
+        pagination.classList.remove('hidden');
+      } else {
+        pagination.classList.add('hidden');
+      }
+    }
+
+    if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+  }
+
+  prevBtn?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+  nextBtn?.addEventListener('click', () => { currentPage++; renderPage(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  difficultyFilter?.addEventListener('change', applyFilters);
+  typeFilter?.addEventListener('change', applyFilters);
+
+  applyFilters();
 </script>
