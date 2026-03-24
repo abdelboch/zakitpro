@@ -198,6 +198,11 @@ def render_local_whiteboard(topic_name: str, summary: str, sections: list[str], 
 
 def generate_whiteboard_image(prompt_text: str, output_path: Path, topic_name: str, summary: str, sections: list[str], badges: list[str] | None = None) -> tuple[Path, str]:
     api_key = os.environ.get('GEMINI_API_KEY')
+    if not api_key:
+        try:
+            api_key = Path('/home/zak/.openclaw/credentials/gemini_api_key').read_text().strip()
+        except Exception:
+            pass
     if api_key:
         payload = {
             'contents': [{'parts': [{'text': prompt_text}]}],
