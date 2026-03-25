@@ -1,0 +1,28 @@
+Hand-drawn whiteboard style square social graphic, high contrast, rough marker lines, readable handwritten text, no photorealism.
+
+Main title at top:
+AI + Intune Assignment Filters
+
+Center flow with arrows between 5 boxes:
+1. Define targeting intent
+2. Capture filter logic
+3. Ask AI to critique
+4. Check edge cases
+5. Validate known devices
+
+Right side callout bubbles:
+- Quiet targeting mistakes hurt
+- Review logic, don't trust it blindly
+- Test before broad rollout
+
+Bottom badge strip:
+- Better filter reviews
+- Safer Intune targeting
+- Fewer rollout surprises
+
+Add simple doodles: filter funnel, laptop icon, warning triangle, checklist, magnifying glass.
+
+Style notes:
+clean whiteboard layout, black marker on white background, light blue and orange accents, bold readable lettering, social-media-friendly composition.
+
+Output should feel like a desktop engineering whiteboard explainer, not corporate clip art.
