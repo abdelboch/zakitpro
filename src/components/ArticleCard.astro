@@ -11,11 +11,12 @@ interface Props {
     type: string;
     pillar: string;
     tags?: string[];
+    readingTime?: string;
   };
 }
 
 const { article } = Astro.props;
-const readingTime = calculateReadingTime(article.description);
+const readingTime = article.readingTime || calculateReadingTime(article.description);
 
 const pillarNames = {
   troubleshooting: 'Windows Troubleshooting',

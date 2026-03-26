@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import ArticleCard from '../../components/ArticleCard.astro';
+import { calculateReadingTime } from '../../utils';
 import DifficultyBadge from '../../components/DifficultyBadge.astro';
 import { pillarNames, pillarDescriptions } from '../../utils/index';
 
@@ -129,7 +130,7 @@ const types = ['war-story', 'deep-dive', 'how-to', 'script-drop', 'error-referen
       {pillarArticles.length > 0 ? (
         pillarArticles.map(article => (
           <div class="article-item" data-difficulty={article.data.difficulty} data-type={article.data.type}>
-            <ArticleCard article={{ ...article.data, slug: article.slug }} />
+            <ArticleCard article={{ ...article.data, slug: article.slug, readingTime: calculateReadingTime(article.body || article.data.description || '') }} />
           </div>
         ))
       ) : (
@@ -139,9 +140,9 @@ const types = ['war-story', 'deep-dive', 'how-to', 'script-drop', 'error-referen
     
     <!-- Pagination -->
     <div id="pagination" class="mt-8 flex justify-center items-center gap-2 hidden">
-      <button id="prev-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">← Previous</button>
+      <button id="prev-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">â Previous</button>
       <span id="page-info" class="text-sm text-gray-600 dark:text-gray-400 px-2"></span>
-      <button id="next-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Next →</button>
+      <button id="next-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Next â</button>
     </div>
   </div>
 </BaseLayout>

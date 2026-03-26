@@ -1,9 +1,31 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-.env
-.env.*
-.DS_Store
-*.log
 .astro/
 .vercel/
+
+# Environment
+.env
+.env.*
 *.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temp/draft files
+.tmp_*
+*.tmp
+linkedin_draft.txt
+lighthouse.json
+
+# Internal ops tooling
+bachir-ops-console/
+
+# Internal content planning
+Writers/

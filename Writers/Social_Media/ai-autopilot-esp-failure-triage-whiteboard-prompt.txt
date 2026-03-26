@@ -1,9 +1,0 @@
-AI + Autopilot ESP Triage
-Speed up Windows Autopilot Enrollment Status Page troubleshooting by feeding AI a structured evidence packet and validating every recommendation.
-HERO MESSAGE: A laptop stuck on an Enrollment Status Page with a warning icon, next to an AI assistant holding a ranked checklist labeled causes 1, 2, 3.
-PHASE CONTROL: Three side-by-side panels labeled Device prep, Device setup, and Account setup with different colored arrows showing that picking the right phase changes the investigation path.
-EVIDENCE PACKET: A clipboard showing error code, blocking app, recent change, scope, and network context, with a green label saying Structured Input.
-ROOT CAUSE SHORTLIST: A whiteboard ranking card with Packaging, Detection Rule, Targeting, and Network, each with confidence dots beside them.
-VALIDATION LOOP: Intune portal icon, app install status card, event log sheet, and detection rule document connected in a loop with a human engineer at the center.
-ESCALATION READY: A clean handoff note moving from Desktop Engineering to Packaging Team with sections for symptom, checks completed, and next ask.
-BOTTOM PAYOFF: Three badges reading Faster narrowing, Better escalations, Fewer blind changes, plus a small shield icon that says Validate before change.
