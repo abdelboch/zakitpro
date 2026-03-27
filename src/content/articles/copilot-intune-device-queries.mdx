@@ -1,0 +1,101 @@
+---
+title: "Copilot for Intune Device Queries: Natural Language to KQL"
+description: "How to use Microsoft Copilot to generate and run KQL device queries in Intune Advanced Analytics, from natural language prompts to actionable fleet data."
+publishedAt: "2026-03-27"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["copilot", "intune", "kql", "device-query", "advanced-analytics"]
+draft: false
+---
+
+# Copilot for Intune Device Queries: Natural Language to KQL
+
+Intune device query lets you run KQL against your managed device inventory to answer questions like "which devices are missing a specific app" or "show me all machines with less than 10 GB free on the system drive." Copilot removes the KQL barrier: you type the question in plain English and it generates the query for you. This guide covers how it works, where it fits in your workflow, and where it falls short.
+
+## How Copilot Device Query Works
+
+Device query in Intune is part of Advanced Analytics. It connects to a real-time data lake of device properties — hardware inventory, installed apps, disk usage, OS build, TPM state, and more — and lets you query across your entire fleet simultaneously.
+
+Without Copilot, you write the KQL manually. The schema has dozens of tables and device properties, and the query syntax has specifics that trip people up even if they know KQL from other Microsoft products. Copilot sits on top of this and translates your intent into valid KQL.
+
+The flow is straightforward. Navigate to Devices > Device query in the Intune admin center. The query editor opens alongside a Copilot chat pane. You type your question, Copilot generates the KQL, you review and execute it. Results come back as a table you can sort, filter, and export.
+
+Copilot also explains the query it generates. Below the KQL output there is a plain-language explanation of what the query does and why it is written that way. This is useful for learning — after a few sessions you start to recognize the patterns and can modify the generated queries directly rather than rephrasing your question.
+
+## Practical Query Examples
+
+The following examples all start as plain-language prompts and produce valid KQL via Copilot.
+
+**Patch compliance check:**
+Prompt: "Show me all Windows 11 devices that are missing the latest cumulative update"
+Copilot generates a query against the device inventory table filtering on OS build number and patch install date.
+
+**Storage monitoring:**
+Prompt: "Which devices have less than 15 GB free on their C drive"
+This produces a query against the logical disk table filtering on free space. Useful before deploying large application packages.
+
+**Hardware compliance:**
+Prompt: "Show me all devices where TPM version is less than 2.0"
+Critical for Windows 11 readiness assessment and FIDO2 hardware key planning.
+
+**Application targeting:**
+Prompt: "Find all devices that do not have the Zscaler client installed"
+This generates a query against the installed applications table with a NOT IN condition on the app name. Use this to build a targeted assignment group for a remediation app deployment.
+
+**Battery health:**
+Prompt: "Show me laptops where battery full charge capacity is less than 50 percent of design capacity"
+This surfaces devices needing battery replacement before they cause user complaints.
+
+You can chain questions conversationally. Ask the initial question, then follow up with "filter those results to only the Finance department" or "show me only devices last synced in the past 7 days" and Copilot refines the KQL without you starting from scratch.
+
+## Using Results to Drive Action
+
+A query result is most useful when it connects directly to something you can act on. Intune's device query returns device names and IDs — use the export to CSV feature to get a list you can feed into other workflows.
+
+For targeted remediation, export the device list and upload it as a static device group import in Entra ID. Assign your remediation policy or app deployment to that group. This is faster than manually filtering Intune device views and more reliable than dynamic groups when you want a one-time targeted deployment.
+
+For reporting, save frequently used queries by copying the generated KQL into your runbook or documentation. You lose the conversational context but retain the query itself for future runs.
+
+Copilot in device query can also help you understand existing queries. Paste a KQL query someone else wrote and ask "what does this query do?" — Copilot returns a plain-language explanation of the logic.
+
+## Setting Up Device Query
+
+Device query requires Microsoft Intune Advanced Analytics. This is included in the Intune Suite add-on or the Intune Plan 2 license. If you do not have it, the device query section in the admin center shows a license prompt rather than the query editor.
+
+To verify you have the right license, navigate to Tenant admin > Intune add-ons. You should see Advanced Analytics listed as active. If it is not present, your organization's licensing admin needs to assign the Intune Suite or Plan 2 add-on.
+
+Once the license is confirmed, there is no additional configuration required. Copilot in device query is on by default for any user with the Intune Administrator or Help Desk Operator role. Read-only Operator roles can view queries and results but cannot execute new queries.
+
+Data collection for most device properties runs on a 24-hour sync cycle. For some properties — disk space, battery, installed apps — the data can be older depending on when the device last checked in. The query results page shows the data timestamp for each device row.
+
+
+## Writing Better Prompts
+
+The difference between a useful query and a useless one usually comes down to how specific the prompt is. Vague prompts produce technically valid KQL that answers the wrong question.
+
+Include the platform when it matters. "Show me devices that need patching" is less useful than "Show me Windows 11 22H2 devices missing the March 2026 cumulative update." Copilot needs scope to produce a precise query.
+
+Specify the time window. "Show me recently synced devices" is ambiguous. "Show me devices that checked in within the last 7 days" gives Copilot a concrete filter to work with.
+
+Use exclusions explicitly. "Show me devices with low disk space, excluding servers and shared kiosks" tells Copilot to add a NOT condition. Without it, you will get a flat list that includes device types you cannot act on.
+
+When Copilot produces a query that is close but not quite right, do not start over. Describe what is wrong: "The previous query is returning too many results — filter to only devices assigned to the London office" or "Change the disk space threshold from 10 GB to 20 GB." Iterating on an existing query is faster than rephrasing from scratch.
+
+## Limitations and Caveats
+
+Copilot's query accuracy depends on the specificity of your prompt. Ambiguous questions produce queries that may be technically valid but not capture what you meant. "Show me old devices" might generate a query filtering on enrollment date rather than last sync date or hardware age — those are different things with different implications.
+
+Always review the generated KQL before running it, particularly on prompts involving deletion-related data or sensitive user information. Copilot generates queries for read operations, but if you use the result set to drive downstream automation, an incorrect query can affect the wrong set of devices.
+
+Device query does not cover all device properties. Some data — Defender antivirus exclusions, specific registry values, custom WMI classes — is not in the Advanced Analytics schema and Copilot cannot query for it. For those scenarios you need the CMPivot equivalent or a Proactive Remediation script that reports custom inventory.
+
+The conversational context in Copilot resets when you navigate away from the device query page. Save your queries manually if you plan to reuse them. There is no built-in query library in Intune — queries do not persist between sessions unless you copy them somewhere.
+
+Multi-tenant environments require separate sessions. If you manage multiple tenants, device query and Copilot operate within the context of the currently logged-in tenant. There is no cross-tenant query capability through the Intune admin center.
+
+## Where Device Query Fits in Your Toolkit
+
+Device query with Copilot is most useful for ad-hoc investigations and pre-deployment checks. Before pushing a large Win32 app, query for devices that meet the disk space requirements and target the deployment specifically. Before a compliance audit, query for the exact posture data the auditor will ask about. Before scheduling a patch deployment window, query for the devices that are actually behind and need the maintenance window.
+
+It is not a replacement for proper monitoring dashboards or alert-based detection. Queries are point-in-time snapshots. For ongoing monitoring you want Intune's built-in compliance reports, Endpoint analytics, or a third-party tool that runs continuously against your fleet telemetry.
