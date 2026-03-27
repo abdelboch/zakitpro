@@ -1,0 +1,82 @@
+---
+title: "Copilot in Intune: AI Features Overview for Desktop Engineers"
+description: "A practical overview of Microsoft Copilot AI features inside Intune, covering policy summarization, device troubleshooting, Copilot Explorer, and licensing."
+publishedAt: "2026-03-27"
+pillar: ai
+difficulty: mid
+type: explainer
+tags: ["copilot", "intune", "ai", "security-copilot", "microsoft-365"]
+draft: false
+---
+
+# Copilot in Intune: AI Features Overview for Desktop Engineers
+
+Copilot in Intune is Microsoft's AI layer embedded directly in the Intune admin center, powered by Security Copilot. It reads your tenant data and responds to natural language questions about devices, policies, and configurations. This article breaks down what Copilot in Intune actually does, what it doesn't, and where it fits into a production desktop engineering workflow.
+
+## What Copilot in Intune Actually Does
+
+The short version: Copilot in Intune gives you an AI assistant that knows your tenant. It isn't a generic chatbot — it has access to your device inventory, compliance state, policy assignments, and configuration baselines. Every response it gives is grounded in your Intune data, not general knowledge.
+
+There are four distinct capability areas you'll encounter in the admin center.
+
+**Policy summarization** lets Copilot read any configuration profile, compliance policy, or app protection policy and give you a plain-English summary. If you've inherited a tenant full of undocumented settings, this feature alone saves hours. Navigate to any policy in the admin center and you'll find a Summarize button powered by Copilot in the toolbar.
+
+**Error analysis and troubleshooting** surfaces in-context guidance when a device shows a policy failure or compliance error. Copilot can explain the error code, identify what's likely causing it, and suggest remediation steps — all within the device blade, without requiring you to leave the admin center or search separately.
+
+**Copilot Explorer** is the dedicated Copilot pane embedded in the Intune admin center. It lets you ask free-form questions about your fleet: "Show me all devices running Windows 10 that haven't checked in for 30 days" or "Which devices have a failed BitLocker policy?" It generates KQL queries from natural language input and runs them against your Advanced Analytics data.
+
+**Policy comparison** lets Copilot diff two policies and highlight differences. This is useful when consolidating overlapping configuration profiles or reviewing a migration handoff.
+
+## Copilot Explorer in Practice
+
+Copilot Explorer is the most practically useful feature for desktop engineers managing large fleets. It sits in the left nav of the admin center under the Copilot icon and works as a persistent interface — you can keep it open while navigating other parts of the portal.
+
+When you type a query, Copilot translates it to KQL, runs it against device inventory data, and returns results in a table. You can refine queries conversationally. For example, asking "Show me Windows 11 devices" returns all managed Windows 11 devices. Following that with "Filter to only those not updated in the last 14 days" narrows the previous result without you having to rebuild the query from scratch.
+
+Explorer also handles audit-prep scenarios well. Questions like "Show me all devices missing a compliance policy assignment" or "Which profiles have the most assignment failures this month" give you a defensible starting point for a compliance review without building custom reports in Log Analytics or exporting CSVs manually.
+
+The practical limit here is data freshness. Device inventory in Intune syncs on a 24-hour cadence for most attributes. If a device was wiped six hours ago, Copilot's query may still show it. Don't rely on Explorer for real-time incident response — it's a planning and reporting tool, not a live monitoring surface.
+
+## Policy Summarization and Comparison
+
+In a typical enterprise Intune tenant, you'll find configuration profiles created over several years by multiple admins, with names like "Windows Security Baseline v2 FINAL FINAL" and minimal documentation. Copilot's summarize feature cuts through that.
+
+Open any configuration profile and click the Copilot button. It returns a structured summary: what settings are configured, what they do in plain English, which platforms are targeted, and whether any settings appear unusual or potentially conflicting with other policies. The summary doesn't replace reading the raw settings, but it's a fast first pass for getting oriented in an unfamiliar tenant.
+
+The comparison feature is equally useful during migrations or consolidation projects. You can point Copilot at two similar profiles and ask it to identify differences. It returns a delta view — settings that exist in one but not the other, and settings with different values configured. This is considerably faster than a manual side-by-side comparison when profiles have 40 or 50 individual settings.
+
+One hard limit: Copilot only summarizes what it can read. Some custom OMA-URI values and encrypted settings don't get interpreted — you'll see the raw value rather than an explanation. For complex Windows CSP paths, you'll still need to cross-reference the documentation.
+
+## Device Troubleshooting with Copilot
+
+Navigate to any managed device in the admin center and you'll find Copilot integration in the device blade. When a device shows compliance failures or policy conflicts, Copilot adds an Explain button next to error codes.
+
+Clicking it returns an explanation of the specific error, common causes, and suggested remediation steps. For well-documented errors like 0x87D1FDE8 (compliance policy push failure) or 0x8018002a (MDM enrollment conflict), the responses are accurate and actionable. For obscure or tenant-specific errors, Copilot sometimes falls back to generic guidance — cross-reference with the raw event logs before acting on it.
+
+Copilot can also generate a full diagnostic summary for a device on request. Asking "Summarize the compliance status for this device" returns a structured view of which policies are applying correctly, which are failing, and what the most likely cause is. This is noticeably faster than reading through policy assignment history manually, especially on devices with complex group membership.
+
+From Ignite 2025, Microsoft also introduced Security Copilot agents for Intune — automated agents that can proactively surface compliance drift, flag devices with unusual policy failure patterns, and suggest remediation without requiring manual prompting. These are available to E5 Security customers and operate within defined scope boundaries you configure.
+
+## Licensing and Access
+
+Copilot in Intune is included with a Security Copilot license. As of 2026, Security Copilot is licensed per Security Compute Unit (SCU) at the tenant level — it isn't a per-user license. You purchase SCUs, and any user with the appropriate Intune RBAC role can access Copilot features within the admin center.
+
+The Intune Administrator role in Entra ID gets Copilot access by default. Help Desk Operator and Read Only Operator roles can view Copilot outputs but can't trigger actions from Copilot prompts. If your RBAC scope is limited to specific device groups, Copilot respects that scope and won't surface data outside your assignment.
+
+Some features — particularly Copilot Explorer and multi-device KQL queries — require Microsoft Intune Advanced Analytics, which is included in Intune Suite or available as a standalone add-on. Without Advanced Analytics, the Explorer pane is limited to single-device context queries.
+
+## Limitations and Caveats
+
+Data latency is the most important constraint in production use. Copilot reads from Intune's data layer, which syncs on delayed schedules for many attributes. Real-time device state isn't available through Copilot — if you need current device status, use Remote Help or the live device diagnostics tools.
+
+Copilot doesn't take unsupervised action. Every suggested remediation from a troubleshooting session still requires you to confirm and execute the change. This is the right design for an IT management tool, but it means Copilot replaces research time rather than action time.
+
+Prompt precision matters more than most admins expect at first. Vague questions get vague answers. "What's wrong with my devices?" returns a general compliance overview. "Show me all devices with a BitLocker encryption failure assigned to the Finance group" returns something actionable. Learning to write specific prompts is the actual skill investment required to get consistent value from Copilot in Intune.
+
+Finally, Copilot here has no access to telemetry outside Intune. Windows Event Log data, Defender for Endpoint alerts, and SIEM correlation require their own Copilot integrations in their respective admin centers. Each Microsoft service has a separate Copilot surface — there's no unified cross-product Copilot context in 2026 yet.
+
+## Where It Fits in Your Workflow
+
+The highest-value use cases are pre-meeting compliance prep (use Explorer to pull current device posture data quickly before a change advisory board session), onboarding inherited tenants (use policy summarization to document what a tenant actually contains before making changes), and Tier 1 escalation triage (use the error-explanation feature to speed up the first pass on device tickets).
+
+Copilot in Intune doesn't replace knowing the platform. Engineers who understand Intune's policy architecture, compliance evaluation engine, and enrollment flow will extract more signal from Copilot's responses than those who don't. The AI surfaces information faster — it doesn't evaluate whether that information is correct for your specific environment. That judgment is still yours.
