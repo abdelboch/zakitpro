@@ -24,14 +24,14 @@ EPM provides several ways to see what's happening in your environment.
 
 ### Activity Logs
 
-The first place to check when something goes wrong—or just to verify operations are working.
+The first place to check when something goes wrongâor just to verify operations are working.
 
 **Screenshot:** ![](/images/epm-part-3-activity-logs.png)
 
 To access:
 
 1. Go to **Microsoft Endpoint Manager**
-2. Navigate to **Devices** → **Endpoint Privilege Management** → **Activity logs**
+2. Navigate to **Devices** â **Endpoint Privilege Management** â **Activity logs**
 
 What you'll see:
 
@@ -48,11 +48,11 @@ What you'll see:
 
 Use filters to find specific events:
 
-- **Date range** – Last 24h, 7 days, 30 days, custom
-- **User** – Specific user or group
-- **Device** – Specific device
-- **Status** – Approved, Rejected, Expired
-- **Application** – Specific app or script
+- **Date range** â Last 24h, 7 days, 30 days, custom
+- **User** â Specific user or group
+- **Device** â Specific device
+- **Status** â Approved, Rejected, Expired
+- **Application** â Specific app or script
 
 **Example filter for troubleshooting:**
 ```
@@ -67,7 +67,7 @@ User: john.doe@contoso.com
 
 Get an overview of EPM usage:
 
-1. Go to **Endpoint Privilege Management** → **Overview**
+1. Go to **Endpoint Privilege Management** â **Overview**
 2. View key metrics:
    - Total elevation requests
    - Approval rate (% approved)
@@ -78,7 +78,7 @@ Get an overview of EPM usage:
 
 For deeper analysis or audit purposes:
 
-1. **Reports** → **Export**
+1. **Reports** â **Export**
 2. Choose format: CSV or PDF
 3. Select date range
 4. Include details:
@@ -121,14 +121,14 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
 
 1. **Check device enrollment status**
    ```
-   Go to Devices → All devices
+   Go to Devices â All devices
    Verify: Last check-in < 24 hours
    Verify: Enrollment state = Enrolled
    ```
 
 2. **Verify policy assignment**
    ```
-   Go to Policies → [Your Policy] → Properties
+   Go to Policies â [Your Policy] â Properties
    Check: Assignments are configured
    Check: Devices/users are in included groups
    ```
@@ -145,7 +145,7 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
 
 4. **Sync device**
    ```
-   On device: Start → Settings → Accounts → Access work or school
+   On device: Start â Settings â Accounts â Access work or school
    Click: Sync
    ```
 
@@ -165,7 +165,7 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
 
 2. **Check policy status**
    ```
-   Go to Devices → Endpoint Privilege Management → Policies
+   Go to Devices â Endpoint Privilege Management â Policies
    Verify: Policy shows "Deployed"
    Check: Last modified date is recent
    ```
@@ -182,7 +182,7 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
    Devices must be:
    - Compliant (or marked as compliant if no compliance policy)
    
-   Check: Devices → Compliance
+   Check: Devices â Compliance
    ```
 
 ### Issue 3: Approval Not Working
@@ -195,7 +195,7 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
 
 1. **Verify approver configuration**
    ```
-   Go to Policy → Settings → Approval
+   Go to Policy â Settings â Approval
    Check: Approvers are specified
    Check: Approvers have correct permissions
    ```
@@ -210,7 +210,7 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
 3. **Manual approval test**
    ```
    As admin, go to:
-   Devices → Endpoint Privilege Management → Approvals
+   Devices â Endpoint Privilege Management â Approvals
    Manually approve a pending request
    ```
 
@@ -271,14 +271,14 @@ Get-MgDeviceManagementDeviceManagementIntentAssignment `
 
 1. **Verify scheduled policy is active**
    ```
-   Go to Policies → [Scheduled Policy]
+   Go to Policies â [Scheduled Policy]
    Check: Status = Deployed
    Check: Next rotation time
    ```
 
 2. **Check rotation logs**
    ```
-   Activity logs → Filter by:
+   Activity logs â Filter by:
    - Event type: Password rotation
    - Date: Expected rotation date
    ```
@@ -364,19 +364,19 @@ Enhanced threat protection:
 
 ## Wrapping Up
 
-Endpoint Privilege Manager is a powerful tool—but only if you monitor it actively. The key takeaways:
+Endpoint Privilege Manager is a powerful toolâbut only if you monitor it actively. The key takeaways:
 
-1. **Monitor Activity Logs** – Don't wait for users to report problems
-2. **Start Small** – Pilot before broad deployment
-3. **Document Everything** – Future you will thank present you
-4. **Iterate** – Adjust policies based on real usage
-5. **Communicate** – Users need to know how to get help
+1. **Monitor Activity Logs** â Don't wait for users to report problems
+2. **Start Small** â Pilot before broad deployment
+3. **Document Everything** â Future you will thank present you
+4. **Iterate** â Adjust policies based on real usage
+5. **Communicate** â Users need to know how to get help
 
 With these practices, you'll have a secure, compliant, and manageable EPM deployment.
 
 ---
 
 **Series: Endpoint Privilege Manager**
-- [Part 1: Introduction & Setup](/epm-part-1-introduction-setup)
-- [Part 2: Creating Policies & Rules](/epm-part-2-policies-rules)
+- [Part 1: Introduction & Setup](/security/security/epm-part-1-introduction-setup/)
+- [Part 2: Creating Policies & Rules](/security/security/epm-part-2-policies-rules/)
 - Part 3: Management & Troubleshooting (You are here)
