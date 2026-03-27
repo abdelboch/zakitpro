@@ -1,0 +1,174 @@
+---
+title: "Security Copilot Agents in Intune: What You Actually Need to Know"
+slug: "security-copilot-agents-intune-guide"
+description: "Security Copilot agents are now live in the Intune admin center. Here's what each agent does, what it costs, and how to put them to work right now."
+publishedAt: "2026-03-27"
+pillar: ai
+difficulty: mid
+type: deep-dive
+tags: ["ai", "intune", "security-copilot", "endpoint-management", "microsoft-365", "copilot"]
+draft: false
+---
+
+Microsoft quietly dropped something genuinely useful into the Intune admin center this month: a dedicated **Agents** section powered by Security Copilot. Not a chatbot. Not a search bar with a sparkle icon. Actual agents that take action, review policies, flag stale devices, and map CVEs to remediation steps. No scripting required.
+
+If you've been watching Copilot features land in Microsoft portals and wondering when anything would actually matter for day-to-day endpoint work, this is that moment. Here's a ground-level breakdown of what's there, what it costs, and where it genuinely saves time.
+
+---
+
+## What Changed and When
+
+Security Copilot agents showed up in the Intune admin center in early March 2026. You'll find them under a new **Agents** node in the left nav. The feature is part of Microsoft's broader push to embed agentic AI across Defender, Entra, Intune, and Purview. They all run on the same Security Copilot backbone.
+
+The agents aren't just Copilot prompts wrapped in a UI. They have defined scopes, they act on real Intune data, and they surface recommendations that an admin can approve or reject. Think of them as async analysts that run in the background and put findings in your queue, rather than something you actively chat with.
+
+---
+
+## The Four Agents (And One That's Already Leaving)
+
+### Policy Configuration Agent
+
+This one is the most immediately useful for most shops. You feed it a plain-language document — a CIS benchmark PDF, a vendor hardening guide, whatever your security team handed you — and it converts the relevant sections into recommended Intune configuration profiles.
+
+That workflow used to mean hours of manually translating Word docs into Settings Catalog entries. Now the agent spits out a draft profile that you review and push. You're still in the loop for approval, but the grunt work disappears.
+
+It also works against standard industry baselines out of the box, so you can tell it "apply CIS Level 1 for Windows 11" without uploading anything.
+
+**Practical use:** Onboarding a new client or business unit? Use this agent to build a baseline config set in 20 minutes instead of two days.
+
+### Vulnerability Remediation Agent
+
+This agent pulls data from Microsoft Defender Vulnerability Management and correlates it with your Intune device inventory. It identifies which devices are exposed, prioritizes by risk score, and suggests remediation steps, whether that's patching, a configuration fix, or pulling a vulnerable app entirely.
+
+The key thing here is the prioritization layer. Most shops already get vulnerability data from Defender. The problem isn't data, it's triage. The agent does that triage pass for you and surfaces the top items with actionable next steps rather than dumping 4,000 rows into a report.
+
+It also maps vulnerabilities to specific Intune remediations where applicable, so instead of "patch this app," you get "deploy this Win32 app update via this assignment group."
+
+**Practical use:** Weekly vulnerability review meetings just got shorter. Run the agent beforehand, export the prioritized list, and spend the meeting on decisions instead of sorting spreadsheets.
+
+### Change Review Agent
+
+Multi Admin Approval (MAA) exists in Intune to prevent a single admin from pushing unapproved policy changes to production. The Change Review Agent integrates with the MAA workflow and evaluates pending approval requests.
+
+When a change comes in, the agent reviews it against your existing policy set and flags scope issues or deviations from your baseline. It adds a recommendation to approve or push back. The approving admin sees that recommendation alongside the original request.
+
+This is useful in larger environments where the person approving changes doesn't always have full context on the current policy state. The agent effectively acts as a second reviewer that's read everything.
+
+**Practical use:** If your MAA queue moves fast and approvers rubber-stamp changes because they don't have time to audit them, this agent adds a meaningful check without slowing down the workflow.
+
+### Device Offboarding Agent (Retiring Soon — Act Now If You Want It)
+
+This agent identified stale and misaligned devices and provided insights before you offboard them. It was useful for cleaning up device records that had gone stale — drifted out of compliance or stopped checking in entirely.
+
+There's a catch: **Microsoft is retiring it.** April 30, 2026 is the last date you can set it up. It gets pulled from the admin center on June 1, 2026. If you want to use it at all, you have about five weeks.
+
+My take — don't build a workflow dependency around it. Use it now for a one-time cleanup pass if you have device debt, but plan for it to be gone. Microsoft hasn't announced a replacement, so handle stale device management via Intune's built-in cleanup rules or your own PowerShell process for the long term.
+
+---
+
+## Licensing Reality Check
+
+None of this is free. Security Copilot agents in Intune require:
+
+- **Microsoft Security Copilot** (consumption-based, billed in Security Compute Units)
+- **Microsoft Intune Plan 1** at minimum; Plan 2 or Intune Suite for some advanced agent features
+- **Microsoft 365 E5** or **E5 Security** for the full Vulnerability Remediation Agent (which depends on Defender Vulnerability Management)
+
+Microsoft announced that Security Copilot will roll out automatically to all M365 E5 customers in 2026, so if your org is already on E5, watch for that entitlement to appear. If you're on E3, you're looking at add-on costs.
+
+Before going to procurement, check your current Security Copilot SCU allocation. The agents consume capacity when they run, and if your org is already using Copilot in other products (Defender, Purview), those workloads share the same SCU pool.
+
+---
+
+## How the Workflow Actually Changes
+
+Here's the before/after for a typical vulnerability triage cycle:
+
+**Before agents:**
+1. Pull Defender vulnerability report (manual export or KQL query)
+2. Cross-reference with Intune device inventory (another query)
+3. Sort by severity, filter to managed devices, identify owners
+4. Map CVEs to available patches or config remediations (manual research)
+5. Build remediation plan in a spreadsheet
+6. Present to team, assign tasks, track separately
+
+**After Vulnerability Remediation Agent:**
+1. Agent runs on its schedule, cross-references Defender + Intune automatically
+2. Prioritized findings appear in the Agents section with recommended remediations
+3. You review, approve actions, assign ownership
+4. Agent can push the Intune remediation directly if you approve it
+
+That's not incremental improvement. Steps 1-5 collapse into a background process. Your job shifts from data collection to decision-making, which is where your time should be going anyway.
+
+The Policy Configuration Agent does something similar for policy work. It doesn't replace engineering judgment. You still need to review what it produces and understand the settings. But it eliminates the translation layer between "what the security team wants" and "what gets configured in Intune."
+
+---
+
+## Getting Started: First Steps
+
+If you want to start using these agents, here's a practical sequence:
+
+1. **Verify licensing and SCU allocation.** Check the Microsoft admin center for Security Copilot entitlement. If it's there, confirm SCU capacity before enabling agents in production.
+
+2. **Enable Security Copilot in the Intune admin center.** Go to **Tenant administration > Security Copilot** and enable the integration.
+
+3. **Find the Agents section.** Left nav in the Intune admin center. It should appear after Copilot is enabled. If you don't see it, check your Intune admin role. You need Intune Administrator or Security Administrator to access it.
+
+4. **Start with Policy Configuration Agent on a non-production baseline.** Feed it a hardening doc or a CIS PDF and see what it produces. Review the output carefully before approving anything for production deployment.
+
+5. **Run Vulnerability Remediation Agent against a pilot group.** Don't approve remediations org-wide on first run. Scope it to a test collection and validate the recommendations before expanding.
+
+6. **Set up Change Review Agent if you're using MAA.** This one integrates cleanly into an existing workflow and adds value without much setup overhead.
+
+7. **Use Device Offboarding Agent before May.** If you have device cleanup debt, run it now. June 1 it's gone.
+
+---
+
+## What the Agents Don't Do
+
+Worth being clear about the limits:
+
+- **They don't replace policy expertise.** The Policy Configuration Agent can misread ambiguous language in a hardening doc. Review everything it produces.
+- **They're not real-time.** Agents run on schedules or when triggered. They're not event-driven in the way an alert would be.
+- **Vulnerability agent coverage depends on Defender.** If your Defender Vulnerability Management coverage has gaps, the agent's output reflects those gaps.
+- **No cross-tenant support yet.** If you manage multiple tenants (common in MSP environments), you're working one tenant at a time.
+
+Also worth noting: the agentic AI framework Microsoft is building here is still evolving. The agents available now are a starting point. Based on the roadmap, expect more specialized agents through the rest of 2026. Microsoft has indicated agent-driven approval workflows will expand significantly through Q2 2026.
+
+---
+
+## FAQ
+
+**Do I need Security Copilot to use any AI features in Intune?**
+
+Not for everything. There are lighter Copilot features in Intune — natural language device queries, policy summaries — that don't require a full Security Copilot license. The *agents* specifically require Security Copilot and the associated SCU capacity. Check [the Intune AI features overview](/ai/copilot-intune-ai-features-overview/) for a breakdown of what's included at each license tier.
+
+**Can the agents make changes automatically, or do I always have to approve?**
+
+By design, all agent-recommended actions require human approval before they're applied. Microsoft built the MAA (Multi Admin Approval) model into the agent framework specifically to keep admins in the loop. You configure the approval workflow and decide whether agent-driven actions require one approver or multiple.
+
+**The Device Offboarding Agent is retiring — will Microsoft replace it?**
+
+Microsoft hasn't announced a direct replacement as of late March 2026. For stale device cleanup, you have options: Intune's built-in device cleanup rules (under **Devices > Device cleanup rules**), PowerShell via the Graph API, or third-party tools. See [this PowerShell approach to device cleanup](/scripting/intune-stale-device-cleanup-powershell/) for a script-based alternative.
+
+**Is there an audit log for what the agents do?**
+
+Yes. Agent activity shows up in the Intune audit log under standard admin activity tracking. This includes what was recommended, who approved it, and when it was applied. You can query it via Graph API or Intune's built-in reports.
+
+**We're on M365 E3, not E5. Can we use any of this?**
+
+Some agents have partial functionality at E3 with the right add-ons. The Vulnerability Remediation Agent's full feature set requires Defender Vulnerability Management, which is part of E5 Security. If you're evaluating an upgrade path, this suite of agents is a reasonable item to include in the E5 business case — especially if vulnerability triage is a current time sink for your team.
+
+---
+
+## Bottom Line
+
+Security Copilot agents in Intune aren't a future roadmap item anymore. They're in the portal right now. The Policy Configuration Agent and Vulnerability Remediation Agent, in particular, address real pain points that most desktop engineering teams deal with every week.
+
+The licensing cost is real and needs a conversation with your procurement team. But if you're already on E5 or have Security Copilot deployed elsewhere in your environment, the endpoint management agents deserve a proper pilot before the end of Q2.
+
+Start with Policy Configuration against a test baseline. See what it produces. You'll form an opinion quickly, and it'll probably be more positive than you expect.
+
+---
+
+*For more on AI-assisted endpoint management, check out [how Copilot handles natural language device queries in Intune](/ai/copilot-intune-device-queries/) and [building your Intune Autopilot deployment from scratch](/deployment/intune-autopilot-windows-11/).*
