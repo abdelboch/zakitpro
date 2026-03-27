@@ -1,0 +1,105 @@
+---
+title: "Intune Windows Autopilot for Windows 11 Deployment"
+description: "How to configure Windows Autopilot in Intune for Windows 11 deployment, covering device registration, profiles, Enrollment Status Page, and common failures."
+publishedAt: "2026-03-27"
+pillar: deployment
+difficulty: mid
+type: how-to
+tags: ["autopilot", "windows-11", "intune", "deployment", "oobe", "entra-id"]
+draft: false
+---
+
+# Intune Windows Autopilot for Windows 11 Deployment
+
+Windows Autopilot in Intune lets you ship a new Windows 11 device directly to a user and have it provision itself into your corporate environment without touching it first. The device boots, connects to the internet, hits the Autopilot service, gets your deployment profile, joins Entra ID, enrolls in Intune, installs required apps, and drops the user at the desktop. This guide covers the full setup path and the failures you will encounter.
+
+## Prerequisites Before Anything Else
+
+Before configuring profiles or enrolling devices, confirm the following are in place.
+
+**Windows 11 hardware requirements.** Autopilot with Entra ID join works on any hardware that runs Windows 11. The minimum requirements — TPM 2.0, 4 GB RAM, 64 GB storage, UEFI firmware, Secure Boot capable — must be met. Devices that do not meet these cannot run Windows 11 at all, so Autopilot is a non-issue. Where it matters is with older hardware enrolled in a Windows 10 Autopilot workflow that you are migrating to Windows 11.
+
+**Automatic MDM enrollment.** Navigate to Entra ID > Mobility (MDM and MAM) > Microsoft Intune and confirm the MDM user scope includes your target users or is set to All. Without this, devices that join Entra ID during Autopilot OOBE will not enroll in Intune.
+
+**Intune license assignment.** Users must have an active Intune license before their device reaches the enrollment step. If the license is not assigned, enrollment will fail during OOBE with a non-obvious error.
+
+**Company branding in Entra ID.** Optional but worth doing before your first user sees the OOBE. Custom branding in Entra ID affects what the sign-in page looks like during Autopilot provisioning. Set it up once in Entra ID > Company branding.
+
+## Registering Devices for Autopilot
+
+Devices must be registered in Autopilot before they can use an Autopilot deployment profile. Registration associates the device's hardware hash with your Entra ID tenant.
+
+**OEM registration.** If you purchase devices through a Microsoft-authorized reseller, they can register the hardware hash directly during fulfillment. The device arrives pre-registered and picks up your Autopilot profile the first time it connects to the internet. This is the zero-touch option and the right choice for volume purchasing.
+
+**Manual registration.** For devices you already have, run the `Get-WindowsAutoPilotInfo` PowerShell script to generate a CSV containing the hardware hash, and import it into Intune at Devices > Enrollment > Windows Autopilot > Devices > Import.
+
+```powershell
+# Install the module
+Install-Script -Name Get-WindowsAutoPilotInfo -Force
+
+# Generate hardware hash CSV
+Get-WindowsAutoPilotInfo -OutputFile C:\Temp\AutopilotHashes.csv
+```
+
+After import, devices appear in Intune > Devices > Windows > Windows enrollment > Devices within a few minutes. Assign your deployment profile to the device group that includes them before the device powers on.
+
+**Group tag registration.** When registering, set a group tag on the device. Use this to separate device types — "Corporate-Laptop", "Shared-Kiosk", "Dev-Workstation" — and drive dynamic Entra ID group membership for profile assignment.
+
+## Creating an Autopilot Deployment Profile
+
+Navigate to Devices > Enrollment > Windows Autopilot > Deployment profiles > Create profile > Windows PC.
+
+Key settings to configure:
+
+**Deployment mode.** User-driven is the standard choice — the end user signs in with their Entra ID credentials during OOBE and the device provisions into their account. Self-deploying mode provisions without user credentials, for shared or kiosk devices.
+
+**Join type.** Use Entra ID joined for cloud-native devices. Hybrid Entra ID join (also Entra joined plus domain joined) is available if you need on-premises domain connectivity, but it requires a direct line of sight to a domain controller during provisioning and adds significant complexity. For new Windows 11 deployments in 2026, Entra-only join is the right call unless you have a specific on-premises dependency.
+
+**OOBE customization.** Hide the privacy settings page, keyboard layout selection, and work or school account options if you do not want users making choices during setup. Most enterprise deployments hide everything and drive directly to the sign-in prompt.
+
+**Automatically configure keyboard.** Set this to Yes if you are deploying in a single-language environment. It skips the keyboard layout selection screen.
+
+After creating the profile, assign it to the Entra ID group containing your registered Autopilot devices.
+
+## Enrollment Status Page Configuration
+
+The Enrollment Status Page (ESP) is the progress screen users see during provisioning. It blocks the desktop until specified apps and policies are installed. Configure it at Devices > Enrollment > Windows Autopilot > Enrollment Status Page.
+
+Set **Show app and profile configuration progress** to Yes. This is what gives users feedback that something is actually happening during the potentially long provisioning wait.
+
+Set **Block device use until all apps and profiles are installed** based on your requirements. If you have security-critical apps (Defender, VPN client, certificate enrollment) that must be installed before the user reaches the desktop, block here. If your app set is large and you can tolerate a user reaching the desktop before all apps install, let it through.
+
+Add required apps to the ESP tracked app list. Only apps explicitly listed here will block the ESP. Apps assigned as required to the device group but not on the ESP tracked list will install in the background after the user gets to the desktop.
+
+## Common Autopilot Failures
+
+**"Something went wrong" error during OOBE.** Almost always caused by one of three things: the device was not registered before it booted, the deployment profile was not assigned to the device's group, or MDM auto-enrollment is not configured in Entra ID. Check all three before troubleshooting further.
+
+**ESP stuck at "Preparing your device."** The most common causes are an app in the tracked list that is failing to install, a certificate connector that is unreachable, or a PowerShell script that is timing out. Navigate in Intune to the device's enrollment status while it is provisioning — Intune logs the ESP phase and specific apps that are blocking.
+
+**Autopilot profile not applying.** The device registered, but its deployment profile is not appearing during OOBE. Verify the device's group tag matches the membership rule of the Entra ID dynamic group. Dynamic group membership evaluation can take 5 to 10 minutes after device registration — if you imported the device and immediately powered it on, it may not have the group membership yet.
+
+**Hybrid join failing.** If you are using Hybrid Entra ID join, the provisioning VM that handles the domain join needs to reach a domain controller. VPN connectivity during OOBE is not available by default. Use a corporate network or a pre-provisioning (white glove) flow that runs before the device ships to the user.
+
+
+## Validating a Successful Deployment
+
+After the device reaches the desktop, confirm the provisioning completed cleanly before closing the ticket.
+
+In Intune, navigate to Devices > All devices and locate the newly enrolled device. Verify the management state shows "Managed", compliance state is "Compliant" or has a defined evaluation timeline, and the last check-in time is recent. If compliance shows "Not evaluated", wait up to 15 minutes for the initial compliance evaluation to complete.
+
+Check the device's policy assignment under Monitor > Device configuration. All assigned profiles should show a "Succeeded" status. Any profile showing "Error" or "Conflict" needs investigation before the device is handed to the user.
+
+Confirm required apps are installed. Navigate to the device's Apps blade and check that each required app assignment shows "Installed". Apps still in "Pending install" after 30 minutes may indicate a Win32 app detection rule issue or a network problem during the ESP download phase.
+
+For user-driven deployments, send the user a brief checklist: confirm Outlook connects to their mailbox, the VPN client launches, and any role-specific applications are present. This surfaces environment-specific issues that device management status checks will not catch.
+
+## Limitations and Caveats
+
+Autopilot is a provisioning technology, not a re-imaging technology. It configures a device that already has Windows installed — it does not deploy a Windows image from scratch. If a device needs a clean OS, you need WinPE-based imaging (MDT, SCCM OSD, or a recovery image) before Autopilot will function correctly.
+
+Autopilot device reset exists for reprovisioning, but it is not the same as a clean wipe. It resets Windows 11 to its just-installed state and re-runs the Autopilot flow, which is appropriate for reassigning a device to a new user. For decommissioning, use the full wipe option in Intune.
+
+In networks with strict egress filtering, Autopilot requires specific endpoints to be reachable. The key ones are the Windows Autopilot deployment service, Intune MDM enrollment endpoints, and Entra ID sign-in endpoints. If any of these are blocked, provisioning will stall without a clear error. Microsoft publishes the required URL list in the Intune documentation — validate these against your proxy and firewall allow-lists before your first deployment.
+
+Autopilot does not handle BIOS or firmware updates. For devices that need firmware updated before deployment, that step happens outside of Autopilot — either from a management tool at the provisioning stage or via a Proactive Remediation after enrollment.
