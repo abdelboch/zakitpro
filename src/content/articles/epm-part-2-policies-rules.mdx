@@ -14,7 +14,7 @@ draft: false
 
 # Endpoint Privilege Manager Part 2: Creating Policies & Rules
 
-Now that Endpoint Privilege Manager is enabled (from Part 1), it's time to create policies that actually control admin access. This is where the magic happens—where you define who can get admin rights, when, and for how long.
+Now that Endpoint Privilege Manager is enabled (from Part 1), it's time to create policies that actually control admin access. This is where the magic happensâwhere you define who can get admin rights, when, and for how long.
 
 Let's dive in.
 
@@ -45,7 +45,7 @@ Before creating anything, understand the two main policy types:
 ### Step 1: Navigate to Policy Creation
 
 1. Sign in to **Microsoft Endpoint Manager** (https://endpoint.microsoft.com)
-2. Go to **Devices** → **Endpoint Privilege Management** → **Policies**
+2. Go to **Devices** â **Endpoint Privilege Management** â **Policies**
 3. Click **Create policy**
 
 **Screenshot:** ![](/images/epm-part-2-policy-wizard.png)
@@ -96,9 +96,9 @@ Configure which applications or commands can run with admin rights:
 
 #### Approval Requirements
 
-1. **No approval required** – User gets access immediately
-2. **Approver required** – Request goes to designated approvers
-3. **Multiple approvers** – Requires multiple people to approve
+1. **No approval required** â User gets access immediately
+2. **Approver required** â Request goes to designated approvers
+3. **Multiple approvers** â Requires multiple people to approve
 
 **Screenshot:** ![](/images/epm-part-2-approval-settings.png)
 
@@ -113,7 +113,7 @@ Now target who gets this policy:
 
 **Screenshot:** ![](/images/epm-part-2-assignment.png)
 
-1. **Assignments** → **Create groups**
+1. **Assignments** â **Create groups**
 2. **Included groups:** Select who gets this policy
 3. **Excluded groups:** Select who should never get this policy
 
@@ -150,9 +150,9 @@ You can restrict what users can do when elevated:
 ### Conditional Rules
 
 Set rules based on:
-- **Device compliance status** – Only elevate on compliant devices
-- **Network location** – Require approval when off corporate network
-- **Time of day** – Stricter rules during business hours vs. off hours
+- **Device compliance status** â Only elevate on compliant devices
+- **Network location** â Require approval when off corporate network
+- **Time of day** â Stricter rules during business hours vs. off hours
 
 ### Credential Caching
 
@@ -207,12 +207,12 @@ If you prefer scheduled rotation instead of JIT:
 
 ## Best Practices for Policy Creation
 
-1. **Start small** – Pilot with IT staff first
-2. **Use groups** – Assign policies to groups, not individual users
-3. **Require approval** – At least initially, until you understand usage patterns
-4. **Document exceptions** – Know which apps users actually need admin for
-5. **Monitor closely** – Check activity logs daily during first month
-6. **Iterate** – Adjust duration and rules based on real usage
+1. **Start small** â Pilot with IT staff first
+2. **Use groups** â Assign policies to groups, not individual users
+3. **Require approval** â At least initially, until you understand usage patterns
+4. **Document exceptions** â Know which apps users actually need admin for
+5. **Monitor closely** â Check activity logs daily during first month
+6. **Iterate** â Adjust duration and rules based on real usage
 
 ## What's Next?
 
@@ -228,6 +228,6 @@ Let's make sure your EPM deployment is actually working.
 ---
 
 **Series: Endpoint Privilege Manager**
-- [Part 1: Introduction & Setup](/epm-part-1-introduction-setup)
+- [Part 1: Introduction & Setup](/security/security/epm-part-1-introduction-setup/)
 - Part 2: Creating Policies & Rules (You are here)
-- [Part 3: Management & Troubleshooting](/epm-part-3-management-troubleshooting)
+- [Part 3: Management & Troubleshooting](/security/security/epm-part-3-management-troubleshooting/)
