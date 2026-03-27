@@ -12,15 +12,15 @@ draft: false
 
 # AI Usage Policy for Endpoint Teams: Practical Governance Without Slowing Delivery
 
-Most endpoint teams don’t fail with AI because the model is “bad.”
+Most endpoint teams donât fail with AI because the model is âbad.â
 
-They fail because there is no shared operating policy. One engineer pastes raw logs into a public model, another asks AI for a remediation script with no peer review, a third deploys a generated fix into broad scope because the output “looked right.”
+They fail because there is no shared operating policy. One engineer pastes raw logs into a public model, another asks AI for a remediation script with no peer review, a third deploys a generated fix into broad scope because the output âlooked right.â
 
 That is not an AI problem. That is a governance gap.
 
 This guide gives you a policy blueprint that desktop engineering teams can actually use in production without turning every change into a compliance ceremony.
 
-By the end, you’ll have:
+By the end, youâll have:
 - A policy model built for Intune/SCCM/PowerShell operations
 - A data-classification boundary for safe prompting
 - A review-and-approval flow tied to change control
@@ -44,7 +44,7 @@ By the end, you’ll have:
 
 ## Why Endpoint Teams Need an AI Policy Now
 
-Desktop teams are already using AI informally, even when leadership believes usage is “limited.”
+Desktop teams are already using AI informally, even when leadership believes usage is âlimited.â
 
 Common real-world patterns:
 - script drafting for repetitive remediations
@@ -113,9 +113,9 @@ A simple model that works:
 1. Red data is never sent to external AI systems.
 2. Amber data requires redaction before prompt submission.
 3. All prompts that include operational logs must use a redaction checklist.
-4. Engineers must include source context tags (“sampled,” “redacted,” “lab-only”).
+4. Engineers must include source context tags (âsampled,â âredacted,â âlab-onlyâ).
 
-For deeper triage techniques with redaction discipline, see [AI CMTrace + ProcMon Log Triage for Desktop Engineers](/ai/ai-cmtrace-procmon-log-triage-for-desktop-engineers).
+For deeper triage techniques with redaction discipline, see [AI CMTrace + ProcMon Log Triage for Desktop Engineers](/troubleshooting/ai-cmtrace-procmon-log-triage-for-desktop-engineers/).
 
 ### Practical redaction minimum
 
@@ -125,7 +125,7 @@ Before any prompt containing endpoint telemetry:
 - collapse unique file paths that expose identity
 - trim logs to only the lines needed for diagnosis
 
-Fast rule: if you would not paste it into a public support forum, don’t paste it into an external model.
+Fast rule: if you would not paste it into a public support forum, donât paste it into an external model.
 
 ## Section 3: Human Review Gates by Risk Level
 
@@ -133,7 +133,7 @@ AI can accelerate creation, not accountability.
 
 Define three risk levels:
 
-### L1 — Low risk
+### L1 â Low risk
 
 Examples:
 - documentation drafts
@@ -144,7 +144,7 @@ Control:
 - author self-review
 - no additional approver required
 
-### L2 — Medium risk
+### L2 â Medium risk
 
 Examples:
 - detection logic
@@ -155,7 +155,7 @@ Control:
 - peer review required
 - test evidence from lab ring
 
-### L3 — High risk
+### L3 â High risk
 
 Examples:
 - remediation scripts modifying services/registry/files
@@ -213,7 +213,7 @@ Minimum audit payload for AI-assisted artifacts:
 
 1. Store prompts in version control with a stable naming convention.
 2. Require change tickets for L3 outputs.
-3. Include “AI-assisted: yes/no” metadata in PR templates.
+3. Include âAI-assisted: yes/noâ metadata in PR templates.
 4. Preserve generated output diffs during review.
 
 This creates defensible traceability without bloating process overhead.
@@ -234,7 +234,7 @@ If you need ring strategy for broader endpoint rollout, refer to [Windows Update
 
 ## Section 7: Team Roles and RACI Model
 
-Avoid the “everyone assumed someone else reviewed it” failure mode.
+Avoid the âeveryone assumed someone else reviewed itâ failure mode.
 
 ### Lightweight RACI
 
@@ -247,7 +247,7 @@ Add this directly into your policy so responsibility is visible before incidents
 
 ## Section 8: Metrics That Show Policy Health
 
-If you can’t measure it, you can’t improve it.
+If you canât measure it, you canât improve it.
 
 Track these quarterly:
 
@@ -286,11 +286,11 @@ Here is a practical first month rollout you can run without a formal program off
 
 ### Week 4: Pilot + tune
 
-- Pilot policy with 2–3 recurring endpoint workflows
+- Pilot policy with 2â3 recurring endpoint workflows
 - Measure cycle time and failure/rollback rates
 - Trim rules that create friction without risk reduction
 
-This is enough to move from “informal AI use” to “controlled engineering acceleration.”
+This is enough to move from âinformal AI useâ to âcontrolled engineering acceleration.â
 
 ## FAQ
 
