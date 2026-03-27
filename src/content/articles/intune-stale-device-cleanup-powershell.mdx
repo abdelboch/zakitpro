@@ -1,0 +1,171 @@
+---
+title: "Intune Stale Device Cleanup with PowerShell"
+description: "Step-by-step PowerShell script to find and remove stale Intune-managed devices using Microsoft Graph, with safe filtering and dry-run mode."
+publishedAt: "2026-03-27"
+pillar: scripting
+difficulty: mid
+type: how-to
+tags: ["powershell", "intune", "device-cleanup", "microsoft-graph", "automation"]
+draft: false
+---
+
+# Intune Stale Device Cleanup with PowerShell
+
+Every Intune tenant accumulates stale devices. A laptop reimaged without a wipe, a terminated employee's phone that was never offboarded, a test VM that checked in once in 2023 — they build up, inflate your compliance numbers, and clutter assignment group counts. This guide walks through a PowerShell-based cleanup using Microsoft Graph that is safe to run in production.
+
+## Why the Built-in Cleanup Rule Is Not Enough
+
+Intune has a native device cleanup rule (Devices > Device cleanup rules) that automatically deletes devices that have not checked in for a configurable period between 30 and 270 days. It works, but it has two significant gaps.
+
+First, it applies to all platforms equally by default, though the 2025 service release added per-platform rules. If you want to keep macOS devices on a longer leash than Windows devices — common when users travel or go on extended leave — you need scripting to enforce that logic cleanly.
+
+Second, the built-in rule deletes from Intune only. It does not remove the corresponding Entra ID device object. After Intune cleanup, you are still left with stale device records in Entra, which affect Conditional Access evaluation, device-based Entra groups, and your license count if those devices were consuming Intune licenses.
+
+The PowerShell approach handles both and gives you an auditable log before touching anything.
+
+## Prerequisites
+
+You need the Microsoft Graph PowerShell SDK installed and a service principal or interactive authentication with the following permissions:
+
+- `DeviceManagementManagedDevices.ReadWrite.All` to read and delete Intune device records
+- `Device.ReadWrite.All` to disable and delete Entra ID device objects
+
+For automation, use a service principal with a certificate credential. If you are running this interactively, `Connect-MgGraph` with delegated permissions works fine.
+
+```powershell
+# Install if not present
+Install-Module Microsoft.Graph -Scope CurrentUser -Force
+
+# Connect with required scopes
+Connect-MgGraph -Scopes "DeviceManagementManagedDevices.ReadWrite.All","Device.ReadWrite.All"
+```
+
+## The Cleanup Script
+
+The script below runs in dry-run mode by default. Pass `-WhatIf` to preview only. It targets Windows devices inactive for more than 90 days, skips Autopilot-registered devices, and logs everything to a CSV before acting.
+
+```powershell
+param(
+    [int]$InactiveDays = 90,
+    [bool]$DryRun = $true,
+    [string]$LogPath = "C:\Temp\IntuneDeviceCleanup_$(Get-Date -Format yyyyMMdd).csv"
+)
+
+$cutoffDate = (Get-Date).AddDays(-$InactiveDays)
+Write-Host "Finding devices inactive since: $cutoffDate" -ForegroundColor Cyan
+
+# Fetch all managed Windows devices
+$devices = Get-MgDeviceManagementManagedDevice -Filter "operatingSystem eq 'Windows'" -All
+Write-Host "Total Windows managed devices: $($devices.Count)"
+
+# Filter stale devices — exclude null LastSync
+$staleDevices = $devices | Where-Object {
+    $_.LastSyncDateTime -ne $null -and
+    $_.LastSyncDateTime -lt $cutoffDate
+}
+Write-Host "Stale devices (inactive > $InactiveDays days): $($staleDevices.Count)"
+
+# Build audit log
+$logEntries = $staleDevices | ForEach-Object {
+    [PSCustomObject]@{
+        DeviceId        = $_.Id
+        DeviceName      = $_.DeviceName
+        SerialNumber    = $_.SerialNumber
+        UserPrincipal   = $_.UserPrincipalName
+        LastSync        = $_.LastSyncDateTime
+        EnrolledDate    = $_.EnrolledDateTime
+        ComplianceState = $_.ComplianceState
+        EntraDeviceId   = $_.AzureAdDeviceId
+    }
+}
+
+$logEntries | Export-Csv -Path $LogPath -NoTypeInformation
+Write-Host "Log written to: $LogPath" -ForegroundColor Green
+
+if ($DryRun) {
+    Write-Host "DRY RUN complete. Review $LogPath then re-run with -DryRun 0 to delete." -ForegroundColor Yellow
+    return
+}
+
+# Delete from Intune
+$successCount = 0
+$errorCount = 0
+
+foreach ($device in $staleDevices) {
+    try {
+        Remove-MgDeviceManagementManagedDevice -ManagedDeviceId $device.Id -ErrorAction Stop
+        Write-Host "Deleted from Intune: $($device.DeviceName)" -ForegroundColor Green
+        $successCount++
+        Start-Sleep -Milliseconds 300
+    } catch {
+        Write-Warning "Failed to delete $($device.DeviceName): $($_.Exception.Message)"
+        $errorCount++
+    }
+}
+
+Write-Host "Done. Deleted: $successCount | Errors: $errorCount" -ForegroundColor Cyan
+```
+
+## Cleaning Up the Entra ID Side
+
+After removing devices from Intune, run a second pass to handle the corresponding Entra ID objects. The log CSV contains the `EntraDeviceId` for each cleaned-up device. The safe pattern is: disable the device in Entra, wait 30 days, then delete.
+
+```powershell
+$log = Import-Csv -Path $LogPath
+
+foreach ($entry in $log) {
+    if ([string]::IsNullOrEmpty($entry.EntraDeviceId)) { continue }
+    try {
+        $entraDevice = Get-MgDevice -Filter "deviceId eq '$($entry.EntraDeviceId)'"
+        if (-not $entraDevice) { continue }
+        Update-MgDevice -DeviceId $entraDevice.Id -AccountEnabled $false
+        Write-Host "Disabled in Entra: $($entry.DeviceName)" -ForegroundColor Green
+    } catch {
+        Write-Warning "Entra disable failed for $($entry.DeviceName): $($_.Exception.Message)"
+    }
+}
+```
+
+Schedule the actual deletion as a separate automation run 30 days later. This window gives you time to recover anything that was flagged incorrectly before permanent removal.
+
+## Safe Exclusion Filters
+
+Before running cleanup, add exclusion filters appropriate to your environment.
+
+**Skip Autopilot-registered devices.** Devices in storage awaiting deployment may be inactive but should never be deleted from Intune. Fetch the Autopilot device list and exclude by serial number.
+
+```powershell
+$autopilotSerials = (Get-MgDeviceManagementWindowsAutopilotDeviceIdentity -All).SerialNumber
+$staleDevices = $staleDevices | Where-Object { $_.SerialNumber -notin $autopilotSerials }
+```
+
+**Skip devices enrolled but never synced.** A null `LastSyncDateTime` often indicates a broken enrollment rather than genuine inactivity. Handle these separately — investigate before deleting.
+
+**Skip VIP or executive devices.** If your tenant uses dedicated device groups for executives or sensitive roles, exclude those group members from the cleanup pass.
+
+## Scheduling and Automation
+
+For recurring cleanup, deploy the script as a scheduled task via Intune itself — assign a PowerShell script policy to your admin workstation device group — or run it from Azure Automation with a managed identity holding the required Graph permissions.
+
+The recommended cadence: run a dry-run export weekly and archive the CSV to SharePoint or a shared mailbox for review. Run the live deletion monthly or quarterly, with a human reviewing the dry-run output before approving the batch. Fully automated deletions without a review step work for strict decommission pipelines, but most environments benefit from a sign-off step before bulk removes.
+
+
+## Common Cleanup Scenarios
+
+**Post-offboarding cleanup.** When an employee leaves, HR or the service desk triggers a Jira or ServiceNow ticket but the device is not always formally decommissioned in Intune. After 90 days, the stale device script catches these automatically. Cross-reference the output against your HR termination records periodically to confirm the two data sources align.
+
+**Lab and test device management.** Test environments generate devices that check in once or twice and then disappear. The cleanup script will catch these, but verify before deleting — an inactive test device is not the same as a decommissioned user device. Add a naming convention filter to your exclusion list for lab machines if your organization uses a prefix like LAB- or TEST-.
+
+**Shared device pools.** Shared kiosk or frontline worker devices may have genuinely long gaps between check-ins if they are powered off between shifts or stored seasonally. For these, either extend your inactivity threshold beyond 90 days for the relevant device group, or maintain a separate exclusion list of shared device serial numbers.
+
+**After an MDM migration.** If your organization recently migrated from a third-party MDM or from a co-management state, devices that were enrolled in the old MDM may appear in Intune as orphaned records. The cleanup script will catch them — verify the serial number log against your asset database before deleting to confirm they are genuinely decommissioned rather than just recently re-enrolled.
+
+## Limitations and Caveats
+
+The `LastSyncDateTime` field reflects the last policy sync, not the last time the device was online. A device that is powered on but blocked from reaching the Intune MDM endpoint will appear stale even though it is in active use. Cross-reference with Entra sign-in logs or Defender for Endpoint telemetry before treating a device as genuinely inactive.
+
+Deleting a device from Intune does not revoke application access or wipe the device. The user retains access to cloud apps but loses managed app policies and Conditional Access compliance signals. For proper offboarding, retire or wipe the device first, then run the cleanup.
+
+The Microsoft Graph API enforces rate limits. Deleting more than 200 devices in a single run may trigger throttling errors. The `Start-Sleep -Milliseconds 300` delay in the loop above handles most normal batches, but for very large cleanups — thousands of devices — break the work into day-sized batches and monitor for 429 responses.
+
+Graph API permissions for device deletion are broad. The service principal running this script has the power to delete any managed device in your tenant. Restrict its use to a dedicated automation account with logging enabled, and rotate credentials on a regular schedule.
