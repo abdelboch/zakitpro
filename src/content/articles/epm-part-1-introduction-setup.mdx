@@ -16,7 +16,7 @@ draft: false
 
 If you've ever dealt with local administrator accounts in your Windows environment, you know the pain: shared passwords, users with unnecessary admin rights, and compliance auditors asking "who has admin access to what?"
 
-Microsoft's Endpoint Privilege Manager (EPM) solves this. Part of the Microsoft Intune family, EPM gives you control over local admin passwords across your fleet—without handing out permanent admin rights like candy.
+Microsoft's Endpoint Privilege Manager (EPM) solves this. Part of the Microsoft Intune family, EPM gives you control over local admin passwords across your fleetâwithout handing out permanent admin rights like candy.
 
 Let's break it down.
 
@@ -75,7 +75,7 @@ Let's walk through the setup process step by step.
 ### Step 1: Verify Your Licenses
 
 1. Sign in to **Microsoft Endpoint Manager admin center** (https://endpoint.microsoft.com)
-2. Navigate to **Tenant administration** → **Licenses**
+2. Navigate to **Tenant administration** â **Licenses**
 3. Check that you have one of:
    - Microsoft Intune Plan 1 or Plan 2
    - Microsoft 365 Business Premium
@@ -85,7 +85,7 @@ Let's walk through the setup process step by step.
 
 ### Step 2: Enable Endpoint Privilege Manager
 
-1. In Endpoint Manager, go to **Devices** → **Endpoint Privilege Management**
+1. In Endpoint Manager, go to **Devices** â **Endpoint Privilege Management**
 2. Click **Get started** or navigate to the EPM blade
 
 **Screenshot:** ![](/images/epm-part-1-intro-setup.png)
@@ -97,13 +97,13 @@ Let's walk through the setup process step by step.
 
 4. Click **Enable** to turn on EPM
 
-> **Note:** Enabling EPM doesn't immediately affect your devices. You need to create and assign policies first—which we'll cover in Part 2.
+> **Note:** Enabling EPM doesn't immediately affect your devices. You need to create and assign policies firstâwhich we'll cover in Part 2.
 
 ### Step 3: Assign Permissions (Optional)
 
 By default, only Intune Administrators can manage EPM policies. You can add more administrators:
 
-1. Go to **Tenant administration** → **Roles** → **Administrative licenses**
+1. Go to **Tenant administration** â **Roles** â **Administrative licenses**
 2. Create a custom role with EPM permissions, OR
 3. Assign users to built-in roles with EPM access
 
@@ -111,15 +111,15 @@ By default, only Intune Administrators can manage EPM policies. You can add more
 
 Before rolling out policies, check which devices support EPM:
 
-1. Go to **Devices** → **All devices**
-2. Filter by **OS** → **Windows**
+1. Go to **Devices** â **All devices**
+2. Filter by **OS** â **Windows**
 3. Check the **Join type** column (needs Azure AD join or Hybrid join)
 4. Check **Last check-in** status
 
 Devices that are:
-- Azure AD joined → Fully supported
-- Hybrid Azure AD joined → Fully supported
-- Intune enrolled (workgroup) → Limited support
+- Azure AD joined â Fully supported
+- Hybrid Azure AD joined â Fully supported
+- Intune enrolled (workgroup) â Limited support
 
 ## What's Next?
 
@@ -136,5 +136,5 @@ The real power of EPM comes from properly configured policies. Let's make sure y
 
 **Series: Endpoint Privilege Manager**
 - Part 1: Introduction & Setup (You are here)
-- [Part 2: Creating Policies & Rules](/epm-part-2-policies-rules)
-- [Part 3: Management & Troubleshooting](/epm-part-3-management-troubleshooting)
+- [Part 2: Creating Policies & Rules](/security/security/epm-part-2-policies-rules/)
+- [Part 3: Management & Troubleshooting](/security/security/epm-part-3-management-troubleshooting/)
