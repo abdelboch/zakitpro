@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 
 export default defineConfig({
-  site: 'https://zakitpro.com',
+  site: 'https://www.zakitpro.com',
   output: 'static',
   adapter: vercel({}),
   redirects: {
