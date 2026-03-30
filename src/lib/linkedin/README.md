@@ -6,10 +6,19 @@ This directory contains the LinkedIn API integration for automated content posti
 
 ```
 linkedin/
-├── transformer.ts    # Content transformation (blog → LinkedIn)
-├── auth.ts          # OAuth2 authentication (TODO)
-├── client.ts        # LinkedIn API wrapper (TODO)
+├── transformer.ts    # Content transformation (blog → LinkedIn) ✅
+├── auth.ts          # OAuth2 authentication ✅
+├── client.ts        # LinkedIn API wrapper ✅
 └── templates.ts     # Post templates (TODO)
+```
+
+**API Routes:**
+```
+src/pages/api/linkedin/
+├── auth.ts          # OAuth authorization redirect ✅
+├── callback.ts      # OAuth callback handler ✅
+├── post.ts          # Create LinkedIn post ✅
+└── status.ts        # Check auth status ✅
 ```
 
 ## Content Transformer
@@ -171,27 +180,171 @@ Article URL: https://zakitpro.com/articles/your-article
 ─────────────────────────────────────────────
 ```
 
-## LinkedIn API Integration (TODO)
+## OAuth2 Authentication
 
-### Authentication (auth.ts)
+The `auth.ts` module handles LinkedIn OAuth 2.0 authentication.
 
-OAuth 2.0 implementation for LinkedIn API access.
+### Features
 
-**Planned features:**
-- 3-legged OAuth flow
-- Token storage in Vercel KV
-- Automatic token refresh
-- Scope: `w_member_social` for posting
+- **3-legged OAuth flow**: Authorization code grant
+- **Token storage**: Interface for Vercel KV or in-memory storage
+- **Token management**: Automatic expiry checking
+- **Secure**: CSRF protection with state parameter
+- **Scopes**: `w_member_social`, `openid`, `profile`
 
-### API Client (client.ts)
+### Usage
 
-LinkedIn API wrapper with rate limiting and error handling.
+#### Initialize Auth Client
 
-**Planned features:**
-- POST /rest/posts endpoint
-- Rate limiting (100 posts/day)
-- Retry logic with exponential backoff
-- Error handling and logging
+```typescript
+import { createLinkedInAuth, MemoryTokenStorage } from './auth';
+
+// Development (in-memory)
+const storage = new MemoryTokenStorage();
+const auth = createLinkedInAuth(storage);
+
+// Production (Vercel KV)
+import { kv } from '@vercel/kv';
+import { VercelKVTokenStorage } from './auth';
+
+const storage = new VercelKVTokenStorage(kv);
+const auth = createLinkedInAuth(storage);
+```
+
+#### OAuth Flow
+
+```typescript
+// 1. Redirect to LinkedIn authorization
+const authUrl = auth.getAuthorizationUrl(state);
+// Redirect user to authUrl
+
+// 2. Handle callback (in API route)
+const tokens = await auth.exchangeCodeForToken(code);
+// Tokens are automatically stored
+
+// 3. Check authentication
+const isAuth = await auth.isAuthenticated();
+
+// 4. Get access token
+const token = await auth.getAccessToken();
+```
+
+#### Token Management
+
+```typescript
+// Check token expiry
+const expiry = await auth.getTokenExpiry();
+if (expiry) {
+  console.log(`Token expires in ${expiry.expiresInSeconds}s`);
+  console.log(`Token expires at ${new Date(expiry.expiresAt)}`);
+}
+
+// Logout (revoke tokens)
+await auth.revokeTokens();
+```
+
+### API Routes
+
+**Initiate OAuth:**
+```
+GET /api/linkedin/auth
+```
+Redirects to LinkedIn authorization page.
+
+**OAuth Callback:**
+```
+GET /api/linkedin/callback?code=...&state=...
+```
+Exchanges authorization code for access token.
+
+**Check Status:**
+```
+GET /api/linkedin/status
+```
+Returns authentication status and token info.
+
+## LinkedIn API Client
+
+The `client.ts` module provides a wrapper for the LinkedIn Posts API.
+
+### Features
+
+- **Posts API**: Create, read, delete posts
+- **Rate limiting**: Tracks and respects 100 posts/day limit
+- **Retry logic**: Exponential backoff on failures
+- **Error handling**: Typed errors with status codes
+- **Auto-authentication**: Uses OAuth tokens from auth module
+
+### Usage
+
+#### Initialize Client
+
+```typescript
+import { createLinkedInClient } from './client';
+import { createLinkedInAuth, MemoryTokenStorage } from './auth';
+
+const auth = createLinkedInAuth(new MemoryTokenStorage());
+const client = createLinkedInClient(auth);
+```
+
+#### Create a Post
+
+```typescript
+// Simple text post
+const post = await client.postText('Hello LinkedIn!', 'PUBLIC');
+console.log('Posted:', post.id);
+
+// With retry
+const post = await client.postTextWithRetry('Important update!');
+```
+
+#### Get Profile
+
+```typescript
+const profile = await client.getProfile();
+console.log('User:', profile.name);
+console.log('LinkedIn ID:', profile.sub);
+```
+
+#### Check Rate Limits
+
+```typescript
+const rateLimit = client.getRateLimitInfo();
+console.log(`Remaining: ${rateLimit.remaining}/${rateLimit.limit}`);
+
+if (client.isApproachingRateLimit(10)) {
+  console.warn('Approaching rate limit!');
+}
+```
+
+#### Error Handling
+
+```typescript
+import { LinkedInAPIError } from './client';
+
+try {
+  await client.postText('...');
+} catch (error) {
+  if (error instanceof LinkedInAPIError) {
+    console.error(`API Error ${error.status}:`, error.message);
+  }
+}
+```
+
+### API Routes
+
+**Create Post:**
+```
+POST /api/linkedin/post
+Body: { text: string, visibility?: 'PUBLIC' | 'CONNECTIONS' }
+```
+
+Example:
+```bash
+curl -X POST http://localhost:4321/api/linkedin/post \
+  -H 'Content-Type: application/json' \
+  -d '{"text": "Hello from zakitpro.com!"}'
+```
 
 ### Templates (templates.ts)
 
@@ -299,13 +452,14 @@ npx tsx test-linkedin-api.ts
 - [x] Preview functionality
 - [x] Test script
 
-### Phase 2.2: LinkedIn API (In Progress)
-- [ ] OAuth2 authentication flow
-- [ ] Token storage (Vercel KV)
-- [ ] LinkedIn API client
-- [ ] Posts API integration
-- [ ] Rate limiting
-- [ ] Error handling
+### Phase 2.2: LinkedIn API ✅ COMPLETE
+- [x] OAuth2 authentication flow
+- [x] Token storage (Vercel KV interface)
+- [x] LinkedIn API client
+- [x] Posts API integration
+- [x] Rate limiting
+- [x] Error handling
+- [x] API routes (auth, callback, post, status)
 
 ### Phase 2.3: Automation (Planned)
 - [ ] Queue system (Vercel KV)
