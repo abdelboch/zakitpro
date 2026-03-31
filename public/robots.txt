@@ -1,4 +1,75 @@
+# robots.txt for zakitpro.com
+# Technical blog for desktop engineers — AI, Intune, Autopilot, PowerShell, endpoint management
+
+# Allow all crawlers by default
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_astro/
+Crawl-delay: 1
 
-Sitemap: https://zakitpro.com/sitemap-index.xml
+# Google
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# GPT / OpenAI
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# ChatGPT User browsing
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Anthropic Claude
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Claude User browsing
+User-agent: claude-user
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Google AI / Gemini
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Meta AI
+User-agent: Meta-ExternalAgent
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Common AI research / indexing bots
+User-agent: cohere-ai
+Allow: /
+User-agent: YouBot
+Allow: /
+User-agent: Applebot
+Allow: /
+
+# Sitemap
+Sitemap: https://www.zakitpro.com/sitemap-index.xml
