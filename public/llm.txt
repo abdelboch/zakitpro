@@ -1,0 +1,136 @@
+# zakitpro
+
+> zakitpro is a practitioner blog for desktop engineers and endpoint managers working with Windows, Microsoft Intune, Autopilot, PowerShell, and AI-augmented workflows. All content is written for working engineers — no fluff, no ads, no tracking.
+
+## Site
+
+- URL: https://www.zakitpro.com
+- RSS: https://www.zakitpro.com/rss.xml
+- About: https://www.zakitpro.com/about/
+- All Articles: https://www.zakitpro.com/articles/
+
+## Audience
+
+Working IT professionals and desktop engineers responsible for managing Windows endpoints in enterprise environments. Readers are hands-on practitioners who deploy devices with Autopilot, manage compliance with Intune, write PowerShell automation, troubleshoot BSODs and enrollment errors, and are adopting AI tools to move faster.
+
+## Content Pillars
+
+1. AI-Augmented Engineering — practical AI workflows, prompt engineering, Copilot in Intune, AI-assisted log triage and troubleshooting
+2. Deployment & Imaging — Autopilot, Intune enrollment, Win32 app deployment, Windows imaging, SCCM/ConfigMgr
+3. Endpoint Security — CIS benchmarks, BitLocker, LAPS, EPM (Endpoint Privilege Management), compliance policies
+4. Windows Troubleshooting — BSOD, event log analysis, profile corruption, enrollment errors, stuck sync
+5. Scripting & Automation — PowerShell fundamentals, Graph API automation, scheduled tasks, modules
+6. Career & Craft — home lab setup, AI certifications, career progression for desktop engineers
+
+## Author
+
+zakitpro is written by an experienced desktop engineer and endpoint architect. The author has hands-on experience with Microsoft Intune, SCCM/ConfigMgr, Windows Autopilot, and enterprise PowerShell automation. All articles reflect real-world engineering practice.
+
+## Content Freshness
+
+Active blog — updated regularly with new articles. Content focused on 2025-2026 tooling. All Intune, Autopilot, and AI content reflects current Microsoft 365 and Azure capabilities.
+
+---
+
+## Articles by Pillar
+
+### AI-Augmented Engineering
+
+- AI-Powered Microsoft Intune: Intelligent Endpoint Management in 2026 — https://www.zakitpro.com/ai/ai-powered-microsoft-intune-2026/
+- AI-Powered PowerShell: Automate Endpoint Management with Intelligence — https://www.zakitpro.com/ai/ai-powered-powershell-2026/
+- AI-Powered Intune Error Resolution: Fix Common Deployment Issues — https://www.zakitpro.com/ai/ai-powered-intune-error-resolution-2026/
+- AI for desktop engineers: practical enterprise guide — https://www.zakitpro.com/ai/ai-for-desktop-engineers-practical-enterprise-guide/
+- AI-Generated Microsoft Graph Queries: Automating Intune Reporting in 2026 — https://www.zakitpro.com/ai/ai-generated-microsoft-graph-queries-2026/
+- AI-Enhanced PowerShell for Desktop Engineers — https://www.zakitpro.com/ai/ai-enhanced-powershell-for-desktop-engineers/
+- AI-Assisted Microsoft Graph Reporting for Desktop Engineers — https://www.zakitpro.com/ai/ai-assisted-microsoft-graph-reporting-desktop-engineers/
+- AI-Assisted Patch Validation for Desktop Engineers — https://www.zakitpro.com/ai/ai-assisted-patch-validation-desktop-engineers/
+- AI-Assisted Win32 App Packaging for Intune: A Desktop Engineer's Fast, Safe Workflow — https://www.zakitpro.com/ai/ai-assisted-win32-app-packaging-intune-desktop-engineers/
+- AI-Assisted Root Cause Analysis for Windows Autopatch Failures — https://www.zakitpro.com/ai/ai-assisted-windows-autopatch-failure-rca/
+- Using AI to Automate Intune Windows Update Ring Management — https://www.zakitpro.com/ai/ai-automate-intune-windows-update-rings/
+- How to Automate Windows Patch Compliance with AI — https://www.zakitpro.com/ai/ai-automate-windows-patch-compliance/
+- How Desktop Engineers Can Use AI to Triage Windows Autopilot ESP Failures Faster — https://www.zakitpro.com/ai/ai-autopilot-esp-failure-triage/
+- AI-assisted change risk review for Intune baselines — https://www.zakitpro.com/ai/ai-change-risk-review-intune-baselines/
+- AI-Assisted Driver Update Approval Review for Desktop Engineers — https://www.zakitpro.com/ai/ai-driver-update-approval-review-for-desktop-engineers/
+- AI-Assisted Intune App Supersedence Change Review for Desktop Engineers — https://www.zakitpro.com/ai/ai-intune-app-supersedence-change-review/
+- AI-Assisted Intune Assignment Filter Validation for Desktop Engineers — https://www.zakitpro.com/ai/ai-intune-assignment-filter-validation-desktop-engineers/
+- Stop Guessing Why Intune Compliance Fails: Use AI to Find the Gap — https://www.zakitpro.com/ai/ai-intune-compliance-troubleshooting/
+- AI-Assisted Intune Policy Drift Detection for Desktop Engineers — https://www.zakitpro.com/ai/ai-intune-policy-drift-detection-desktop-engineers/
+- How to Use AI to Triage Intune Policy Failures Faster — https://www.zakitpro.com/ai/ai-intune-policy-troubleshooting/
+- AI log redaction for endpoint troubleshooting — https://www.zakitpro.com/ai/ai-log-redaction-for-endpoint-troubleshooting/
+- AI Prompt-to-PowerShell Workflow for Desktop Engineers (Safe, Fast, Repeatable) — https://www.zakitpro.com/ai/ai-prompt-to-powershell-workflow-desktop-engineers/
+- AI Remediation Script Review Checklist for Desktop Engineers — https://www.zakitpro.com/ai/ai-remediation-script-review-checklist-for-desktop-engineers/
+- AI runbook generation for desktop engineers — https://www.zakitpro.com/ai/ai-runbook-generation-desktop-engineers/
+- How Desktop Engineers Can Use AI to Build Safer SCCM Boundary Group Validation Queries — https://www.zakitpro.com/ai/ai-sccm-boundary-group-query-validation/
+- AI log triage for SCCM client install failures — https://www.zakitpro.com/ai/ai-sccm-log-triage-client-install-failures/
+- AI-Assisted SCCM Task Sequence Troubleshooting for Desktop Engineers — https://www.zakitpro.com/ai/ai-sccm-task-sequence-troubleshooting-prompts/
+- AI Usage Policy for Endpoint Teams: Practical Governance Without Slowing Delivery — https://www.zakitpro.com/ai/ai-usage-policy-endpoint-teams-practical-governance/
+- How Desktop Engineers Can Use AI to Validate Windows Autopatch Deployment Rings — https://www.zakitpro.com/ai/ai-validate-windows-autopatch-deployment-rings/
+- Using AI to Validate Windows LAPS Policies in Intune Before You Get Burned — https://www.zakitpro.com/ai/ai-validate-windows-laps-policies-intune/
+- Using AI to Analyze Windows Event Logs Faster — https://www.zakitpro.com/ai/ai-windows-event-log-analysis-troubleshooting/
+- Best AI certifications for IT and desktop engineers (2026 edition) — https://www.zakitpro.com/ai/best-ai-certifications-it-desktop-engineers/
+- Copilot in Intune: AI Features Overview for Desktop Engineers — https://www.zakitpro.com/ai/copilot-intune-ai-features-overview/
+- Copilot for Intune Device Queries: Natural Language to KQL — https://www.zakitpro.com/ai/copilot-intune-device-queries/
+- How to prompt AI to write secure PowerShell — https://www.zakitpro.com/ai/how-to-prompt-ai-to-write-secure-powershell/
+- How Desktop Engineers Can Safely Use AI for Intune Detection Rules — https://www.zakitpro.com/ai/how-to-safely-use-ai-for-intune-detection-rules/
+- How to Use AI to Read SCCM Logs Faster: A Desktop Engineer's Triage Framework — https://www.zakitpro.com/ai/how-to-use-ai-to-read-sccm-logs-faster/
+- Local AI Ops for IT Teams: Run Fast Automations on Employee PCs Without Losing Control — https://www.zakitpro.com/ai/local-ai-ops-for-it-teams/
+- SCCM + AI Log Triage Playbook for Desktop Engineers — https://www.zakitpro.com/ai/sccm-ai-log-triage-playbook/
+- Security Copilot Agents in Intune: What You Actually Need to Know — https://www.zakitpro.com/ai/security-copilot-agents-intune-guide/
+- Using AI to generate Intune detection rules — https://www.zakitpro.com/ai/using-ai-to-generate-intune-detection-rules/
+
+### Deployment & Imaging
+
+- Microsoft Intune Explained for Desktop Engineers (2026 Guide) — https://www.zakitpro.com/deployment/microsoft-intune-for-desktop-engineers/
+- Windows Autopilot: The Complete Guide — https://www.zakitpro.com/deployment/windows-autopilot-complete-guide/
+- Intune Windows Autopilot for Windows 11 Deployment — https://www.zakitpro.com/deployment/intune-autopilot-windows-11/
+- Windows Autopilot Part 1: Prerequisites & Getting Started — https://www.zakitpro.com/deployment/autopilot-part-1-prerequisites/
+- Windows Autopilot Part 2: Register Devices & Create Profiles — https://www.zakitpro.com/deployment/autopilot-part-2-registration-profiles/
+- Windows Autopilot Part 3: Testing & Troubleshooting — https://www.zakitpro.com/deployment/autopilot-part-3-testing-troubleshooting/
+- Deploy Apps with Intune Win32 — https://www.zakitpro.com/deployment/deploy-apps-intune-win32/
+- Deploy Printers with Intune — https://www.zakitpro.com/deployment/deploy-printers-intune/
+- Fix Intune Access Denied Errors — https://www.zakitpro.com/deployment/intune-access-denied-fix/
+- Intune Device Wipe and Retire — https://www.zakitpro.com/deployment/intune-device-wipe-retire/
+- Fix Intune Enrollment Errors — https://www.zakitpro.com/deployment/intune-enrollment-errors-fix/
+- Fix Intune Stuck in Sync Loop — https://www.zakitpro.com/deployment/intune-stuck-sync-fixer/
+- SCCM vs Intune in 2026: The Hybrid Reality Guide — https://www.zakitpro.com/deployment/sccm-vs-intune-hybrid-reality-guide-2026/
+- Windows Update for Business Deployment — https://www.zakitpro.com/deployment/windows-update-business-deployment/
+
+### Endpoint Security
+
+- BitLocker Recovery Keys: The Complete Guide — https://www.zakitpro.com/security/bitlocker-recovery-keys-guide/
+- Certificate Management in Windows — https://www.zakitpro.com/security/certificate-management-windows/
+- CIS Benchmark Hardening for Windows — https://www.zakitpro.com/security/cis-benchmark-hardening-windows/
+- Endpoint Privilege Manager Part 1: Introduction & Setup — https://www.zakitpro.com/security/epm-part-1-introduction-setup/
+- Endpoint Privilege Manager Part 2: Creating Policies & Rules — https://www.zakitpro.com/security/epm-part-2-policies-rules/
+- Endpoint Privilege Manager Part 3: Management & Troubleshooting — https://www.zakitpro.com/security/epm-part-3-management-troubleshooting/
+- Intune Compliance Policies Explained — https://www.zakitpro.com/security/intune-compliance-policies/
+- Intune Device Restriction Profiles Explained — https://www.zakitpro.com/security/intune-device-restriction-profiles/
+- Endpoint Privilege Management in Intune: Setting Up Support-Approved Elevations — https://www.zakitpro.com/security/intune-epm-support-approved-elevations/
+
+### Windows Troubleshooting
+
+- AI Log Triage for Desktop Engineers: CMTrace + ProcMon Practical Workflow — https://www.zakitpro.com/troubleshooting/ai-cmtrace-procmon-log-triage-for-desktop-engineers/
+- Common BSOD Error Codes and Fixes — https://www.zakitpro.com/troubleshooting/common-bsod-error-codes/
+- Fix User Profile Corruption in Windows — https://www.zakitpro.com/troubleshooting/fix-user-profile-corruption/
+- Fix Grayed Out Location Services in Windows — https://www.zakitpro.com/troubleshooting/location-services-grayed-out-fix/
+- Network Sharing Troubleshooting Guide — https://www.zakitpro.com/troubleshooting/network-sharing-troubleshooting/
+- Remote Desktop Troubleshooting Guide — https://www.zakitpro.com/troubleshooting/remote-desktop-troubleshooting/
+- Windows Event Log Essentials for IT — https://www.zakitpro.com/troubleshooting/windows-event-log-essentials/
+- Fix Windows First Sign-In After Sysprep — https://www.zakitpro.com/troubleshooting/windows-first-signin-restore-fix/
+
+### Scripting & Automation
+
+- Active Directory Group Management Scripts — https://www.zakitpro.com/scripting/active-directory-group-management/
+- Getting Started with PowerShell — https://www.zakitpro.com/scripting/getting-started-with-powershell/
+- Intune Stale Device Cleanup with PowerShell — https://www.zakitpro.com/scripting/intune-stale-device-cleanup-powershell/
+- Microsoft Graph API for Intune — https://www.zakitpro.com/scripting/microsoft-graph-api-intune/
+- Password Reset Scripts for IT — https://www.zakitpro.com/scripting/password-reset-scripts-it/
+- PowerShell Error Handling Best Practices — https://www.zakitpro.com/scripting/powershell-error-handling/
+- PowerShell Modules: Install, Update, Use — https://www.zakitpro.com/scripting/powershell-modules-guide/
+- PowerShell Remoting Troubleshooting Guide — https://www.zakitpro.com/scripting/powershell-remoting-troubleshooting/
+- PowerShell Win32 App Installer Scripts — https://www.zakitpro.com/scripting/powershell-win32-app-installers/
+- Top 20 Essential PowerShell Gallery Scripts for Desktop Engineers in 2026 — https://www.zakitpro.com/scripting/top-20-essential-powershell-gallery-scripts-desktop-engineers/
+
+### Career & Craft
+
+- Setup Your Home Lab for IT Learning — https://www.zakitpro.com/career/setup-home-lab-it-learning/
