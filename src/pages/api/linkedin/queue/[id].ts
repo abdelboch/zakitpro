@@ -8,6 +8,8 @@
  * Phase 2.3 - Queue System
  */
 
+export const prerender = false;
+
 import type { APIRoute } from 'astro';
 import { MemoryQueueStorage } from '../../../../lib/linkedin/queue';
 
