@@ -1,0 +1,154 @@
+---
+title: "Endpoint Privilege Management in Intune: Setting Up Support-Approved Elevations"
+slug: "intune-epm-support-approved-elevations"
+description: "How to configure Endpoint Privilege Management's support-approved workflow in Intune so standard users can request elevation on demand without permanent admin rights."
+publishedAt: "2026-03-31"
+pillar: security
+difficulty: mid
+type: how-to
+tags: ["Intune", "EPM", "Endpoint Privilege Management", "Windows", "least privilege"]
+draft: false
+---
+
+Most desktop engineers have been fighting the same battle for years: users need local admin rights to install one piece of software, so IT grants them admin access, and suddenly the security team is paging you at 2 AM because a ransomware payload ran with elevation. Endpoint Privilege Management (EPM) in Intune's Suite is the serious answer to that cycle.
+
+EPM lets users run as standard accounts day-to-day, while still being able to elevate specific files when needed — either automatically through policy, or by asking an admin for approval. That second path, the **support-approved** workflow, is what most orgs end up leaning on for anything that doesn't fit a clean elevation rule. It's also the area Microsoft has been actively improving: an upcoming Intune update will let any user on a shared device request support-approved elevations, not just the device's enrolled primary user. That's worth understanding before it lands.
+
+This article walks through how support-approved elevations work, how to configure them, and what you need to watch out for in production.
+
+---
+
+## What EPM Actually Does
+
+Before getting into support-approved specifics, the architecture matters.
+
+EPM ships as part of the Intune Suite add-on, which means you need either the Intune Suite license or the standalone EPM add-on. It installs a client-side component on Windows devices. When a user right-clicks a file and chooses **Run with elevated access**, the EPM client intercepts that attempt and checks it against your policies.
+
+There are four elevation types you can assign to a rule:
+
+- **Automatic** — the file elevates without any user interaction
+- **User confirmed** — the user acknowledges the elevation, no admin involved
+- **User justification** — the user types a business reason, no admin approval needed
+- **Support approved** — the user submits a request, an Intune admin must approve before elevation happens
+
+Support-approved is the strictest. Nothing runs until a human with the right Intune permissions reviews and approves the request. The user gets a notification when approved, and they have a 24-hour window to run the elevated file before the token expires.
+
+The elevation itself runs in an isolated virtual account, not in the user's actual session context. The only exception is the *Elevate as current user* type, which is separate. This isolation matters because it limits what a compromised elevation can actually touch.
+
+---
+
+## The Elevation Request Flow
+
+Understanding exactly what happens step-by-step helps you plan the support workflow:
+
+1. User right-clicks a file and selects **Run with elevated access**
+2. EPM client checks the file against elevation rules
+3. If a support-approved rule matches (or default client behavior is set to support-approved), a dialog appears prompting the user to enter a business reason
+4. The request — including the user's name, device name, file name, and typed justification — is sent to the Intune admin center
+5. An Intune admin with the **Endpoint Privilege Manager** role reviews the request under **Endpoint Security > Endpoint Privilege Management > Elevation requests**
+6. Admin approves or denies. If approved, the user's device receives a notification
+7. User has 24 hours to run the file with elevation. After that, the token expires and they'd need to submit a fresh request
+
+The 24-hour window is fixed. There's no way to extend it or close it early from the admin side. If a user is approved but doesn't run the file within that window, they start over.
+
+---
+
+## Configuring Support-Approved Elevations
+
+### Prerequisites
+
+- Intune Suite license or EPM standalone add-on assigned to the user or device
+- Windows 10 or 11 device enrolled in Intune
+- EPM client deployed (this happens automatically when you assign an elevation settings policy)
+
+### Step 1 — Create an elevation settings policy
+
+Before elevation rules do anything, devices need an elevation settings policy that enables EPM. Without it, rules are ignored.
+
+1. In the Intune admin center, go to **Endpoint Security > Endpoint Privilege Management**
+2. Select **Elevation settings policy > Create policy**
+3. Platform: Windows 10 and later
+4. Set **Endpoint Privilege Management** to **Enabled**
+5. For **Default elevation response**, choose **Require support approval** if you want any uncovered elevation attempt to trigger the support-approved workflow. Choose **Deny all requests** if you only want to allow what's explicitly in rules
+6. Set **Send elevation data for reporting** to **Enabled** — you want the logs
+7. Assign to your target device or user group
+
+The default elevation response is the safety net. If a user tries to elevate something not covered by any rule, the default response determines what happens. Setting it to **Require support approval** means no elevation slips through silently.
+
+### Step 2 — Create an elevation rules policy with support-approved type
+
+1. Go to **Endpoint Security > Endpoint Privilege Management > Elevation rules policy > Create policy**
+2. Add a new rule
+3. Under **Elevation type**, select **Support approved**
+4. File identification: provide at minimum the **File name** (including extension). You can strengthen the rule with optional conditions like:
+   - **Product name** — matches the VersionInfo metadata in the binary
+   - **Internal name** — more reliable than product name for verifying a file
+   - **Min OS version** — useful when a specific version introduced a requirement
+   - **File hash** — strongest option, locks to an exact binary version
+5. Save and assign the policy to the same group as your settings policy
+
+One thing to get right on file hashing: the hash locks to that specific binary version. If the vendor updates the software, the hash breaks and users get denied. For frequently updated tools, rely on product name plus internal name rather than hash. For infrequently changed system utilities, hash is worth the overhead.
+
+### Step 3 — Assign Endpoint Privilege Manager permissions
+
+Admins who review elevation requests need a specific role. The built-in **Endpoint Privilege Manager** Intune role covers this. You can also add the **Elevation Requests Manager** permission to a custom role.
+
+Assign this role to whoever will be handling the help desk queue. They don't need full Intune admin access — EPM role assignments are scoped independently.
+
+### Step 4 — User experience: what your users see
+
+When a user triggers a support-approved elevation, they see a dialog with a text field for their business reason. The quality of that justification is entirely up to the user — there's no validation or minimum length. You may want to document expected formats in your service catalog so you're not approving requests that just say "need this."
+
+After they submit, they see a pending state. Once an admin approves, they receive a Windows toast notification. They then have 24 hours to run the file. If they miss that window, they submit again.
+
+---
+
+## The Admin Review Process
+
+Elevation requests appear in **Intune admin center > Endpoint Security > Endpoint Privilege Management > Elevation requests**. Each request shows:
+
+- User display name and UPN
+- Device name
+- File that was requested
+- User-submitted justification
+- Timestamp of the request
+
+From there you approve or deny. There's no bulk approval UI — each request is reviewed individually. If your org has high volume, this becomes a help desk workflow item, not something an admin reviews ad-hoc.
+
+The 24-hour approval window on the *admin* side is also worth noting: requests expire if not reviewed within a reasonable timeframe, so you need someone monitoring the queue. Microsoft's advice is to integrate this into your existing ticketing workflow rather than expecting admins to watch the Intune portal.
+
+---
+
+## What's Changing: Support Approvals for Shared Devices
+
+Currently, support-approved elevation requests can only be submitted by the device's primary user or the user who enrolled it. Anyone else who logs into that device sees the EPM prompt but can't complete the request.
+
+Microsoft has announced this restriction is going away. The upcoming change will allow any user on a device to submit a support-approved elevation request, regardless of enrollment relationship. This is particularly relevant for shared device scenarios — kiosk systems, lab workstations, shared admin consoles — where the enrolled user rarely matches whoever is actually sitting at the keyboard.
+
+When that update rolls out, test your default elevation response settings. If you were relying on the restriction as an informal way to limit who could submit requests, you'll need to revisit your scope. Tighten your elevation rules to cover only what's actually needed, and make sure your help desk is resourced to handle the potential uptick in requests from shared-device environments.
+
+---
+
+## Limitations and Real-World Caveats
+
+A few things that bite people in production:
+
+**File hashes break on updates.** If you fingerprint a binary by hash and the vendor ships an update, every user gets denied until you update the rule. For actively updated software, use product name or internal name as your primary identifier.
+
+**The 24-hour window is non-negotiable.** Users who don't run the approved file within 24 hours must submit again. There's no admin workaround for this. Brief users before you go live.
+
+**No self-service deny or cancel.** Once a user submits a request, they can't retract it. Admins can deny it, but users are stuck waiting until someone reviews.
+
+**MSI files are supported, but not always obvious.** EPM supports `.exe` and `.msi` alongside `.ps1` scripts. For MSI-based app installs, you need to match on the MSI file itself — not the bootstrapper or wrapper `.exe`. Check what your users are actually double-clicking before writing the rule.
+
+**Scope tags and reports.** As of the recent Intune update (service release 2603), scope tags now properly filter EPM reports. If you have a multi-region deployment where different admins scope to different sites, this fixes the reporting gap where admins could see elevation activity outside their assigned scope.
+
+**It's an Intune Suite add-on.** EPM isn't included in standard Intune licensing. You need either the Intune Suite add-on (~$10/user/month) or the standalone EPM license. Check before you build out the workflow.
+
+---
+
+## Conclusion
+
+Support-approved elevation is the right answer for anything that doesn't meet the bar for automatic or user-confirmed elevation — which, in most environments, covers a substantial chunk of what users actually need admin rights for. The workflow is solid once configured, but it requires the help desk to actively manage the approval queue. Don't deploy it without a clear owner and a process for handling requests within a reasonable SLA.
+
+The upcoming expansion to shared-device users is worth getting ahead of. Review your default elevation response settings now, and make sure your elevation rules are as specific as they need to be — hash or at minimum product name and internal name. Broad rules will generate broad request queues.
