@@ -23,6 +23,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 const defaultDescription = 'IT Desktop Engineering Blog — Technical articles, PowerShell scripts, and career guides for endpoint engineers.';
 const metaDescription = description || defaultDescription;
 const resolvedOgImage = ogImage ? new URL(ogImage, siteUrl).href : `${siteUrl}/og-default.png`;
+const currentPath = Astro.url.pathname;
 
 const orgSchema = {
   '@context': 'https://schema.org',
@@ -91,6 +92,11 @@ const breadcrumbSchema = article && pillar ? {
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title="zakitpro RSS Feed" href="/rss.xml" />
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <!-- JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
     {articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />}
@@ -140,16 +146,16 @@ const breadcrumbSchema = article && pillar ? {
             </button>
             <div class="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
               {Object.entries(pillarNames).map(([id, name]) => (
-                <a href={`/${id}/`} class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <a href={`/${id}/`} class:list={["block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors", { "text-sky-500 font-medium": currentPath.startsWith(`/${id}/`) }]}>
                   {name}
                 </a>
               ))}
             </div>
           </div>
-          <a href="/scripts/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Scripts</a>
-          <a href="/series/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Series</a>
-          <a href="/error-codes/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">Error Codes</a>
-          <a href="/about/" class="text-gray-600 dark:text-gray-300 hover:text-accent transition-colors">About</a>
+          <a href="/scripts/" class:list={["text-gray-600 dark:text-gray-300 hover:text-sky-500 transition-colors", { "text-sky-500 font-medium": currentPath.startsWith('/scripts/') }]}>Scripts</a>
+          <a href="/series/" class:list={["text-gray-600 dark:text-gray-300 hover:text-sky-500 transition-colors", { "text-sky-500 font-medium": currentPath.startsWith('/series/') }]}>Series</a>
+          <a href="/error-codes/" class:list={["text-gray-600 dark:text-gray-300 hover:text-sky-500 transition-colors", { "text-sky-500 font-medium": currentPath.startsWith('/error-codes/') }]}>Error Codes</a>
+          <a href="/about/" class:list={["text-gray-600 dark:text-gray-300 hover:text-sky-500 transition-colors", { "text-sky-500 font-medium": currentPath.startsWith('/about/') }]}>About</a>
         </nav>
         
         <!-- Right Side -->
@@ -160,6 +166,7 @@ const breadcrumbSchema = article && pillar ? {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
           </button>
+          <kbd class="hidden md:inline-flex items-center text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded border border-gray-200 dark:border-gray-700 ml-1 font-mono">⌘K</kbd>
           
           <!-- Theme Toggle -->
           <button id="theme-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-accent transition-colors" aria-label="Toggle theme">
@@ -232,6 +239,8 @@ const breadcrumbSchema = article && pillar ? {
             <h4 class="font-semibold mb-4">Subscribe</h4>
             <ul class="space-y-2 text-sm">
               <li><a href="/rss.xml" class="text-gray-600 dark:text-gray-400 hover:text-accent">RSS Feed</a></li>
+              <li><a href="https://linkedin.com/in/zakboch" class="text-gray-500 dark:text-gray-400 hover:text-sky-500 transition-colors">LinkedIn</a></li>
+              <li><a href="https://github.com/zakopenc" class="text-gray-500 dark:text-gray-400 hover:text-sky-500 transition-colors">GitHub</a></li>
             </ul>
           </div>
         </div>
