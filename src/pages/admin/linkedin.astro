@@ -1,0 +1,644 @@
+---
+/**
+ * LinkedIn Admin Dashboard
+ *
+ * Features:
+ * - Authentication status and token management
+ * - Manual post creation and preview
+ * - Queue management (Phase 2.3)
+ * - Post history and analytics
+ */
+
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="LinkedIn Admin Dashboard">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div class="max-w-6xl mx-auto px-4">
+
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          LinkedIn Integration
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Manage LinkedIn authentication and content posting
+        </p>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="alert-container" class="mb-6"></div>
+
+      <!-- Authentication Status Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Authentication Status
+          </h2>
+          <div id="auth-status-indicator" class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+            <span class="text-sm text-gray-600 dark:text-gray-400">Checking...</span>
+          </div>
+        </div>
+
+        <div id="auth-details" class="space-y-3">
+          <!-- Auth details loaded dynamically -->
+        </div>
+
+        <div class="mt-4 flex gap-3">
+          <button id="btn-authorize" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            Authorize LinkedIn
+          </button>
+          <button id="btn-refresh-status" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            Refresh Status
+          </button>
+        </div>
+      </div>
+
+      <!-- Manual Post Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          Create LinkedIn Post
+        </h2>
+
+        <form id="post-form" class="space-y-4">
+          <div>
+            <label for="post-text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Post Text
+            </label>
+            <textarea
+              id="post-text"
+              rows="8"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter your LinkedIn post text here..."
+            ></textarea>
+            <div class="mt-1 flex justify-between text-sm">
+              <span id="char-count" class="text-gray-500 dark:text-gray-400">0 / 3000 characters</span>
+              <span id="char-warning" class="text-amber-600 dark:text-amber-400 hidden">⚠️ Over 1300 characters (less engagement)</span>
+            </div>
+          </div>
+
+          <div>
+            <label for="post-visibility" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Visibility
+            </label>
+            <select
+              id="post-visibility"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="PUBLIC">Public</option>
+              <option value="CONNECTIONS">Connections Only</option>
+            </select>
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="submit"
+              id="btn-post"
+              class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <span>Post to LinkedIn</span>
+            </button>
+            <button
+              type="button"
+              id="btn-preview"
+              class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+            >
+              Preview
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Queue Management Card (Phase 2.3) -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+            Post Queue
+          </h2>
+          <div class="flex items-center gap-3">
+            <span id="queue-count" class="text-sm text-gray-600 dark:text-gray-400">0 posts</span>
+            <button id="btn-refresh-queue" class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+              Refresh
+            </button>
+            <button id="btn-process-queue" class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+              Process Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Queue Filters -->
+        <div class="flex gap-2 mb-4">
+          <button class="queue-filter-btn px-3 py-1 text-sm rounded transition bg-blue-600 text-white" data-status="all">
+            All
+          </button>
+          <button class="queue-filter-btn px-3 py-1 text-sm rounded transition border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-status="pending">
+            Pending
+          </button>
+          <button class="queue-filter-btn px-3 py-1 text-sm rounded transition border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-status="posted">
+            Posted
+          </button>
+          <button class="queue-filter-btn px-3 py-1 text-sm rounded transition border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700" data-status="failed">
+            Failed
+          </button>
+        </div>
+
+        <!-- Queue List -->
+        <div id="queue-list" class="space-y-3">
+          <p class="text-sm text-gray-600 dark:text-gray-400 text-center py-8">
+            Loading queue...
+          </p>
+        </div>
+      </div>
+
+      <!-- Documentation Link -->
+      <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">
+          📚 Documentation
+        </h3>
+        <p class="text-sm text-blue-800 dark:text-blue-300 mb-2">
+          See the <code class="px-1 py-0.5 bg-blue-100 dark:bg-blue-900/50 rounded">src/lib/linkedin/README.md</code> for complete API documentation.
+        </p>
+        <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+          <li>• OAuth flow: <code class="text-xs">/api/linkedin/auth</code> → <code class="text-xs">/api/linkedin/callback</code></li>
+          <li>• Post API: <code class="text-xs">POST /api/linkedin/post</code></li>
+          <li>• Status check: <code class="text-xs">GET /api/linkedin/status</code></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Preview Modal -->
+  <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">LinkedIn Post Preview</h3>
+          <button id="btn-close-preview" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+            ✕
+          </button>
+        </div>
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+          <div class="flex items-start gap-3 mb-3">
+            <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+              in
+            </div>
+            <div>
+              <div class="font-semibold text-gray-900 dark:text-white">Your Name</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">Now</div>
+            </div>
+          </div>
+          <div id="preview-content" class="text-gray-900 dark:text-white whitespace-pre-wrap break-words"></div>
+        </div>
+        <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+          <span id="preview-char-count"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let isAuthenticated = false;
+
+    // Utility: Show alert
+    function showAlert(message: string, type: 'success' | 'error' | 'info' = 'info') {
+      const container = document.getElementById('alert-container');
+      if (!container) return;
+
+      const colors = {
+        success: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
+        error: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
+        info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
+      };
+
+      const alert = document.createElement('div');
+      alert.className = `${colors[type]} border rounded-lg p-4 mb-4`;
+      alert.textContent = message;
+
+      container.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+
+    // Check URL parameters for OAuth callback messages
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+    const errorMessage = urlParams.get('message');
+
+    if (success === 'true') {
+      showAlert('✓ LinkedIn authentication successful!', 'success');
+      // Clean URL
+      window.history.replaceState({}, '', '/admin/linkedin');
+    } else if (error) {
+      showAlert(`✗ Authentication failed: ${errorMessage || error}`, 'error');
+      window.history.replaceState({}, '', '/admin/linkedin');
+    }
+
+    // Load authentication status
+    async function loadAuthStatus() {
+      const indicator = document.getElementById('auth-status-indicator');
+      const details = document.getElementById('auth-details');
+      const btnAuthorize = document.getElementById('btn-authorize') as HTMLButtonElement;
+      const btnPost = document.getElementById('btn-post') as HTMLButtonElement;
+
+      try {
+        const response = await fetch('/api/linkedin/status');
+        const data = await response.json();
+
+        isAuthenticated = data.authenticated;
+
+        // Update indicator
+        if (indicator) {
+          if (data.authenticated) {
+            indicator.innerHTML = `
+              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              <span class="text-sm text-green-600 dark:text-green-400 font-medium">Connected</span>
+            `;
+          } else {
+            indicator.innerHTML = `
+              <div class="w-3 h-3 rounded-full bg-red-500"></div>
+              <span class="text-sm text-red-600 dark:text-red-400 font-medium">Not Connected</span>
+            `;
+          }
+        }
+
+        // Update details
+        if (details) {
+          if (data.authenticated && data.tokenExpiry) {
+            const expiresAt = new Date(data.tokenExpiry.expiresAt);
+            const daysLeft = data.tokenExpiry.expiresInDays;
+
+            details.innerHTML = `
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="text-gray-600 dark:text-gray-400">Status:</span>
+                  <span class="ml-2 font-medium text-green-600 dark:text-green-400">Active</span>
+                </div>
+                <div>
+                  <span class="text-gray-600 dark:text-gray-400">Token expires:</span>
+                  <span class="ml-2 font-medium text-gray-900 dark:text-white">${expiresAt.toLocaleDateString()}</span>
+                </div>
+                <div>
+                  <span class="text-gray-600 dark:text-gray-400">Days remaining:</span>
+                  <span class="ml-2 font-medium text-gray-900 dark:text-white">${daysLeft} days</span>
+                </div>
+              </div>
+            `;
+          } else {
+            details.innerHTML = `
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Not authenticated. Click "Authorize LinkedIn" to connect your account.
+              </p>
+            `;
+          }
+        }
+
+        // Update buttons
+        if (btnAuthorize) {
+          btnAuthorize.textContent = data.authenticated ? 'Re-authorize LinkedIn' : 'Authorize LinkedIn';
+        }
+
+        if (btnPost) {
+          btnPost.disabled = !data.authenticated;
+        }
+
+      } catch (error) {
+        console.error('Failed to load auth status:', error);
+        if (indicator) {
+          indicator.innerHTML = `
+            <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+            <span class="text-sm text-gray-600 dark:text-gray-400">Error loading status</span>
+          `;
+        }
+      }
+    }
+
+    // Character counter
+    const postText = document.getElementById('post-text') as HTMLTextAreaElement;
+    const charCount = document.getElementById('char-count');
+    const charWarning = document.getElementById('char-warning');
+
+    if (postText) {
+      postText.addEventListener('input', () => {
+        const length = postText.value.length;
+        if (charCount) {
+          charCount.textContent = `${length} / 3000 characters`;
+
+          if (length > 3000) {
+            charCount.classList.add('text-red-600', 'dark:text-red-400', 'font-semibold');
+          } else {
+            charCount.classList.remove('text-red-600', 'dark:text-red-400', 'font-semibold');
+          }
+        }
+
+        if (charWarning) {
+          if (length > 1300 && length <= 3000) {
+            charWarning.classList.remove('hidden');
+          } else {
+            charWarning.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    // Authorization button
+    const btnAuthorize = document.getElementById('btn-authorize');
+    if (btnAuthorize) {
+      btnAuthorize.addEventListener('click', () => {
+        window.location.href = '/api/linkedin/auth';
+      });
+    }
+
+    // Refresh status button
+    const btnRefreshStatus = document.getElementById('btn-refresh-status');
+    if (btnRefreshStatus) {
+      btnRefreshStatus.addEventListener('click', () => {
+        loadAuthStatus();
+        showAlert('Status refreshed', 'info');
+      });
+    }
+
+    // Preview button
+    const btnPreview = document.getElementById('btn-preview');
+    const previewModal = document.getElementById('preview-modal');
+    const btnClosePreview = document.getElementById('btn-close-preview');
+    const previewContent = document.getElementById('preview-content');
+    const previewCharCount = document.getElementById('preview-char-count');
+
+    if (btnPreview && previewModal) {
+      btnPreview.addEventListener('click', () => {
+        const text = (document.getElementById('post-text') as HTMLTextAreaElement)?.value || '';
+
+        if (previewContent) {
+          previewContent.textContent = text || '(Empty post)';
+        }
+
+        if (previewCharCount) {
+          previewCharCount.textContent = `${text.length} characters`;
+        }
+
+        previewModal.classList.remove('hidden');
+      });
+    }
+
+    if (btnClosePreview && previewModal) {
+      btnClosePreview.addEventListener('click', () => {
+        previewModal.classList.add('hidden');
+      });
+
+      previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) {
+          previewModal.classList.add('hidden');
+        }
+      });
+    }
+
+    // Post form submission
+    const postForm = document.getElementById('post-form') as HTMLFormElement;
+    const btnPost = document.getElementById('btn-post') as HTMLButtonElement;
+
+    if (postForm) {
+      postForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const text = (document.getElementById('post-text') as HTMLTextAreaElement)?.value;
+        const visibility = (document.getElementById('post-visibility') as HTMLSelectElement)?.value;
+
+        if (!text || text.trim().length === 0) {
+          showAlert('Please enter post text', 'error');
+          return;
+        }
+
+        if (text.length > 3000) {
+          showAlert('Post exceeds 3000 character limit', 'error');
+          return;
+        }
+
+        if (!isAuthenticated) {
+          showAlert('Please authenticate with LinkedIn first', 'error');
+          return;
+        }
+
+        // Disable button and show loading
+        btnPost.disabled = true;
+        const originalText = btnPost.innerHTML;
+        btnPost.innerHTML = '<span>Posting...</span>';
+
+        try {
+          const response = await fetch('/api/linkedin/post', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text, visibility }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showAlert('✓ Post created successfully!', 'success');
+            // Clear form
+            (document.getElementById('post-text') as HTMLTextAreaElement).value = '';
+            if (charCount) {
+              charCount.textContent = '0 / 3000 characters';
+            }
+            if (charWarning) {
+              charWarning.classList.add('hidden');
+            }
+          } else {
+            showAlert(`✗ Failed to create post: ${data.message || data.error}`, 'error');
+          }
+        } catch (error) {
+          console.error('Post error:', error);
+          showAlert('✗ Network error. Please try again.', 'error');
+        } finally {
+          btnPost.disabled = false;
+          btnPost.innerHTML = originalText;
+        }
+      });
+    }
+
+    // Queue management
+    let currentQueueFilter = 'all';
+
+    async function loadQueue() {
+      const queueList = document.getElementById('queue-list');
+      const queueCount = document.getElementById('queue-count');
+
+      if (!queueList) return;
+
+      try {
+        const url = currentQueueFilter === 'all'
+          ? '/api/linkedin/queue'
+          : `/api/linkedin/queue?status=${currentQueueFilter}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (queueCount) {
+          queueCount.textContent = `${data.count || 0} post${data.count === 1 ? '' : 's'}`;
+        }
+
+        if (!data.posts || data.posts.length === 0) {
+          queueList.innerHTML = '<p class="text-sm text-gray-600 dark:text-gray-400 text-center py-8">No posts in queue</p>';
+          return;
+        }
+
+        queueList.innerHTML = data.posts.map((post: any) => {
+          const statusColors = {
+            pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200',
+            processing: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200',
+            posted: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200',
+            failed: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200',
+          };
+
+          const truncatedText = post.text.length > 150 ? post.text.substring(0, 150) + '...' : post.text;
+          const scheduledTime = post.scheduledTime ? new Date(post.scheduledTime).toLocaleString() : 'ASAP';
+          const createdTime = new Date(post.createdAt).toLocaleString();
+
+          return `
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs px-2 py-1 rounded ${statusColors[post.status as keyof typeof statusColors]}">
+                      ${post.status}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      Article: ${post.articleSlug}
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-900 dark:text-white">${truncatedText}</p>
+                </div>
+                <button
+                  class="queue-delete-btn ml-3 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                  data-id="${post.id}"
+                  title="Delete from queue"
+                >
+                  ✕
+                </button>
+              </div>
+              <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
+                <div class="flex gap-3">
+                  <span>Scheduled: ${scheduledTime}</span>
+                  <span>Created: ${createdTime}</span>
+                  <span>Attempts: ${post.attempts}/${post.maxAttempts}</span>
+                </div>
+                ${post.status === 'failed' && post.lastError ? `
+                  <span class="text-red-600 dark:text-red-400" title="${post.lastError}">⚠️ Error</span>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Add event listeners to delete buttons
+        document.querySelectorAll('.queue-delete-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const target = e.target as HTMLElement;
+            const id = target.dataset.id;
+            if (!id) return;
+
+            if (!confirm('Remove this post from the queue?')) return;
+
+            try {
+              const response = await fetch(`/api/linkedin/queue/${id}`, {
+                method: 'DELETE',
+              });
+
+              if (response.ok) {
+                showAlert('✓ Post removed from queue', 'success');
+                loadQueue();
+              } else {
+                const data = await response.json();
+                showAlert(`✗ Failed to remove: ${data.message || data.error}`, 'error');
+              }
+            } catch (error) {
+              console.error('Delete error:', error);
+              showAlert('✗ Network error', 'error');
+            }
+          });
+        });
+
+      } catch (error) {
+        console.error('Failed to load queue:', error);
+        queueList.innerHTML = '<p class="text-sm text-red-600 dark:text-red-400 text-center py-8">Failed to load queue</p>';
+      }
+    }
+
+    // Queue filter buttons
+    document.querySelectorAll('.queue-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const status = target.dataset.status;
+        if (!status) return;
+
+        currentQueueFilter = status;
+
+        // Update button styles
+        document.querySelectorAll('.queue-filter-btn').forEach(b => {
+          b.className = 'queue-filter-btn px-3 py-1 text-sm rounded transition border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700';
+        });
+        target.className = 'queue-filter-btn px-3 py-1 text-sm rounded transition bg-blue-600 text-white';
+
+        loadQueue();
+      });
+    });
+
+    // Refresh queue button
+    const btnRefreshQueue = document.getElementById('btn-refresh-queue');
+    if (btnRefreshQueue) {
+      btnRefreshQueue.addEventListener('click', () => {
+        loadQueue();
+        showAlert('Queue refreshed', 'info');
+      });
+    }
+
+    // Process queue button
+    const btnProcessQueue = document.getElementById('btn-process-queue');
+    if (btnProcessQueue) {
+      btnProcessQueue.addEventListener('click', async () => {
+        if (!isAuthenticated) {
+          showAlert('Please authenticate with LinkedIn first', 'error');
+          return;
+        }
+
+        if (!confirm('Process all scheduled posts in the queue?')) return;
+
+        btnProcessQueue.disabled = true;
+        const originalText = btnProcessQueue.textContent;
+        btnProcessQueue.textContent = 'Processing...';
+
+        try {
+          const response = await fetch('/api/linkedin/queue/process', {
+            method: 'POST',
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showAlert(`✓ Processed ${data.processed} post(s): ${data.succeeded} succeeded, ${data.failed} failed`, 'success');
+            loadQueue();
+          } else {
+            showAlert(`✗ Failed to process queue: ${data.message || data.error}`, 'error');
+          }
+        } catch (error) {
+          console.error('Process queue error:', error);
+          showAlert('✗ Network error', 'error');
+        } finally {
+          btnProcessQueue.disabled = false;
+          btnProcessQueue.textContent = originalText;
+        }
+      });
+    }
+
+    // Initial load
+    loadAuthStatus();
+    loadQueue();
+  </script>
+</Layout>

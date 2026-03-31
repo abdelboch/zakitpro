@@ -13,7 +13,13 @@ const articles = defineCollection({
     tags: z.array(z.string()).default([]),
     seriesId: z.string().optional(),
     seriesPart: z.number().optional(),
-    draft: z.boolean().default(false)
+    draft: z.boolean().default(false),
+    linkedin: z.object({
+      autoPost: z.boolean().default(false),
+      customText: z.string().optional(),
+      hashtags: z.array(z.string()).optional(),
+      scheduledTime: z.string().optional()
+    }).optional()
   })
 });
 

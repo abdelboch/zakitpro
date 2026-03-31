@@ -346,6 +346,206 @@ curl -X POST http://localhost:4321/api/linkedin/post \
   -d '{"text": "Hello from zakitpro.com!"}'
 ```
 
+## Queue System (Phase 2.3)
+
+The queue system manages scheduled LinkedIn posts with automatic processing via cron jobs.
+
+### Features
+
+- **Queue Management**: Add, update, remove posts from queue
+- **Scheduled Posting**: Post at specific times
+- **Retry Logic**: Automatic retry on failure (configurable attempts)
+- **Status Tracking**: Track posts through pending → processing → posted/failed
+- **Admin Interface**: Web UI for queue management
+- **Cron Processing**: Automatic processing via Vercel Cron Jobs
+
+### Queue Storage
+
+Two storage implementations:
+
+**Development (In-Memory):**
+```typescript
+import { MemoryQueueStorage } from './queue';
+const storage = new MemoryQueueStorage();
+```
+
+**Production (Vercel KV):**
+```typescript
+import { kv } from '@vercel/kv';
+import { VercelKVQueueStorage } from './queue';
+const storage = new VercelKVQueueStorage(kv);
+```
+
+### Queue API Routes
+
+**Get Queue:**
+```
+GET /api/linkedin/queue
+GET /api/linkedin/queue?status=pending
+GET /api/linkedin/queue?status=failed
+```
+
+**Add to Queue:**
+```
+POST /api/linkedin/queue
+Body: {
+  articleSlug: string,
+  text: string,
+  visibility?: 'PUBLIC' | 'CONNECTIONS',
+  scheduledTime?: string,  // ISO 8601
+  maxAttempts?: number     // Default: 3
+}
+```
+
+**Get Queued Post:**
+```
+GET /api/linkedin/queue/[id]
+```
+
+**Update Queued Post:**
+```
+PATCH /api/linkedin/queue/[id]
+Body: {
+  text?: string,
+  visibility?: string,
+  status?: 'pending' | 'processing' | 'posted' | 'failed',
+  scheduledTime?: string
+}
+```
+
+**Delete from Queue:**
+```
+DELETE /api/linkedin/queue/[id]
+```
+
+**Process Queue:**
+```
+POST /api/linkedin/queue/process
+```
+
+**Auto-Queue Articles:**
+```
+POST /api/linkedin/auto-queue
+POST /api/linkedin/auto-queue?article=slug
+POST /api/linkedin/auto-queue?dryRun=true
+```
+
+### Usage Examples
+
+#### Add Post to Queue
+
+```typescript
+const response = await fetch('/api/linkedin/queue', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    articleSlug: 'ai-driver-update-review',
+    text: 'Your LinkedIn post text here...',
+    visibility: 'PUBLIC',
+    scheduledTime: '2026-04-01T14:00:00Z',
+    maxAttempts: 3,
+  }),
+});
+```
+
+#### Process Queue Manually
+
+```typescript
+const response = await fetch('/api/linkedin/queue/process', {
+  method: 'POST',
+});
+
+const result = await response.json();
+// { processed: 5, succeeded: 4, failed: 1 }
+```
+
+#### Auto-Queue Articles
+
+```bash
+# Queue all articles with linkedin.autoPost: true
+curl -X POST https://zakitpro.com/api/linkedin/auto-queue
+
+# Queue specific article
+curl -X POST https://zakitpro.com/api/linkedin/auto-queue?article=ai-driver-update-review
+
+# Dry run (check what would be queued)
+curl -X POST https://zakitpro.com/api/linkedin/auto-queue?dryRun=true
+```
+
+### Cron Job Configuration
+
+Automatic queue processing is configured in `vercel.json`:
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/linkedin/queue/process",
+      "schedule": "0 9,14 * * *"
+    }
+  ]
+}
+```
+
+This processes scheduled posts at 9 AM and 2 PM UTC daily.
+
+See `.github/CRON.md` for detailed cron configuration and monitoring.
+
+### Admin Dashboard
+
+The admin dashboard (`/admin/linkedin`) provides:
+
+- **Authentication Status**: View LinkedIn connection and token expiry
+- **Manual Posting**: Create and preview posts before publishing
+- **Queue Management**: View, filter, and manage queued posts
+- **Process Queue**: Manually trigger queue processing
+
+**Access:** Visit `/admin/linkedin` after deployment
+
+### Frontmatter Schema
+
+Add LinkedIn metadata to article frontmatter:
+
+```yaml
+---
+title: "Your Article Title"
+publishedAt: "2026-03-30"
+linkedin:
+  autoPost: true                    # Auto-add to queue
+  scheduledTime: "2026-04-01T14:00:00Z"  # Optional: schedule for specific time
+  customText: |                     # Optional: override auto-generation
+    Custom LinkedIn post text here.
+  hashtags: ["AI", "Intune", "Windows"]  # Optional: override tag conversion
+---
+```
+
+### Automated Workflow
+
+1. **Write Article**: Create MDX with `linkedin.autoPost: true`
+2. **Push to Main**: CI/CD builds and deploys
+3. **Auto-Queue**: Call `/api/linkedin/auto-queue` in CI/CD
+4. **Cron Processing**: Scheduled posts are processed automatically
+5. **Monitoring**: Check admin dashboard for status
+
+### Queue Processor
+
+```typescript
+import { createQueueProcessor } from './queue';
+import { createLinkedInClient } from './client';
+
+const processor = createQueueProcessor(
+  queueStorage,
+  async (text, visibility) => {
+    const result = await client.postTextWithRetry(text, visibility);
+    return { id: result.id };
+  }
+);
+
+// Process scheduled posts
+const result = await processor.processScheduledPosts();
+console.log(`Processed: ${result.processed}, Succeeded: ${result.succeeded}`);
+```
+
 ### Templates (templates.ts)
 
 Reusable LinkedIn post templates.
@@ -461,12 +661,14 @@ npx tsx test-linkedin-api.ts
 - [x] Error handling
 - [x] API routes (auth, callback, post, status)
 
-### Phase 2.3: Automation (Planned)
-- [ ] Queue system (Vercel KV)
-- [ ] Cron job for processing queue
-- [ ] Automated posting on git push
-- [ ] Admin dashboard
-- [ ] Manual approval workflow
+### Phase 2.3: Automation ✅ COMPLETE
+- [x] Queue system (Vercel KV)
+- [x] Queue API routes (CRUD operations)
+- [x] Queue processor endpoint
+- [x] Cron job for processing queue
+- [x] Auto-queue API endpoint
+- [x] Admin dashboard with queue management
+- [x] Manual approval workflow (via admin UI)
 
 ### Phase 2.4: Monitoring (Planned)
 - [ ] Post success/failure tracking
@@ -509,5 +711,10 @@ npx tsx test-linkedin-api.ts
 
 ---
 
-**Status:** Phase 2.1 Complete - Transformer ready for testing
-**Next:** Phase 2.2 - LinkedIn API OAuth implementation
+**Status:** Phase 2.3 Complete - Queue system and automation ready
+**Completed:**
+- Phase 2.1: Content Transformation ✅
+- Phase 2.2: LinkedIn OAuth & API ✅
+- Phase 2.3: Queue System & Automation ✅
+
+**Next:** Phase 2.4 - Monitoring & Analytics
