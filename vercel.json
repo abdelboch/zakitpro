@@ -1,9 +1,3 @@
 {
-  "buildCommand": "npm run build",
-  "crons": [
-    {
-      "path": "/api/linkedin/queue/process",
-      "schedule": "0 9,14 * * *"
-    }
-  ]
+  "buildCommand": "npm run build"
 }
