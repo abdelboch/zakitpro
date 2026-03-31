@@ -18,7 +18,7 @@ interface Props {
 import { pillarNames } from '../utils/index';
 
 const { title, description, pillar, ogImage, article } = Astro.props;
-const siteUrl = 'https://zakitpro.com';
+const siteUrl = 'https://www.zakitpro.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 const defaultDescription = 'IT Desktop Engineering Blog — Technical articles, PowerShell scripts, and career guides for endpoint engineers.';
 const metaDescription = description || defaultDescription;
