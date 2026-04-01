@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const freebies = [
+  {
+    title: '50 AI Prompts for Desktop Engineers',
+    description: 'A practical prompt library for Intune, SCCM, PowerShell, Autopilot, patching, and endpoint troubleshooting.',
+    image: '/images/toolkits/50-ai-prompts-cover.png',
+    pdf: '/downloads/50-ai-prompts-for-desktop-engineers.pdf',
+    bullets: [
+      '50 enterprise-ready prompts',
+      'Intune, SCCM, PowerShell, event logs, deployment, patching',
+      'Validation note included for every prompt'
+    ]
+  },
+  {
+    title: 'AI Output Validation Checklist for Endpoint Teams',
+    description: 'A safety-first review framework for scripts, detections, Intune changes, logs, and production rollouts.',
+    image: '/images/toolkits/ai-output-validation-cover.png',
+    pdf: '/downloads/ai-output-validation-checklist-for-endpoint-teams.pdf',
+    bullets: [
+      '5-step validation framework',
+      'Review scripts, policies, detections, and reports',
+      'Printable sign-off checklist for real change control'
+    ]
+  }
+];
+---
+
+<BaseLayout title="Free AI Toolkit for Desktop Engineers" description="Get two free PDFs for desktop engineers: 50 AI prompts for Intune, SCCM, and PowerShell plus an AI output validation checklist for endpoint teams.">
+  <section class="bg-gradient-to-b from-sky-50 to-white dark:from-slate-950 dark:to-slate-900 py-16 md:py-24">
+    <div class="max-w-6xl mx-auto px-4 grid lg:grid-cols-[1.15fr_0.85fr] gap-10 items-start">
+      <div>
+        <span class="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-300">
+          Free AI Toolkit
+        </span>
+        <h1 class="mt-5 text-4xl md:text-5xl font-heading font-bold text-slate-950 dark:text-white leading-tight">
+          Get 2 free PDFs built for desktop engineers using AI in the real world
+        </h1>
+        <p class="mt-5 text-lg text-slate-600 dark:text-slate-300 max-w-3xl">
+          No fluff. No generic AI prompts. These guides are designed for people working with Intune, SCCM, PowerShell, device troubleshooting, and endpoint security.
+        </p>
+
+        <div class="mt-8 grid sm:grid-cols-3 gap-4">
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm">
+            <p class="text-2xl font-bold text-sky-500">2</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Professional PDFs</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm">
+            <p class="text-2xl font-bold text-sky-500">50</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Enterprise AI prompts</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm">
+            <p class="text-2xl font-bold text-sky-500">1</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Safety checklist teams can actually use</p>
+          </div>
+        </div>
+
+        <div class="mt-10 space-y-4">
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+            <h2 class="font-semibold text-slate-950 dark:text-white">What you get</h2>
+            <ul class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+              <li>• A prompt pack you can start using today for Intune, SCCM, PowerShell, event logs, and patching</li>
+              <li>• A validation checklist to keep AI output from becoming production risk</li>
+              <li>• Resources written for endpoint engineers, not generic AI audiences</li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+            <h2 class="font-semibold text-slate-950 dark:text-white">Who this is for</h2>
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">
+              Desktop engineers, endpoint admins, Intune admins, PowerShell-heavy IT teams, and anyone trying to use AI without guessing their way into production mistakes.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="lg:sticky lg:top-28 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-7 shadow-xl shadow-slate-200/60 dark:shadow-none">
+        <h2 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">Get both PDFs free</h2>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+          Enter your email and I’ll send you straight to the download page.
+        </p>
+
+        <form class="mt-6 space-y-4" action="https://formsubmit.co/abdelboch@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="New zakitpro AI Toolkit signup" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_next" value="https://www.zakitpro.com/ai-toolkit/thanks/" />
+          <input type="hidden" name="Lead Magnet" value="AI Toolkit for Desktop Engineers" />
+
+          <div>
+            <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Name</label>
+            <input id="name" name="name" type="text" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20" placeholder="Your name" />
+          </div>
+
+          <div>
+            <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Email</label>
+            <input id="email" name="email" type="email" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20" placeholder="you@company.com" />
+          </div>
+
+          <button type="submit" class="w-full rounded-xl bg-sky-500 px-4 py-3 font-semibold text-white transition hover:bg-sky-600">
+            Get the free PDFs
+          </button>
+        </form>
+
+        <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          No spam. Just useful desktop engineering content and future toolkit updates.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="py-16 bg-white dark:bg-slate-950">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="max-w-2xl mb-8">
+        <h2 class="text-3xl font-heading font-bold text-slate-950 dark:text-white">Inside the free toolkit</h2>
+        <p class="mt-3 text-slate-600 dark:text-slate-300">
+          These are not filler PDFs. They are built to be immediately useful for working engineers.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8">
+        {freebies.map((item) => (
+          <article class="overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-sm">
+            <div class="grid md:grid-cols-[0.95fr_1.05fr] gap-0">
+              <div class="bg-slate-100 dark:bg-slate-950 p-5 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
+                <img src={item.image} alt={item.title} class="w-full max-w-sm rounded-2xl shadow-xl shadow-slate-300/40 dark:shadow-black/30" loading="lazy" />
+              </div>
+              <div class="p-6 md:p-7">
+                <h3 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">{item.title}</h3>
+                <p class="mt-3 text-slate-600 dark:text-slate-300">{item.description}</p>
+                <ul class="mt-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                  {item.bullets.map((bullet) => <li>• {bullet}</li>)}
+                </ul>
+                <div class="mt-6 flex flex-wrap gap-3">
+                  <a href="/ai-toolkit/thanks/" class="inline-flex items-center rounded-xl bg-slate-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-slate-950 transition hover:opacity-90">
+                    Preview the download page
+                  </a>
+                  <a href={item.pdf} class="inline-flex items-center rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:border-sky-500 hover:text-sky-500">
+                    Direct PDF link
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

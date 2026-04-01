@@ -1,0 +1,440 @@
+50 AI Prompts for Desktop Engineers
+
+Subtitle: A practical prompt library for Intune, SCCM, PowerShell, Windows troubleshooting, Autopilot, and endpoint security
+
+Introduction
+
+Why this exists
+Desktop engineering teams are being asked to move faster across packaging, policy deployment, endpoint security, troubleshooting, reporting, and automation. AI can help, but only if you ask precise questions and force structured output. Generic prompts produce generic answers. This guide gives you concrete prompts designed for real enterprise desktop work.
+
+How to use this guide
+Use these prompts as starting points, not final answers. Paste in your actual logs, scripts, policy settings, event IDs, deployment goals, and device state. Ask the model to explain assumptions, show edge cases, and output checklists or scripts in a format your team can test. For anything touching production, validate in a lab, review permissions, and confirm against Microsoft documentation and your own standards.
+
+Category 1: Intune App, Policy, and Device Troubleshooting
+
+1) Prompt Title: Diagnose a failed Intune Win32 app deployment
+Exact Prompt Text:
+You are a senior Microsoft Intune support engineer. I will paste details from Intune portal status, IME logs, app install command, detection rule, and device context. Analyze why this Win32 app deployment failed. Give me: 1) most likely root cause ranked by confidence, 2) log lines that matter, 3) whether the issue is packaging, install command, detection, context, dependency, restart behavior, or assignment, 4) a step-by-step remediation plan, and 5) what I should test next on a pilot device. Do not give generic advice. Use the exact evidence I provide.
+When to Use It:
+When a Win32 app shows failed or stuck status and you need to quickly narrow down whether the issue is in packaging, detection, command line, or device state.
+Caution / Validation Note:
+Always verify against IntuneManagementExtension.log, AppWorkload.log, and local install behavior. AI may overfit to one error string and miss context like dependency sequencing or user/device assignment mismatch.
+
+2) Prompt Title: Explain Intune Management Extension log output
+Exact Prompt Text:
+Review the following Intune Management Extension log excerpt and explain it like a desktop engineer, not like documentation. For each important line, tell me what Intune is doing, whether it is normal or abnormal, and what action it suggests. Then summarize the probable issue in plain English and list the next three logs or registry locations I should inspect.
+When to Use It:
+When you have IME log snippets but need fast interpretation without manually tracing each line.
+Caution / Validation Note:
+Time correlation matters. Confirm timestamps, app IDs, ESP state, and user sign-in state before accepting the conclusion.
+
+3) Prompt Title: Troubleshoot a policy that shows conflict or not applicable
+Exact Prompt Text:
+I am troubleshooting an Intune configuration or compliance policy that is showing conflict, error, or not applicable. Based on the policy settings, assignment scope, platform, OS version, and device type I provide, tell me: 1) why the result is happening, 2) whether the setting is unsupported, conflicting, superseded, or filtered out, 3) what evidence would confirm that, and 4) the cleanest correction with the least user impact.
+When to Use It:
+When settings catalog, endpoint security, compliance, or administrative template policies do not apply as expected.
+Caution / Validation Note:
+Check CSP support, Windows edition requirements, and policy precedence. AI can miss tenant-specific conflicts or preview-setting limitations.
+
+4) Prompt Title: Triage devices not checking into Intune
+Exact Prompt Text:
+Act as an Intune escalation engineer. I have devices that are not checking into Intune or are showing stale last check-in times. Using the symptoms and device details I provide, build a triage path that covers MDM enrollment state, certificate health, task scheduler, services, network reachability, proxy, licensing, and co-management considerations. Present the output as: likely causes, commands to validate, logs to check, and recovery actions from least disruptive to most disruptive.
+When to Use It:
+When devices stop syncing, go stale, or fail to receive new policy.
+Caution / Validation Note:
+Validate dsregcmd /status, DeviceManagement-Enterprise-Diagnostics-Provider logs, MDM certificates, and service health. Sync issues can also be tenant-side and not device-side.
+
+5) Prompt Title: Analyze proactive remediation failure patterns
+Exact Prompt Text:
+I will provide a remediation detection script, remediation script, exit codes, and sample device results. Identify why the proactive remediation is failing or returning inconsistent status. Tell me whether the problem is script logic, exit code handling, execution context, 32-bit versus 64-bit behavior, permissions, timing, or unreliable assumptions about the device state. Then rewrite only the problematic parts.
+When to Use It:
+When proactive remediations report unexpected results across a subset of devices.
+Caution / Validation Note:
+Test in both SYSTEM and user context where applicable. Confirm script behavior with transcript logging and explicit exit codes.
+
+6) Prompt Title: Review Intune device restriction deployment impact
+Exact Prompt Text:
+I am planning to deploy this Intune restriction or settings catalog policy. Review the settings and tell me: 1) what the setting actually changes on Windows, 2) what user or application impact is likely, 3) what conflicts or regressions to watch for, 4) what pilot groups should be excluded, and 5) what rollback plan makes sense.
+When to Use It:
+Before deploying restrictive policies that could affect user productivity or break management tooling.
+Caution / Validation Note:
+Do not rely on AI for supportability claims. Confirm each setting in Microsoft documentation and map it to business-critical apps before rollout.
+
+7) Prompt Title: Summarize tenant-side Intune troubleshooting notes
+Exact Prompt Text:
+Convert the following raw troubleshooting notes for an Intune issue into a clean engineering summary. Include environment, symptom, impacted scope, evidence gathered, probable root cause, remediation attempted, final fix, and follow-up actions. Write it in a format suitable for internal knowledge base or incident review.
+When to Use It:
+After a messy incident when you need reusable documentation quickly.
+Caution / Validation Note:
+Review the summary for missing assumptions, especially where evidence is incomplete or multiple causes were possible.
+
+Category 2: PowerShell Generation, Refactoring, and Review
+
+8) Prompt Title: Generate a production-safe PowerShell script
+Exact Prompt Text:
+Write a PowerShell script for the following desktop engineering task: [describe task]. Requirements: use strict mode, parameter validation, try/catch, structured logging, useful exit codes, and comments only where they add value. Assume enterprise Windows endpoints. If the task is risky, include -WhatIf support or a safe simulation mode. After the script, explain key assumptions and failure points.
+When to Use It:
+When you need a first draft for a real admin or remediation script and want guardrails built in.
+Caution / Validation Note:
+Never run generated code in production without code review, execution policy review, and testing in the target context.
+
+9) Prompt Title: Review PowerShell for security and operational risk
+Exact Prompt Text:
+Review this PowerShell script like a senior desktop automation reviewer. Identify security risks, destructive operations, poor error handling, unsafe assumptions, performance issues, and anything that would make it unreliable in Intune, SCCM, or remote execution. Then provide a revised version and a bullet list of what changed and why.
+When to Use It:
+When inheriting older scripts or preparing a script for broad deployment.
+Caution / Validation Note:
+AI can improve style while missing business logic defects. Validate outputs, side effects, and permissions with peer review.
+
+10) Prompt Title: Convert interactive PowerShell to unattended execution
+Exact Prompt Text:
+Refactor this PowerShell script so it can run unattended in SYSTEM context or as a scheduled enterprise deployment. Remove prompts, replace GUI dependencies, handle non-interactive sessions, make logging explicit, and preserve the original function. Explain any parts that cannot safely run unattended.
+When to Use It:
+When adapting helpdesk or manual scripts for Intune, SCCM, or task sequence use.
+Caution / Validation Note:
+Test in the exact execution host. Scripts that work in a console can fail under IME, SCCM, or task scheduler due to profile and path differences.
+
+11) Prompt Title: Build a script to collect troubleshooting artifacts
+Exact Prompt Text:
+Create a PowerShell script that collects the minimum useful troubleshooting artifacts for this issue: [describe issue]. Include relevant logs, registry keys, service states, installed apps, event logs, device identity info, and timestamps. Export everything to a single folder with clear filenames and a summary text file. Keep user data exposure low.
+When to Use It:
+When you need consistent evidence collection for repeated desktop issues.
+Caution / Validation Note:
+Check data handling requirements. Some logs or registry exports may include usernames, URLs, or device identifiers that need controlled storage.
+
+12) Prompt Title: Rewrite a script for readability without changing behavior
+Exact Prompt Text:
+Refactor this PowerShell script for readability and maintainability without changing its behavior. Improve naming, simplify logic, remove dead code, normalize error handling, and point out any places where behavior may be ambiguous. Do not introduce external module dependencies unless absolutely necessary.
+When to Use It:
+When stabilizing mature scripts that work but are difficult to maintain.
+Caution / Validation Note:
+Refactoring can accidentally change behavior. Diff outputs and test the old and new versions against the same sample systems.
+
+13) Prompt Title: Generate Pester tests for a desktop engineering script
+Exact Prompt Text:
+Write Pester tests for this PowerShell function or script. Focus on parameter validation, expected outputs, edge cases, and failure handling. If parts interact with the registry, files, services, or WMI, show how to mock them. Keep the tests practical for an enterprise automation repo.
+When to Use It:
+When improving confidence in scripts used across many devices.
+Caution / Validation Note:
+Mock-heavy tests can still miss real-world failures. Run integration tests on representative endpoints as well.
+
+14) Prompt Title: Explain why a PowerShell script works locally but fails in Intune or SCCM
+Exact Prompt Text:
+Analyze this PowerShell script and tell me why it may work locally in an admin console but fail when run through Intune, SCCM, or task scheduler. Consider execution context, working directory, profile loading, bitness, network access, permissions, transcript location, and dependency assumptions. Then list the exact changes needed to make it deployment-safe.
+When to Use It:
+When the same script behaves differently between manual and managed execution.
+Caution / Validation Note:
+Verify 32-bit versus 64-bit PowerShell behavior, UNC access under SYSTEM, and profile-dependent variables before changing the script.
+
+Category 3: Detection Rules, Remediation Logic, and Packaging
+
+15) Prompt Title: Create a robust Intune detection rule strategy
+Exact Prompt Text:
+I need a reliable detection method for this Windows app: [app details]. Recommend the best detection strategy using file, folder, registry, MSI, script, or a combination. Explain why your choice is resilient across updates, per-user versus per-device installs, version changes, and repair scenarios. If script detection is best, provide the script and expected return behavior.
+When to Use It:
+When packaging a new app or fixing false install status in Intune.
+Caution / Validation Note:
+Validate against actual install behavior on clean, upgraded, and repaired systems. Weak detection rules are a major cause of repeat installs and false compliance.
+
+16) Prompt Title: Build detection and remediation pair for configuration drift
+Exact Prompt Text:
+Design an Intune remediation pair for this configuration drift issue: [describe setting]. Provide a detection script and remediation script with clear output, explicit exit codes, and idempotent behavior. Also explain how to tell whether the issue is truly remediated on the next check-in.
+When to Use It:
+When you need ongoing correction of registry, service, file, or policy drift.
+Caution / Validation Note:
+Ensure the remediation does not fight with GPO, security baselines, or application self-heal mechanisms.
+
+17) Prompt Title: Review app packaging logic before deployment
+Exact Prompt Text:
+Review this app packaging approach for Intune Win32 deployment. I will provide the source layout, install and uninstall commands, dependencies, return codes, and detection rule. Tell me what is fragile, what is missing, what may break during upgrades or reinstalls, and what changes would make the package safer for enterprise rollout.
+When to Use It:
+Before promoting a package from test to pilot or production.
+Caution / Validation Note:
+Still validate manually on a clean device and on a device with an older version installed. AI cannot inspect the actual installer behavior unless you provide evidence.
+
+18) Prompt Title: Generate uninstall logic that is safe at scale
+Exact Prompt Text:
+Create a safe uninstall approach for this application in enterprise Windows. Consider MSI versus EXE uninstall behavior, reboot handling, user impact, active process checks, logging, and leftover components. Output a command or PowerShell wrapper appropriate for Intune or SCCM and list prechecks I should run first.
+When to Use It:
+When removing or replacing software across a large device fleet.
+Caution / Validation Note:
+Do not trust silent uninstall flags blindly. Test on real devices with the same installed variant, language, and architecture.
+
+19) Prompt Title: Compare two detection methods and choose the better one
+Exact Prompt Text:
+I have two possible detection methods for this app or setting. Method A: [details]. Method B: [details]. Compare them for reliability, maintenance burden, false positives, false negatives, speed, and compatibility with Intune or SCCM. Recommend one and explain what failure mode I should watch for.
+When to Use It:
+When deciding between registry, file, MSI, or script detection options.
+Caution / Validation Note:
+The best theoretical method may still fail in your environment if vendors change paths, product codes, or upgrade logic.
+
+20) Prompt Title: Create a packaging validation checklist
+Exact Prompt Text:
+Build a packaging validation checklist for this Windows application before I deploy it through Intune or SCCM. Include install, detection, uninstall, repair, upgrade, reboot behavior, user impact, logging, context, architecture, and rollback validation. Format it as a practical test checklist an engineer can follow.
+When to Use It:
+When standardizing app readiness review before deployment approval.
+Caution / Validation Note:
+Customize the checklist for the installer type and app criticality. High-risk apps need broader compatibility and rollback testing.
+
+Category 4: Assignment Filters, Targeting, Rings, and Deployment Design
+
+21) Prompt Title: Design Intune assignment filters for precise targeting
+Exact Prompt Text:
+Help me design Intune assignment filters for this deployment goal: [describe goal]. I will provide device attributes, enrollment types, ownership model, OS versions, and exclusions. Recommend the cleanest filter logic, explain why it works, identify likely blind spots, and give examples of devices that would be included and excluded.
+When to Use It:
+When trying to target apps or policies without over-scoping or creating complicated group sprawl.
+Caution / Validation Note:
+Test filter evaluation carefully. Bad assumptions about available properties or stale attributes can silently exclude devices.
+
+22) Prompt Title: Review a phased deployment ring strategy
+Exact Prompt Text:
+Review this phased deployment strategy for Windows updates, apps, or policies. I will provide ring definitions, group membership logic, business constraints, and rollback expectations. Tell me whether the ring design is operationally sound, where blast radius is too high, what telemetry gates are missing, and how to improve exception handling.
+When to Use It:
+When building or refining pilot, early adopter, broad, and critical-device deployment waves.
+Caution / Validation Note:
+AI suggestions must still align with change management, maintenance windows, and business-critical device handling.
+
+23) Prompt Title: Evaluate include and exclude group logic
+Exact Prompt Text:
+I need to sanity-check this Intune assignment model with include and exclude groups. Based on the groups and purpose I provide, explain the effective targeting, likely surprises, conflict risks, and how to simplify the design while keeping control. Use plain language and include a few example devices.
+When to Use It:
+When policy or app assignments become hard to reason about and troubleshooting scope is unclear.
+Caution / Validation Note:
+Confirm real membership in Entra ID and Intune. Timing delays and nested logic assumptions can create false confidence.
+
+24) Prompt Title: Build a safe rollout plan for a risky policy change
+Exact Prompt Text:
+Create a rollout plan for this high-impact Intune or Windows policy change: [describe change]. Include pilot selection, prechecks, success criteria, monitoring, rollback triggers, communications, and decision points for moving to the next phase. Keep it practical for a desktop engineering team.
+When to Use It:
+Before deploying changes that could disrupt authentication, networking, endpoint protection, printing, browsers, or VPN.
+Caution / Validation Note:
+You still need environment-specific rollback ownership, comms approval, and support readiness defined outside the AI output.
+
+25) Prompt Title: Map deployment intent to the right assignment approach
+Exact Prompt Text:
+Given this deployment goal, tell me whether I should use required assignment, available assignment, filters, dynamic groups, remediation, or a different mechanism in Intune. Explain the operational tradeoffs, user experience impact, and reporting implications.
+When to Use It:
+When engineers disagree on how to deploy something and want a clearer design decision.
+Caution / Validation Note:
+The right answer depends on business process and lifecycle ownership, not just technical capability.
+
+26) Prompt Title: Predict side effects of changing group-based targeting
+Exact Prompt Text:
+I am about to change group membership or assignment targeting for an Intune app or policy. Based on the current and proposed model I provide, identify the likely side effects on existing devices, reinstall behavior, policy withdrawal, and reporting. Highlight anything that could create unexpected churn.
+When to Use It:
+Before changing production targeting for widely deployed apps or settings.
+Caution / Validation Note:
+Always validate with a small sample group. Assignment changes can have non-obvious effects, especially with supersedence and uninstall intent.
+
+Category 5: SCCM / MECM Application and Client Triage
+
+27) Prompt Title: Triage SCCM app deployment failure from logs
+Exact Prompt Text:
+You are a senior MECM engineer. I will paste excerpts from AppDiscovery.log, AppEnforce.log, CAS.log, ContentTransferManager.log, and Software Center behavior. Identify the most likely failure point, explain the log evidence, classify the issue as content, detection, install command, boundary, cache, dependency, or client health, and give me the shortest path to confirm and fix it.
+When to Use It:
+When an SCCM application fails and you need fast log-driven triage.
+Caution / Validation Note:
+Correlate the deployment type, revision, and timestamps. Log snippets without surrounding context can be misleading.
+
+28) Prompt Title: Explain SCCM content distribution issues
+Exact Prompt Text:
+Analyze this SCCM content distribution problem using the symptoms and log excerpts I provide. Tell me whether the issue is with package distribution, DP health, boundary groups, client location, content validation, or cache. Then give me a troubleshooting sequence from server-side checks to client-side checks.
+When to Use It:
+When clients cannot download content or behave inconsistently by location.
+Caution / Validation Note:
+Confirm boundaries and distribution status in console. AI can suggest client fixes for what is actually an infrastructure issue.
+
+29) Prompt Title: Review an SCCM detection method and deployment type
+Exact Prompt Text:
+Review this MECM deployment type configuration, including install command, uninstall command, requirements, detection method, user experience, and return codes. Identify weak points and tell me how to make it more reliable across upgrades, reinstall attempts, and task sequence use.
+When to Use It:
+When creating or modernizing application deployment types in MECM.
+Caution / Validation Note:
+Test in Software Center and task sequence scenarios separately. Detection and restart behavior can differ in practice.
+
+30) Prompt Title: Diagnose SCCM client health problems
+Exact Prompt Text:
+I am dealing with SCCM client health issues. Based on the symptoms, ccmexec behavior, policy retrieval results, WMI state, and relevant logs I provide, tell me what subsystem is most likely broken and what repair actions should come first. Include when a full client reinstall is justified versus premature.
+When to Use It:
+When the client stops evaluating policy, software updates, inventory, or application deployments correctly.
+Caution / Validation Note:
+Validate WMI, certificates, MP communication, and service health before jumping to reinstall. Reinstalling can hide the real root cause.
+
+31) Prompt Title: Compare SCCM and Intune deployment behavior in co-management
+Exact Prompt Text:
+I need help understanding whether this issue should be handled in SCCM or Intune for a co-managed device. Based on the workload split, device state, and symptoms I provide, tell me which authority is likely responsible, what evidence confirms that, and how co-management may change troubleshooting steps.
+When to Use It:
+When similar apps, policies, or updates exist in both management planes and ownership is unclear.
+Caution / Validation Note:
+Verify actual workload sliders and policy source on the device. Assumptions about authority are a common troubleshooting error.
+
+32) Prompt Title: Turn SCCM log noise into a concise incident summary
+Exact Prompt Text:
+Summarize the following SCCM client or application troubleshooting notes into a concise engineering incident report. Include issue statement, affected scope, timeline, evidence, root cause, fix, and prevention actions. Remove noise but preserve the technical details that matter.
+When to Use It:
+After troubleshooting a noisy SCCM issue and needing reusable documentation.
+Caution / Validation Note:
+Check that the summary does not collapse multiple contributing causes into one oversimplified conclusion.
+
+Category 6: Windows Troubleshooting, Event Logs, and Performance Analysis
+
+33) Prompt Title: Correlate Windows event logs for a user-impacting issue
+Exact Prompt Text:
+I will provide event log entries, timestamps, user symptoms, and device details. Correlate the events into a likely timeline, distinguish symptom from root cause, and tell me which events are actionable versus incidental. Then recommend the next logs, services, or subsystems I should inspect.
+When to Use It:
+When many event IDs appear at once and you need a coherent story instead of isolated log interpretation.
+Caution / Validation Note:
+Event logs often show secondary failures. Confirm with service state, application logs, and recent changes before locking onto a root cause.
+
+34) Prompt Title: Analyze Windows update failure evidence
+Exact Prompt Text:
+Review this Windows update failure data, including error codes, WindowsUpdate.log output, CBS excerpts, SetupDiag results, and device state. Tell me whether the issue is servicing stack, component store corruption, safeguard hold, disk space, driver, policy, or compatibility related. Then provide a prioritized remediation plan.
+When to Use It:
+When cumulative updates or feature updates repeatedly fail.
+Caution / Validation Note:
+Always confirm with SetupDiag, CBS, and Windows Update for Business policy state. Some update failures are intentionally blocked by safeguards.
+
+35) Prompt Title: Investigate slow logon or startup on managed endpoints
+Exact Prompt Text:
+Act as a Windows endpoint performance engineer. Based on the startup, sign-in, GPO, service, scheduled task, and profile symptoms I provide, identify the most likely causes of slow logon or boot. Distinguish between one-time delays and recurring delays, and suggest measurements or logs to confirm each theory.
+When to Use It:
+When users report slow sign-in or startup and the cause is unclear.
+Caution / Validation Note:
+Measure before and after. Performance complaints are often subjective and can involve network, identity, or application latency beyond the endpoint.
+
+36) Prompt Title: Explain a crash or hang from logs and dumps
+Exact Prompt Text:
+Using the crash details, event logs, faulting module, Reliability Monitor entries, and any dump analysis summary I provide, explain the likely cause of this application crash or hang in plain engineering language. Separate confirmed evidence from assumptions and tell me what data would raise confidence.
+When to Use It:
+When you have partial crash evidence and need a structured interpretation.
+Caution / Validation Note:
+AI is not a dump debugger. Treat conclusions as guidance unless backed by WinDbg analysis or vendor-confirmed fault data.
+
+37) Prompt Title: Build a troubleshooting decision tree for recurring endpoint issues
+Exact Prompt Text:
+Create a practical troubleshooting decision tree for this recurring Windows endpoint issue: [describe issue]. Base it on the symptoms, common causes, event IDs, services, and tools involved. Make it concise enough for experienced support engineers but detailed enough to avoid random guessing.
+When to Use It:
+When the same class of incident appears repeatedly and you want a standard triage flow.
+Caution / Validation Note:
+Update the decision tree using actual incident outcomes. AI-generated logic should not replace evidence-driven runbooks.
+
+38) Prompt Title: Identify likely root causes from a set of Windows symptoms
+Exact Prompt Text:
+Given these Windows endpoint symptoms, rank the top five likely root causes and explain why each is plausible. For each one, provide one validating check and one disqualifying check so I can narrow it down quickly.
+When to Use It:
+At the start of a messy troubleshooting case when you need a hypothesis list instead of random testing.
+Caution / Validation Note:
+Do not stop at probability ranking. Use the validating and disqualifying checks to avoid bias.
+
+Category 7: Autopilot, Enrollment, Identity, and Provisioning
+
+39) Prompt Title: Troubleshoot an Autopilot ESP failure
+Exact Prompt Text:
+I am troubleshooting a Windows Autopilot Enrollment Status Page failure. Based on the stage, error details, device preparation behavior, assigned apps and policies, and logs I provide, tell me whether the likely issue is app install timing, required app design, device registration, network, licensing, or policy load. Then recommend the cleanest fix and what to remove from ESP if needed.
+When to Use It:
+When devices stall or fail during user-driven or pre-provisioned Autopilot.
+Caution / Validation Note:
+Validate with ESP logs, IME timing, and whether required apps are truly necessary during enrollment. Overloading ESP is a common design problem.
+
+40) Prompt Title: Analyze hybrid or Entra join enrollment problems
+Exact Prompt Text:
+Review this device join and enrollment issue using dsregcmd output, enrollment status, certificate state, user sign-in behavior, and network conditions. Tell me whether the problem is Entra registration, hybrid join timing, MDM auto-enrollment, SCP or line-of-sight dependency, licensing, or token-related. Present the answer as likely cause, evidence, and next action.
+When to Use It:
+When a device does not land in the expected identity and management state.
+Caution / Validation Note:
+Hybrid join introduces timing and connectivity dependencies. Validate identity state before troubleshooting downstream policy issues.
+
+41) Prompt Title: Review Autopilot profile and enrollment design
+Exact Prompt Text:
+Review this Autopilot design for operational risk. I will provide profile settings, deployment mode, naming approach, app load, compliance requirements, and user experience choices. Tell me what is efficient, what is fragile, what may slow enrollment, and what I should redesign before scaling.
+When to Use It:
+When planning or refining Autopilot at scale.
+Caution / Validation Note:
+AI can suggest clean designs that ignore your identity, networking, or regional constraints. Validate against your actual onboarding process.
+
+42) Prompt Title: Build an enrollment troubleshooting checklist
+Exact Prompt Text:
+Create a troubleshooting checklist for Windows enrollment failures in this environment. Cover identity, licensing, network, certificates, MDM scope, OS edition, time sync, enrollment restrictions, and known device-side artifacts. Keep the checklist optimized for engineers, not end users.
+When to Use It:
+When standardizing first-line engineering triage for enrollment incidents.
+Caution / Validation Note:
+Tailor the checklist to your join model and licensing plan. Generic enrollment checklists often miss environment-specific blockers.
+
+43) Prompt Title: Diagnose why apps or policies arrive late after enrollment
+Exact Prompt Text:
+I need help explaining why apps or policies are delayed after enrollment. Based on the enrollment method, device state, assignment model, ESP configuration, and logs I provide, identify whether the delay is expected, misconfigured, or symptomatic of device health problems. Then suggest the best change to improve time-to-productive-state.
+When to Use It:
+When newly enrolled devices appear healthy but take too long to become usable.
+Caution / Validation Note:
+Distinguish between design delay, service delay, and device fault. Not every slow arrival problem is a bug.
+
+44) Prompt Title: Translate Autopilot logs into actionable next steps
+Exact Prompt Text:
+Explain these Autopilot-related logs and registry values in practical terms. For each key signal, tell me what phase it belongs to, what success looks like, what failure looks like, and what my next troubleshooting step should be.
+When to Use It:
+When you have raw log data from modern provisioning but need to move from evidence to action quickly.
+Caution / Validation Note:
+Use precise timestamps and known deployment phase boundaries. Mixing device prep, enrollment, and app install phases can create false conclusions.
+
+Category 8: Endpoint Security, Patch Validation, and Copilot-Assisted Analysis
+
+45) Prompt Title: Review an endpoint security policy for operational impact
+Exact Prompt Text:
+Review this Intune endpoint security, Defender, firewall, ASR, or disk encryption policy set. Tell me what each major setting is likely to do in practice, what operational risks it introduces, what exclusions or prerequisites may be needed, and how to pilot it safely without weakening the control objective.
+When to Use It:
+Before deploying security controls that may affect line-of-business apps, scripts, or user workflows.
+Caution / Validation Note:
+Security settings can interact in unexpected ways. Validate with security, app owners, and representative pilot devices.
+
+46) Prompt Title: Triage Microsoft Defender alerts on an endpoint
+Exact Prompt Text:
+Act as a joint desktop and defender analyst. I will provide Microsoft Defender alert details, device timeline evidence, process information, user context, and recent changes. Tell me whether this looks malicious, benign, false positive, or policy-driven noise. Then recommend containment, validation, and desktop engineering follow-up actions.
+When to Use It:
+When security events need endpoint context before escalation or remediation.
+Caution / Validation Note:
+Do not use AI as final incident authority. Confirm with your SOC process, advanced hunting, and approved containment procedures.
+
+47) Prompt Title: Validate a monthly patch rollout plan
+Exact Prompt Text:
+Create a patch validation plan for this month’s Windows and Microsoft 365 update cycle. Include pilot selection, prechecks, smoke tests, business-critical app validation, rollback triggers, and success criteria. Assume I need something realistic for a desktop engineering team managing production risk.
+When to Use It:
+Before monthly patch deployment or when formalizing quality gates.
+Caution / Validation Note:
+Patch risk changes every month. Adjust the validation plan for known issues, release notes, and app dependencies.
+
+48) Prompt Title: Summarize release notes into engineering impact
+Exact Prompt Text:
+I will paste Microsoft release notes, known issues, and vendor update notes. Summarize only the parts that matter to desktop engineering: deployment risk, known breakage patterns, prerequisites, rollback concerns, and which device groups I should watch most closely.
+When to Use It:
+When you need a fast, actionable readout from long vendor release notes.
+Caution / Validation Note:
+Always review the original source for critical changes. Summaries can omit edge cases or superseding updates.
+
+49) Prompt Title: Use Security Copilot or Copilot in Intune findings to drive action
+Exact Prompt Text:
+I have output from Security Copilot or Copilot in Intune related to this endpoint or policy issue. Help me translate it into engineering action. Separate high-confidence findings from suggestions, identify what evidence still needs verification, and propose next steps for desktop engineering, security, and service desk teams.
+When to Use It:
+When Copilot-generated analysis is useful but too broad or uncertain to act on directly.
+Caution / Validation Note:
+Copilot findings are not final proof. Validate against device state, portal data, logs, and your own change history.
+
+50) Prompt Title: Build a post-incident hardening and prevention plan
+Exact Prompt Text:
+Based on this endpoint incident, outage, or repeated failure pattern, build a prevention plan that combines technical controls, monitoring, packaging or policy changes, documentation, and support process improvements. Separate quick wins from long-term fixes and note which actions need cross-team ownership.
+When to Use It:
+After an incident when you want to prevent recurrence instead of only documenting what happened.
+Caution / Validation Note:
+Make sure prevention actions are assigned to real owners and measured. AI can produce good ideas that never become operational change.
+
+How to Validate AI Output Before Production
+
+1. Check the source data first. If the prompt was built on incomplete logs, wrong timestamps, or stale policy state, the answer can sound right and still be wrong.
+2. Verify against authoritative references. Confirm settings, CSP support, command syntax, and management behavior in Microsoft documentation and trusted vendor docs.
+3. Test in the real execution context. Validate whether the output works in SYSTEM versus user context, 32-bit versus 64-bit PowerShell, Intune versus SCCM, and network-restricted versus full-access devices.
+4. Use pilot devices, not assumptions. Run on clean devices, previously managed devices, and edge-case devices that reflect your real fleet.
+5. Review for hidden risk. Check for destructive commands, weak detection logic, over-broad targeting, missing error handling, insecure secrets handling, and unrealistic rollback steps.
+6. Compare against known-good evidence. For troubleshooting, confirm that the AI explanation matches actual logs, event IDs, portal state, and device behavior.
+7. Require peer review for production changes. Generated scripts, deployment logic, and security changes should be reviewed by another engineer before rollout.
+8. Keep the prompt and result. Store the exact prompt, inputs, and final edited output with your ticket or change record so decisions remain auditable.
+
+Used well, AI can compress investigation and drafting time. Used carelessly, it can accelerate bad assumptions. Treat it like a fast junior engineer with broad product knowledge and zero accountability unless you validate the output.
