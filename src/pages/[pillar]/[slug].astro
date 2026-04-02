@@ -13,6 +13,7 @@ export async function getStaticPaths() {
 
 const { article } = Astro.props;
 const { Content, headings } = await article.render();
+const majorHeadings = headings?.filter(h => h.depth === 2) ?? [];
 ---
 
 <BaseLayout
@@ -40,59 +41,8 @@ const { Content, headings } = await article.render();
     </nav>
     
     <div class="lg:grid lg:grid-cols-4 lg:gap-8">
-      <!-- Left Sidebar - Table of Contents (Desktop) -->
-      {headings && headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 3 && (
-        <aside class="hidden lg:block lg:col-span-1">
-          <div class="sticky top-24">
-            <nav class="text-sm">
-              <h4 class="font-semibold mb-3 text-gray-900 dark:text-white">On this page</h4>
-              <ul class="space-y-2">
-                {headings.filter(h => h.depth >= 2 && h.depth <= 3).map(heading => (
-                  <li class={heading.depth === 3 ? 'ml-4' : ''}>
-                    <a 
-                      href={`#${heading.slug}`}
-                      class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1"
-                    >
-                      {heading.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-        </aside>
-      )}
-      
       <!-- Main Content -->
-      <article class="lg:col-span-2">
-        <!-- Mobile TOC -->
-        {headings && headings.filter(h => h.depth >= 2 && h.depth <= 3).length >= 3 && (
-          <div class="lg:hidden mb-6 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-            <button
-              id="mobile-toc-btn"
-              class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 text-sm font-semibold text-gray-900 dark:text-white"
-              aria-expanded="false"
-              aria-controls="mobile-toc"
-            >
-              On this page
-              <svg id="mobile-toc-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </button>
-            <nav id="mobile-toc" class="hidden px-4 py-3 bg-white dark:bg-gray-900">
-              <ul class="space-y-2 text-sm">
-                {headings.filter(h => h.depth >= 2 && h.depth <= 3).map(heading => (
-                  <li class={heading.depth === 3 ? 'ml-4' : ''}>
-                    <a href={`#${heading.slug}`} class="text-gray-600 dark:text-gray-400 hover:text-accent transition-colors block py-1 mobile-toc-link">
-                      {heading.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-        )}
-
+      <article class="lg:col-span-3 xl:col-span-3">
         <!-- Article Header -->
         <header class="mb-8">
           <div class="flex flex-wrap items-center gap-3 mb-4">
@@ -113,6 +63,21 @@ const { Content, headings } = await article.render();
           {article.data.description && (
             <p class="text-lg text-gray-600 dark:text-gray-400">{article.data.description}</p>
           )}
+
+          {majorHeadings.length >= 3 && (
+            <nav class="mt-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 p-5">
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Table of contents</h2>
+              <ul class="grid gap-2 md:grid-cols-2 text-sm">
+                {majorHeadings.map((heading) => (
+                  <li>
+                    <a href={`#${heading.slug}`} class="text-gray-700 dark:text-gray-300 hover:text-accent transition-colors">
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
           
           {article.data.updatedAt && (
             <p class="text-sm text-gray-500 mt-2">Updated: {new Date(article.data.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
@@ -120,7 +85,7 @@ const { Content, headings } = await article.render();
         </header>
         
         <!-- Article Content -->
-        <div class="prose dark:prose-invert max-w-none">
+        <div class="article-content prose dark:prose-invert max-w-none">
           <Content />
         </div>
         
@@ -186,27 +151,11 @@ const { Content, headings } = await article.render();
   </div>
 </BaseLayout>
 
-<script>
-  // Mobile TOC
-  const tocBtn = document.getElementById('mobile-toc-btn');
-  const tocPanel = document.getElementById('mobile-toc');
-  const tocChevron = document.getElementById('mobile-toc-chevron');
-  tocBtn?.addEventListener('click', () => {
-    const expanded = tocBtn.getAttribute('aria-expanded') === 'true';
-    tocBtn.setAttribute('aria-expanded', String(!expanded));
-    tocPanel?.classList.toggle('hidden');
-    tocChevron?.classList.toggle('rotate-180');
-  });
-  document.querySelectorAll('.mobile-toc-link').forEach(link => {
-    link.addEventListener('click', () => {
-      tocPanel?.classList.add('hidden');
-      tocBtn?.setAttribute('aria-expanded', 'false');
-      tocChevron?.classList.remove('rotate-180');
-    });
-  });
-</script>
-
 <style is:global>
+  .article-content > h1:first-child {
+    display: none;
+  }
+
   /* Code block styling */
   .prose pre {
     position: relative;
