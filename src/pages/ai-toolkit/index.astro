@@ -24,10 +24,33 @@ const freebies = [
       'Printable sign-off checklist for real change control'
     ]
   }
+  ,
+  {
+    title: 'Microsoft Copilot for Intune & Endpoint Management',
+    description: 'A playbook of AI‑powered prompts, policies, and troubleshooting steps for using Copilot with Intune and desktop devices.',
+    image: '/images/toolkits/ai-copilot-cover.png',
+    pdf: '/downloads/copilot-intune-ai-playbook.pdf',
+    bullets: [
+      'Copilot prompt library for Intune',
+      'Automation playbooks for device onboarding',
+      'Best‑practice checklist for AI‑generated policies'
+    ]
+  },
+  {
+    title: 'AI‑Powered PowerShell Automation',
+    description: 'Guidance, prompt patterns, and safety checklist for generating reliable PowerShell scripts with AI for desktop engineers.',
+    image: '/images/toolkits/ai-powershell-cover.png',
+    pdf: '/downloads/ai-powered-powershell-automation.pdf',
+    bullets: [
+      'Prompt patterns for common admin tasks',
+      'Step‑by‑step playbook for script creation',
+      'Safety checklist to avoid production risks'
+    ]
+  }
 ];
 ---
 
-<BaseLayout title="Free AI Toolkit for Desktop Engineers" description="Get two free PDFs for desktop engineers: 50 AI prompts for Intune, SCCM, and PowerShell plus an AI output validation checklist for endpoint teams.">
+<BaseLayout title="Free AI Toolkit for Desktop Engineers" description="Get four free PDFs for desktop engineers covering AI prompts, validation, Copilot for Intune, and AI-powered PowerShell automation.">
   <section class="bg-gradient-to-b from-sky-50 to-white dark:from-slate-950 dark:to-slate-900 py-16 md:py-24">
     <div class="max-w-6xl mx-auto px-4 grid lg:grid-cols-[1.15fr_0.85fr] gap-10 items-start">
       <div>
@@ -35,7 +58,7 @@ const freebies = [
           Free AI Toolkit
         </span>
         <h1 class="mt-5 text-4xl md:text-5xl font-heading font-bold text-slate-950 dark:text-white leading-tight">
-          Get 2 free PDFs built for desktop engineers using AI in the real world
+          Get 4 free PDFs built for desktop engineers using AI in the real world
         </h1>
         <p class="mt-5 text-lg text-slate-600 dark:text-slate-300 max-w-3xl">
           No fluff. No generic AI prompts. These guides are designed for people working with Intune, SCCM, PowerShell, device troubleshooting, and endpoint security.
@@ -43,16 +66,16 @@ const freebies = [
 
         <div class="mt-8 grid sm:grid-cols-3 gap-4">
           <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm">
-            <p class="text-2xl font-bold text-sky-500">2</p>
+            <p class="text-2xl font-bold text-sky-500">4</p>
             <p class="text-sm text-slate-600 dark:text-slate-400">Professional PDFs</p>
           </div>
           <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm">
-            <p class="text-2xl font-bold text-sky-500">50</p>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Enterprise AI prompts</p>
+            <p class="text-2xl font-bold text-sky-500">100+</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Enterprise AI prompts & workflows</p>
           </div>
           <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-4 shadow-sm">
-            <p class="text-2xl font-bold text-sky-500">1</p>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Safety checklist teams can actually use</p>
+            <p class="text-2xl font-bold text-sky-500">4</p>
+            <p class="text-sm text-slate-600 dark:text-slate-400">Implementation guides for real endpoint work</p>
           </div>
         </div>
 
@@ -62,7 +85,7 @@ const freebies = [
             <ul class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
               <li>• A prompt pack you can start using today for Intune, SCCM, PowerShell, event logs, and patching</li>
               <li>• A validation checklist to keep AI output from becoming production risk</li>
-              <li>• Resources written for endpoint engineers, not generic AI audiences</li>
+              <li>• Copilot and PowerShell playbooks written for endpoint engineers, not generic AI audiences</li>
             </ul>
           </div>
           <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
@@ -75,7 +98,7 @@ const freebies = [
       </div>
 
       <aside class="lg:sticky lg:top-28 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-7 shadow-xl shadow-slate-200/60 dark:shadow-none">
-        <h2 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">Get both PDFs free</h2>
+        <h2 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">Get all 4 PDFs free</h2>
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
           Enter your email to subscribe and unlock the free toolkit. Buttondown may ask you to confirm your email first.
         </p>
@@ -95,7 +118,7 @@ const freebies = [
           </div>
 
           <button type="submit" class="w-full rounded-xl bg-sky-500 px-4 py-3 font-semibold text-white transition hover:bg-sky-600">
-            Get the free PDFs
+            Get the free toolkit
           </button>
         </form>
 
