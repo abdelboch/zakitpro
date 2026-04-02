@@ -8,6 +8,9 @@ export default defineConfig({
   site: 'https://www.zakitpro.com',
   output: 'static',
   adapter: vercel({}),
+  security: {
+    checkOrigin: false,
+  },
   redirects: {
     '/blog/ai-generated-microsoft-graph-queries-2026': '/ai/ai-generated-microsoft-graph-queries-2026/',
     '/blog/ai-powered-powershell-2026': '/ai/ai-powered-powershell-2026/',
