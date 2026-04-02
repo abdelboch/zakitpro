@@ -1,25 +1,29 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
+export const prerender = false;
+
+const hasAccess = Astro.cookies.get('ai_toolkit_access')?.value === 'granted';
+
 const downloads = [
   {
     title: '50 AI Prompts for Desktop Engineers',
-    href: '/downloads/50-ai-prompts-for-desktop-engineers.pdf',
+    href: '/api/download/50-ai-prompts-for-desktop-engineers',
     description: 'Prompt library for Intune, SCCM, PowerShell, troubleshooting, and endpoint operations.'
   },
   {
     title: 'AI Output Validation Checklist for Endpoint Teams',
-    href: '/downloads/ai-output-validation-checklist-for-endpoint-teams.pdf',
+    href: '/api/download/ai-output-validation-checklist-for-endpoint-teams',
     description: 'Safety-first validation framework for scripts, detections, policies, logs, and rollout decisions.'
   },
   {
     title: 'Microsoft Copilot for Intune & Endpoint Management',
-    href: '/downloads/copilot-intune-ai-playbook.pdf',
+    href: '/api/download/copilot-intune-ai-playbook',
     description: 'AI-powered prompts, policies, and troubleshooting steps for using Copilot with Intune and desktop devices.'
   },
   {
     title: 'AI-Powered PowerShell Automation',
-    href: '/downloads/ai-powered-powershell-automation.pdf',
+    href: '/api/download/ai-powered-powershell-automation',
     description: 'Prompt patterns, workflow guidance, and a safety checklist for generating reliable PowerShell scripts with AI.'
   }
 ];
@@ -32,27 +36,41 @@ const downloads = [
         Download unlocked
       </span>
       <h1 class="mt-5 text-4xl font-heading font-bold text-slate-950 dark:text-white">
-        Your free AI toolkit is ready
+        {hasAccess ? 'Your free AI toolkit is ready' : 'Unlock your free AI toolkit'}
       </h1>
       <p class="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-        Grab all four PDFs below. Keep them somewhere accessible — they are designed to be used during real endpoint work, not just skimmed once.
+        {hasAccess
+          ? 'Grab all four PDFs below. Keep them somewhere accessible — they are designed to be used during real endpoint work, not just skimmed once.'
+          : 'Downloads stay locked until you submit a valid name and email on the toolkit form.'}
       </p>
     </div>
   </section>
 
   <section class="py-14 bg-white dark:bg-slate-950">
     <div class="max-w-4xl mx-auto px-4 grid gap-6">
-      {downloads.map((item) => (
-        <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-6 md:p-7 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-          <div>
-            <h2 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">{item.title}</h2>
-            <p class="mt-2 text-slate-600 dark:text-slate-300">{item.description}</p>
-          </div>
-          <a href={item.href} class="inline-flex items-center justify-center rounded-xl bg-sky-500 px-5 py-3 font-semibold text-white transition hover:bg-sky-600">
-            Download PDF
+      {hasAccess ? (
+        downloads.map((item) => (
+          <article class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-6 md:p-7 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+            <div>
+              <h2 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">{item.title}</h2>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">{item.description}</p>
+            </div>
+            <a href={item.href} class="inline-flex items-center justify-center rounded-xl bg-sky-500 px-5 py-3 font-semibold text-white transition hover:bg-sky-600">
+              Download PDF
+            </a>
+          </article>
+        ))
+      ) : (
+        <article class="rounded-3xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 p-6 md:p-7 shadow-sm">
+          <h2 class="text-2xl font-heading font-bold text-slate-950 dark:text-white">Downloads are locked</h2>
+          <p class="mt-3 text-slate-700 dark:text-slate-300">
+            Enter a valid name and email on the AI Toolkit form first, then you will be redirected here with access enabled.
+          </p>
+          <a href="/ai-toolkit/" class="mt-5 inline-flex items-center justify-center rounded-xl bg-sky-500 px-5 py-3 font-semibold text-white transition hover:bg-sky-600">
+            Go to the signup form
           </a>
         </article>
-      ))}
+      )}
 
       <div class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 md:p-7">
         <h2 class="text-xl font-heading font-bold text-slate-950 dark:text-white">What to do next</h2>

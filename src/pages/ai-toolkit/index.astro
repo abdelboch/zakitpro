@@ -6,7 +6,7 @@ const freebies = [
     title: '50 AI Prompts for Desktop Engineers',
     description: 'A practical prompt library for Intune, SCCM, PowerShell, Autopilot, patching, and endpoint troubleshooting.',
     image: '/images/toolkits/50-ai-prompts-cover.png',
-    pdf: '/downloads/50-ai-prompts-for-desktop-engineers.pdf',
+    href: '/ai-toolkit/thanks/',
     bullets: [
       '50 enterprise-ready prompts',
       'Intune, SCCM, PowerShell, event logs, deployment, patching',
@@ -17,7 +17,7 @@ const freebies = [
     title: 'AI Output Validation Checklist for Endpoint Teams',
     description: 'A safety-first review framework for scripts, detections, Intune changes, logs, and production rollouts.',
     image: '/images/toolkits/ai-output-validation-cover.png',
-    pdf: '/downloads/ai-output-validation-checklist-for-endpoint-teams.pdf',
+    href: '/ai-toolkit/thanks/',
     bullets: [
       '5-step validation framework',
       'Review scripts, policies, detections, and reports',
@@ -29,7 +29,7 @@ const freebies = [
     title: 'Microsoft Copilot for Intune & Endpoint Management',
     description: 'A playbook of AI‑powered prompts, policies, and troubleshooting steps for using Copilot with Intune and desktop devices.',
     image: '/images/toolkits/ai-copilot-cover.png',
-    pdf: '/downloads/copilot-intune-ai-playbook.pdf',
+    href: '/ai-toolkit/thanks/',
     bullets: [
       'Copilot prompt library for Intune',
       'Automation playbooks for device onboarding',
@@ -40,7 +40,7 @@ const freebies = [
     title: 'AI‑Powered PowerShell Automation',
     description: 'Guidance, prompt patterns, and safety checklist for generating reliable PowerShell scripts with AI for desktop engineers.',
     image: '/images/toolkits/ai-powershell-cover.png',
-    pdf: '/downloads/ai-powered-powershell-automation.pdf',
+    href: '/ai-toolkit/thanks/',
     bullets: [
       'Prompt patterns for common admin tasks',
       'Step‑by‑step playbook for script creation',
@@ -103,18 +103,18 @@ const freebies = [
           Enter your email to subscribe and unlock the free toolkit. Buttondown may ask you to confirm your email first.
         </p>
 
-        <form class="mt-6 space-y-4" action="https://buttondown.com/api/emails/embed-subscribe/zakitpro" method="POST">
-          <input type=\"hidden\" name=\"tag\" value=\"ai-toolkit\" />
-          <input type=\"hidden\" name=\"_next\" value=\"https://www.zakitpro.com/ai-toolkit/thanks/\" />
+        <form class="mt-6 space-y-4" action="/api/subscribe" method="POST">
+          <input type="hidden" name="tag" value="ai-toolkit" />
+          <input type="hidden" name="next" value="/ai-toolkit/thanks/" />
 
           <div>
             <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Name</label>
-            <input id="name" name="name" type="text" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20" placeholder="Your name" />
+            <input id="name" name="name" type="text" required minlength="2" autocomplete="name" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20" placeholder="Your name" />
           </div>
 
           <div>
             <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Email</label>
-            <input id="email" name="email" type="email" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20" placeholder="you@company.com" />
+            <input id="email" name="email" type="email" required autocomplete="email" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-slate-900 dark:text-white focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20" placeholder="you@company.com" />
           </div>
 
           <button type="submit" class="w-full rounded-xl bg-sky-500 px-4 py-3 font-semibold text-white transition hover:bg-sky-600">
@@ -155,8 +155,8 @@ const freebies = [
                   <a href="/ai-toolkit/thanks/" class="inline-flex items-center rounded-xl bg-slate-950 dark:bg-white px-4 py-2.5 text-sm font-semibold text-white dark:text-slate-950 transition hover:opacity-90">
                     Preview the download page
                   </a>
-                  <a href={item.pdf} class="inline-flex items-center rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:border-sky-500 hover:text-sky-500">
-                    Direct PDF link
+                  <a href={item.href} class="inline-flex items-center rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 transition hover:border-sky-500 hover:text-sky-500">
+                    Unlock the downloads
                   </a>
                 </div>
               </div>
