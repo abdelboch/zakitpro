@@ -156,8 +156,14 @@ const majorHeadings = headings?.filter(h => h.depth === 2) ?? [];
     display: none;
   }
 
-  /* Code block styling */
-  .prose pre {
+  .article-content h2#table-of-contents,
+  .article-content h2#table-of-contents + ul,
+  .article-content h2#table-of-contents + ol {
+    display: none;
+  }
+
+   /* Code block styling */
+.prose pre {
     position: relative;
     margin: 1.5rem 0;
     border-radius: 0.5rem;
