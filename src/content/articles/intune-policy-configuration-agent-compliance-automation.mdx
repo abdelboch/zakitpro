@@ -1,0 +1,278 @@
+---
+title: "Intune Policy Configuration Agent: Turn STIG and NIST Documents into Policies in Minutes"
+slug: "intune-policy-configuration-agent-compliance-automation"
+description: "Security Copilot's Policy Configuration Agent translates compliance documents into Intune policies automatically. Upload STIGs, NIST, or CIS benchmarks and get working settings catalog policies."
+publishedAt: "2026-04-02"
+pillar: ai
+difficulty: mid
+type: deep-dive
+tags: ["intune", "security-copilot", "ai", "compliance", "stig", "nist"]
+draft: false
+---
+
+If you've ever stared at a 200-page STIG document wondering which Intune settings actually implement those controls, Microsoft's new Policy Configuration Agent just became your new best friend.
+
+This Security Copilot agent takes compliance documents (STIGs, NIST frameworks, CIS benchmarks, internal security policies) and automatically maps them to Intune settings catalog policies. You upload a PDF, the agent identifies matching settings, and you review the suggestions before creating a policy. The whole workflow takes minutes instead of weeks.
+
+It's in public preview as of March 2026, requires a Security Copilot license, and only works in the public cloud. But for teams drowning in compliance work, it's a legitimate time-saver.
+
+---
+
+## What the Policy Configuration Agent Actually Does
+
+The agent is a generative AI feature built into Intune that translates compliance requirements into actionable device configuration policies. You give it a document (STIG, NIST 800-53, CIS Benchmark, your org's internal security baseline), and it:
+
+1. Analyzes the requirements in the document
+2. Searches the Intune settings catalog for matching configuration options
+3. Recommends specific settings and values based on the requirements
+4. Generates a draft settings catalog policy you can review and customize
+5. Lets you deploy the policy to devices
+
+The agent doesn't just extract text. It understands the intent behind compliance requirements and maps them to the correct Windows settings in Intune's catalog. If a STIG control says "disable legacy authentication protocols," the agent finds the specific settings that enforce that control.
+
+### What Makes This Different from Manual Policy Creation
+
+Before this agent, implementing a STIG or NIST baseline in Intune meant:
+
+- Reading through hundreds of pages of compliance documentation
+- Manually searching the Intune settings catalog for each control
+- Guessing which setting names correspond to requirements written in compliance language
+- Creating multiple policies to cover all controls
+- Hoping you didn't miss anything critical
+
+The agent automates steps 1-3 and gives you a single policy draft with all relevant settings pre-populated. You still review and customize, but the heavy lifting is done.
+
+---
+
+## How to Use the Agent (Step-by-Step)
+
+### Prerequisites
+
+You need:
+- **Microsoft Intune Plan 1** (or higher)
+- **Microsoft Security Copilot** license with available security compute units (SCUs)
+- **Microsoft Intune plugin** enabled in Security Copilot
+- Public cloud tenant (government clouds not supported yet)
+- **Intune Administrator** or **Policy and Profile Manager** role
+
+The agent is Windows-only right now. No macOS, iOS, or Android support in this preview.
+
+### Step 1: Access the Agent
+
+1. Open the Intune admin center (`intune.microsoft.com`)
+2. Navigate to **Agents** > **Policy Configuration Agent**
+3. If this is your first time, you'll need to activate the agent (one-time setup)
+
+The agent interface has four tabs: Overview, Knowledge, Suggestions, and Settings.
+
+### Step 2: Upload a Knowledge Source (Your Compliance Document)
+
+A "knowledge source" is any document that defines security requirements. The agent supports:
+
+- **STIGs** (Security Technical Implementation Guides from DISA)
+- **NIST frameworks** (800-53, 800-171, Cybersecurity Framework)
+- **CIS Benchmarks** (Center for Internet Security hardening guides)
+- **Internal policy documents** (your org's security standards, baseline requirements)
+- **Plain text instructions** (if you don't have a formal document, you can type requirements directly)
+
+**To upload a document:**
+
+1. Go to the **Knowledge** tab
+2. Click **Add knowledge source**
+3. Upload your document (PDF, DOCX, or TXT, up to 25 KB)
+4. Or paste text directly if it's under 25 KB
+5. Give it a descriptive name (e.g., "Windows 11 STIG v2r3")
+
+The agent processes the document and extracts configuration requirements. This takes 1-2 minutes for typical baseline documents.
+
+**Important:** Upload one baseline at a time. If you're implementing multiple STIGs (e.g., Windows 11 STIG + Office STIG), run them separately and merge the results later if needed.
+
+### Step 3: Review Suggested Settings
+
+After processing, the agent shows suggested Intune settings on the **Suggestions** tab. Each suggestion includes:
+
+- **The compliance requirement** (quoted from your document)
+- **The Intune setting** that implements the requirement
+- **Recommended value** (based on the document's guidance)
+- **Confidence score** (how certain the agent is about the mapping)
+
+You'll see suggestions grouped by category (security, networking, user rights, etc.). Common STIG controls map to dozens of settings across different areas of the catalog.
+
+**Review carefully:**
+- High-confidence matches (90%+) are usually accurate, but not always
+- Medium-confidence matches (60-89%) may need manual verification
+- Low-confidence matches (<60%) often require you to decide if the mapping makes sense
+
+If your organization has exceptions to a control (e.g., your compliance framework allows password complexity to be lower in certain scenarios), remove or adjust that suggestion before creating the policy.
+
+### Step 4: Create the Policy
+
+Once you're satisfied with the suggestions:
+
+1. Click **Create policy** on the Suggestions tab
+2. The agent generates a new **settings catalog policy** pre-populated with all selected settings
+3. Name the policy (e.g., "Windows 11 STIG Baseline - March 2026")
+4. Assign it to a device group
+5. Save and deploy
+
+The policy appears in **Devices** > **Configuration** > **Policies** like any other settings catalog policy. You can edit it, duplicate it, or use it as a template for variations.
+
+### Step 5: Iterate and Refine
+
+After deployment, monitor policy compliance in Intune reporting. If devices fail certain settings, you may need to adjust values or create remediation scripts for edge cases the agent couldn't handle.
+
+You can return to the agent anytime, upload an updated version of your baseline, and regenerate suggestions. The agent doesn't track policy versions, so you'll need to manually compare old and new suggestions if your compliance requirements change.
+
+---
+
+## Real Workflow Example: Implementing a Windows 11 STIG
+
+Let's walk through a realistic scenario.
+
+**Scenario:** Your compliance team just published an updated Windows 11 STIG (Defense Information Systems Agency security guidance for government and defense contractors). You need an Intune policy that implements all applicable controls by end of week.
+
+**The old way:**
+1. Download the 300-page STIG PDF
+2. Manually review each control (there are 200+ for Windows 11)
+3. Search the Intune settings catalog for matching settings
+4. Guess which setting names correspond to STIG language like "V-253270: Anonymous SID/Name translation must be disabled"
+5. Create a policy with 80+ settings across 12 different categories
+6. Hope you didn't miss anything critical
+7. Estimated time: 16-24 hours of focused work
+
+**With the Policy Configuration Agent:**
+1. Upload the STIG PDF to the agent (2 minutes)
+2. Wait for processing (2 minutes)
+3. Review 85 suggested settings with confidence scores (30 minutes)
+4. Remove 3 settings your org has exceptions for (5 minutes)
+5. Click "Create policy," name it, assign to pilot group (5 minutes)
+6. Deploy and monitor (ongoing)
+7. Estimated time: 45 minutes, most of it review
+
+The agent found 85 applicable settings out of the 200+ STIG controls. Why not all 200? Some controls can't be configured via Intune (e.g., physical security requirements, network architecture). The agent only suggests settings it can map to the Intune catalog.
+
+---
+
+## Limitations You Need to Know About
+
+### 1. Knowledge Source Size Limit (25 KB)
+
+The agent caps uploads at 25 KB. Most STIG PDFs are larger than this. Workarounds:
+
+- Extract relevant sections into a smaller document
+- Copy/paste text from the PDF (up to 25 KB of text)
+- Use the STIG checklist (smaller file) instead of the full guide
+
+Microsoft may raise this limit based on preview feedback, but for now, you'll need to chunk large documents.
+
+### 2. Windows-Only Support (As of March 2026)
+
+The agent only maps settings for Windows devices. No iOS, Android, macOS, or Linux support yet. If your compliance framework covers multiple platforms, you'll still need to handle non-Windows policies manually.
+
+### 3. Not All Controls Map to Intune Settings
+
+Compliance documents include requirements that Intune can't enforce directly:
+
+- Physical security controls
+- Network architecture requirements
+- Application-specific settings for non-Windows apps
+- Manual procedures (e.g., "review audit logs monthly")
+
+The agent skips these. You'll get 60-80% coverage for typical STIGs, higher for pure OS hardening guides like CIS Benchmarks.
+
+### 4. Confidence Scores Aren't Perfect
+
+A 95% confidence match can still be wrong. The agent uses LLM-based reasoning, which means:
+
+- It sometimes maps settings based on keyword similarity rather than actual function
+- It may suggest deprecated settings if the baseline document is old
+- It doesn't know your environment's specific constraints (e.g., settings that break your legacy apps)
+
+Always review suggestions. Never deploy a generated policy to production without testing.
+
+### 5. No Policy Version Tracking
+
+If you upload an updated baseline (e.g., STIG v2r4 replacing v2r3), the agent treats it as a brand-new knowledge source. It won't show you a diff of what changed between versions. You'll need to compare policies manually or use a third-party tool.
+
+### 6. Public Cloud Only (No GCC High or DoD)
+
+Government cloud tenants can't use this agent yet. If your org is in GCC High or DoD, you're stuck with manual policy creation until Microsoft extends support.
+
+---
+
+## When This Agent Pays Off (and When It Doesn't)
+
+**Use the Policy Configuration Agent when:**
+- You're implementing a new compliance baseline (STIG, NIST, CIS) for the first time
+- Your compliance team just published an updated framework and you need to refresh policies quickly
+- You're migrating from Group Policy to Intune and need to convert hardening baselines
+- You're onboarding a new device platform (e.g., adding Windows 11 to an existing Windows 10 baseline)
+- You have Security Copilot licenses already and want to maximize ROI
+
+**Skip the agent and do it manually when:**
+- Your baseline is under 20 settings (faster to configure by hand)
+- You're working in a government cloud tenant (not supported yet)
+- Your compliance requirements are non-Windows platforms
+- You don't have a Security Copilot license (the agent is part of Copilot, not core Intune)
+- Your baseline document is poorly formatted or uses non-standard terminology (the agent will struggle with low-quality input)
+
+The breakeven point is roughly 30-40 settings. Below that, manual creation is often faster once you account for review time. Above that, the agent saves hours.
+
+---
+
+## Practical Tips for Better Results
+
+### Write Better Prompts for Natural Language Mode
+
+If you don't have a formal document, you can type requirements directly. The agent accepts plain language like:
+
+> "Disable guest accounts, require BitLocker encryption, enforce password complexity with 14-character minimum, block legacy TLS protocols, and enable Windows Defender real-time protection."
+
+The agent will suggest matching settings. More specific prompts produce better results. Instead of "secure the device," say "require 14-character passwords with complexity, disable guest accounts, and enforce BitLocker AES-256."
+
+### Use Checklist Files When Possible
+
+STIGs and CIS Benchmarks often include machine-readable checklist files (XML or CSV) alongside the PDF. These are smaller, better structured, and easier for the agent to parse. If your baseline offers both formats, upload the checklist.
+
+### Test on a Pilot Group First
+
+The agent generates a policy, but it doesn't know your environment. Always assign the generated policy to a small pilot group (10-50 devices) and monitor for:
+
+- Settings that break app compatibility
+- Authentication issues from overly restrictive security settings
+- User experience problems (e.g., disabling features your users rely on)
+
+After a week of pilot testing, adjust the policy before rolling it out broadly.
+
+### Keep Knowledge Sources Updated
+
+Compliance baselines change. DISA publishes quarterly STIG updates. NIST frameworks get revised. CIS benchmarks release annually. Set a calendar reminder to check for updates and re-run the agent with the latest version.
+
+The agent doesn't notify you when a new baseline is available. That's on you.
+
+---
+
+## How This Fits Into Your Compliance Workflow
+
+The Policy Configuration Agent handles one piece of compliance: translating requirements into Intune policies. It doesn't:
+
+- Monitor compliance status (use Intune reporting for that)
+- Generate compliance reports (export data from Intune or use third-party tools)
+- Remediate non-compliant devices automatically (you'll need remediation scripts or manual fixes)
+- Validate that your policies actually meet compliance requirements (auditors still need to review your implementation)
+
+Think of it as an accelerator for policy creation, not a complete compliance solution. You still need the rest of your compliance toolchain — reporting, auditing, remediation, documentation.
+
+---
+
+## Final Take
+
+The Intune Policy Configuration Agent is the first time I've seen an AI feature in Intune that solves a real, painful problem for desktop engineers.
+
+If you've ever manually mapped STIG controls to Group Policy or Intune settings, you know how tedious that work is. This agent doesn't eliminate the need for review, but it cuts the initial grunt work from hours to minutes.
+
+The 25 KB file size limit is annoying, and the Windows-only support means you'll still handle iOS/Android baselines manually. But for Windows hardening baselines, this is a legitimate productivity boost.
+
+If your organization has Security Copilot licenses and you're responsible for compliance baselines in Intune, turn this on. Upload your next STIG or NIST baseline and see what it generates. Worst case, it saves you 30 minutes of catalog searching. Best case, it turns a 16-hour project into a 45-minute task.
+
+Just don't skip the review step. AI-generated compliance policies need human oversight. Every time.
