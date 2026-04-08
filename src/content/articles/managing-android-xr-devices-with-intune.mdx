@@ -1,0 +1,71 @@
+---
+title: "Managing Android XR Devices with Microsoft Intune: A Practical Guide"
+slug: "managing-android-xr-devices-with-intune"
+description: "A practitioner's guide to enrolling, managing, and securing Android XR devices using Microsoft Intune and Android Enterprise."
+publishedAt: "2026-04-07"
+pillar: ai
+difficulty: mid
+type: how-to
+tags: ["android-xr", "intune", "mobile-device-management", "android-enterprise"]
+draft: false
+---
+
+# Managing Android XR Devices with Microsoft Intune: A Practical Guide
+
+Microsoft has officially extended Microsoft Intune’s reach into the extended reality (XR) space, announcing support for Android XR devices. For desktop and endpoint engineers, this means these devices can now be managed using familiar Android Enterprise enrollment modes—specifically dedicated and fully managed—alongside your existing fleet of mobile devices.
+
+As these devices enter enterprise environments, understanding how to integrate them into your existing Intune infrastructure is critical. This guide breaks down the practical steps for getting started, configuring your environment, and applying security policies.
+
+---
+
+## Understanding the Integration
+
+The new support for Android XR allows you to use established management workflows. If you are already familiar with enrolling Android Enterprise devices, the process for Android XR will feel very similar.
+
+The devices are treated as standard Android endpoints in the Intune admin center. This enables you to:
+- Enroll devices using dedicated or fully managed modes.
+- Deploy applications via managed Google Play.
+- Apply security and compliance policies to enforce organizational standards.
+
+By aligning XR management with your existing mobile strategy, Microsoft aims to reduce the overhead of introducing these newer devices into the corporate ecosystem.
+
+---
+
+## Practical Enrollment Workflow
+
+To get started with managing Android XR devices, follow this workflow:
+
+1. **Verify Prerequisites:** Ensure your tenant is set up for Android Enterprise. You will need a managed Google Play account connected to your Intune environment.
+2. **Configure Enrollment Profile:** Create an enrollment profile in the Intune admin center, selecting either *Android Enterprise Dedicated* or *Fully Managed* depending on your use case.
+3. **Initiate Device Enrollment:** Follow the device-specific enrollment process provided by the XR manufacturer. This typically involves connecting to the corporate Wi-Fi and using a QR code generated during the profile creation step in Intune.
+4. **Validation:** Once the device successfully enrolls, it should appear in the Intune admin center under the "Devices" tab, where you can monitor its enrollment status and health.
+
+The key to a successful rollout is consistency. Treat XR devices as you would any other Android-managed endpoint; avoid creating specialized policies unless the device’s specific capabilities mandate it.
+
+---
+
+## Application and Policy Management
+
+Deployment of applications is handled through the managed Google Play store, just like any other enterprise Android device. You can push specific applications required for the XR experience by adding them to your managed Google Play store and assigning them to the relevant groups in Intune.
+
+When it comes to policies, focus on:
+- **Security Policies:** Ensure devices are encrypted, passcodes are enforced, and remote wipe capabilities are active.
+- **Compliance Policies:** Define thresholds for device health, such as ensuring minimum OS versions or enforcing specific configurations.
+
+Keep in mind that while core management is the same, user interaction on XR devices differs significantly from traditional phones or tablets. Test your policies on a pilot group of XR devices to ensure they do not unintentionally break the specific user experiences these devices provide.
+
+---
+
+## Known Limitations and Considerations
+
+While the support for Android XR is a significant step forward, it is currently in its early stages. Engineers should be aware of a few nuances:
+
+- **Specific Scenario Support:** Not all Android Enterprise features may be available on every XR device. Check the manufacturer's documentation for any device-specific limitations.
+- **Testing:** Always prioritize testing within a controlled lab environment. XR devices can have different hardware configurations and sensor requirements that might influence how policies are applied.
+- **Ongoing Updates:** As support matures, keep an eye on Microsoft's official blog and Intune documentation for updates regarding new features or expanded compatibility.
+
+---
+
+## Conclusion
+
+The introduction of Android XR management support within Microsoft Intune is a welcome addition, simplifying the integration of immersive devices into enterprise workflows. By utilizing established Android Enterprise management patterns, engineers can confidently secure and manage these devices alongside their existing fleet. As with any new technology, start with a phased rollout and thorough validation to ensure a seamless experience for your end users.
