@@ -1,0 +1,132 @@
+---
+title: "Windows Hotpatch via Intune: Deploy Security Updates Without Reboots"
+slug: "windows-hotpatch-intune-guide-2026"
+description: "Windows Hotpatch is now the default for Intune-managed devices starting May 2026. Here's what it actually does, what your devices need to qualify, and how to configure it before Microsoft flips the switch."
+publishedAt: "2026-04-09"
+updatedAt: "2026-04-09"
+pillar: desktop-engineering
+difficulty: mid
+type: how-to
+tags: ["windows-hotpatch", "microsoft-intune", "windows-update", "endpoint-management", "windows-autopatch", "quality-updates", "desktop-engineering"]
+draft: false
+---
+
+Microsoft is enabling Windows Hotpatch by default for all eligible Intune-managed devices starting with the May 2026 security update. If you haven't looked at your quality update policies yet, now is the time. Eligible devices will start receiving reboot-free security patches automatically unless you've explicitly configured your policies or opted out at the tenant level.
+
+This article explains how hotpatch works, what your devices need to qualify, how to enable or block it in Intune, and the gotchas that will catch you if you don't plan ahead.
+
+---
+
+## What Hotpatch Actually Does
+
+The name is a bit misleading. Hotpatch doesn't apply updates while your device is mid-task like some kind of surgical procedure. What it does is inject security fixes directly into running processes in memory, meaning the update takes effect immediately without requiring a reboot to complete.
+
+Traditionally, a security update modifies files on disk, then waits for a reboot to swap out the old files for the patched ones. Until that reboot happens, the vulnerable code is still in memory and still running. Hotpatch skips the disk-write-and-reboot dance by patching the in-memory code directly. The device gets the fix right now, running processes included.
+
+This matters for two reasons. First, security posture: devices are protected from the moment the patch applies, not after the user finally clicks "restart." Second, user experience: no restart prompt, no interruption, no support tickets about update pop-ups.
+
+The tradeoff is that hotpatch only works for security updates, not feature updates or cumulative quality improvements. And it doesn't work every month.
+
+---
+
+## The Baseline Month Cycle
+
+Here's the part that trips people up. Hotpatch doesn't replace your monthly restarts entirely. It runs on a quarterly baseline cycle.
+
+Four times a year (January, April, July, October), devices receive a full cumulative update that requires a restart. These are called **baseline months**. Think of them as the foundation that hotpatch builds on. During the other eight months of the year (the hotpatch months), security-only fixes are applied in-memory without a restart.
+
+So in practice: your devices will restart once per quarter for the baseline, then get eight months of quiet security patching with no user disruption.
+
+April 2026 is a baseline month. That means devices are getting a full CU restart right now, and starting in May, hotpatch takes over for the next two months before the next baseline in July.
+
+If your organization is about to have hotpatch enabled by default and you haven't communicated the quarterly restart to your users yet, do that before July.
+
+---
+
+## What Your Devices Need to Qualify
+
+Not every Windows device is eligible for hotpatch. Here's what actually needs to be true before Intune will deliver a hotpatch update to a device.
+
+**OS version:** Windows 11, version 24H2 or later. Devices still on 22H2 or 23H2 won't qualify. If your fleet hasn't moved to 24H2, hotpatch won't apply to those devices regardless of what your policies say.
+
+**License:** One of the following: Windows 11 Enterprise E3 or E5, Microsoft 365 E3 or E5, Microsoft 365 F3, Windows 11 Education A3 or A5, Microsoft 365 Business Premium, or Windows 365 Enterprise.
+
+**Virtualization-Based Security (VBS):** Must be enabled. VBS is required for hotpatch to function because it underpins the memory protection mechanisms that make in-memory patching safe. On most modern corporate hardware this is already on, but if your devices have it disabled in BIOS or via policy, those devices fall back to standard update behavior.
+
+**ARM64 devices:** If you have Surface Pro X, Copilot+ PCs, or any other ARM64 device, there's an extra step. Compiled Hybrid PE (CHPE) usage must be disabled before hotpatch will apply. This requires setting a registry flag and restarting the device once to take effect. After that, hotpatch works normally.
+
+**Baseline is current:** Devices must have the latest quarterly baseline installed. A device that skipped April's baseline won't be eligible for May's hotpatch.
+
+---
+
+## How to Configure Hotpatch in Intune
+
+Hotpatch is controlled through Windows quality update policies in the Intune admin center.
+
+Go to **Devices > Windows updates > Quality updates tab > Create > Windows quality update policy**. Under the Settings section, you'll see the option: **"When available, apply without restarting the device ('Hotpatch')"** -- set it to **Allow** to enable hotpatch, or **Block** for standard restart behavior. Assign the policy to your device groups.
+
+**The default behavior from May 2026:** Any device not assigned to a quality update policy will have hotpatch enabled automatically by the tenant-level default. If you want to preserve standard behavior for unassigned devices, create and assign a policy with hotpatch set to Block, or use the tenant-level opt-out setting.
+
+**Tenant-level opt-out:** The opt-out control became available in the Intune admin center on April 1, 2026. If your organization isn't ready for hotpatch at all, this lets you block it globally without touching individual policies. The deadline to opt out before the first hotpatch update hits is **May 11, 2026**. After that, eligible unassigned devices start receiving hotpatch updates.
+
+---
+
+## What Happens to Ineligible Devices
+
+Devices that don't meet the hotpatch prerequisites don't get stuck or error out. Intune simply falls back to standard quality update behavior for those devices. They'll get the same security content, delivered via the normal disk-write-and-restart method.
+
+The reporting in Intune will show which devices received a hotpatch update versus a standard update. Look at **Devices > Monitor > Windows quality update report** to see the breakdown.
+
+If you're seeing a higher-than-expected number of devices falling back, the most common reasons are: still on 23H2 or earlier, VBS disabled via BIOS or policy, ARM64 devices with CHPE still enabled, or a license gap where a device was enrolled without an E3/E5 license assigned.
+
+Run this Graph query to identify devices not yet on 24H2:
+
+```
+GET https://graph.microsoft.com/v1.0/deviceManagement/managedDevices?$filter=operatingSystem eq 'Windows' and osVersion lt '10.0.26100'&$select=deviceName,osVersion,userPrincipalName
+```
+
+---
+
+## Practical Deployment Checklist
+
+Before May 11, work through this list.
+
+**Assess your fleet baseline:** Check how many devices are on Windows 11 24H2 in the Intune admin center under Devices > All devices, filtered by OS version. If a significant chunk of your fleet is below 24H2, hotpatch won't affect those devices but you should have a plan for getting them there.
+
+**Review existing quality update policies:** If you already have quality update policies deployed, verify their hotpatch settings. Policies created before hotpatch became prominent may not have this configured explicitly. Open each policy and confirm whether hotpatch is set to Allow or Block.
+
+**Check VBS status:** Use Endpoint Analytics or a device compliance report to verify VBS is enabled across your fleet. If you have a policy that disables Secure Boot or VBS, fix that first.
+
+**Handle ARM64 devices separately:** If you have ARM64 devices and want them on hotpatch, create a separate policy and document the CHPE disable step. You'll need to push a registry change and restart those devices once before they're eligible.
+
+**Communicate the quarterly restart:** Users accustomed to monthly restarts will see fewer prompts overall. But the baseline months (starting with July 2026) will still require a restart. Set expectations early so your helpdesk doesn't get flooded with "is my computer broken?" tickets in July.
+
+**Decide on opt-out:** If your organization has compliance requirements that mandate traditional patch validation before deployment, use the tenant-level opt-out or a Block policy to preserve that workflow.
+
+---
+
+## Limitations Worth Knowing
+
+Hotpatch only applies to Monthly B security updates. It doesn't deliver feature updates, non-security quality improvements, or cumulative preview updates. Those still require the traditional update path.
+
+Government cloud tenants (GCC, GCC High, DoD) are not supported for hotpatch. Hotpatch is not supported for Windows 11 Home or Windows 10 -- it's Enterprise and Business licensing only.
+
+If a device gets patched via hotpatch and something breaks, rollback is not straightforward. You can't "un-hotpatch" a device without rolling back the entire security update. Plan your testing accordingly for any critical applications.
+
+Third-party application compatibility is generally not a concern since hotpatch only modifies Windows OS code, not application code. But if your environment has deep kernel hooks (security agents, DLP tools, EDR platforms), test with those vendors before broad rollout.
+
+---
+
+## The Real Value for Desktop Engineers
+
+The user-experience improvement gets the headline attention, but the operational value is more interesting. With hotpatch, your critical security patches have a shorter window between "released" and "deployed." Under the old model, a device only gets protected after it reboots. Under hotpatch, the fix is live the moment the patch applies.
+
+For any organization measuring patch compliance as "percentage of devices protected against critical CVEs within X days," hotpatch improves that metric without changing anything about your deployment schedule. The patch applies, the device is protected, no restart required.
+
+The quarterly baseline model does mean you still have a restart story to manage. But four scheduled restarts per year at a predictable cadence is operationally cleaner than monthly prompts that users dismiss until they stop bothering.
+
+If your organization is running Windows Autopatch, hotpatch is already integrated into the ring-based deployment flow. For organizations managing quality updates directly through Intune without Autopatch, the steps above give you the same coverage.
+
+---
+
+The window to act before Microsoft's default kicks in is short. If you haven't built a quality update policy with explicit hotpatch settings, now is when to do it. Check your 24H2 coverage, verify VBS, handle your ARM64 edge cases, and either allow hotpatch or opt out intentionally before May 11.
